@@ -63,7 +63,7 @@
   position: relative;
   left: 7%;
   width: 86%;
-  margin-bottom: 5%;
+  margin-bottom: 7%;
   margin-top: 2%;
 }
 
@@ -151,4 +151,11 @@
 
 .destination-rating .destination-text {
   font-size: medium;
+}
+
+.pick-image{
+  width: 86%;
+  margin-left: 7%;
+  border-radius: var(--br-3xs);
+  margin-top: 2%;
 }
