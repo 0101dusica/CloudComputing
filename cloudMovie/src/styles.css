@@ -1,1 +1,149 @@
-/* You can add global styles to this file, and also import other style files */
+
+html,body {
+    margin: 0;
+    height: 100%;
+    line-height: normal;
+  }
+  
+  .popup-overlay {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+  }
+  
+  :root {
+    /* fonts */
+    --font-sansation: Sansation;
+    --font-adamina: Adamina;
+    --font-roboto: Roboto;
+    --body-small-bold: "Plus Jakarta Sans";
+    --font-inter: Inter;
+    --font-inherit: inherit;
+  
+    /* font sizes */
+    --font-size-mini: 15px;
+    --font-size-base: 16px;
+    --font-size-xl: 20px;
+    --font-size-sm: 14px;
+    --body-small-bold-size: 12px;
+    --font-size-2xs: 11px;
+    --font-size-smi: 13px;
+    --font-size-13xl: 32px;
+    --font-size-5xl: 24px;
+    --font-size-lg: 18px;
+    --font-size-9xl: 28px;
+    --font-size-109xl: 128px;
+    --font-size-3xs: 10px;
+    --font-size-smi-5: 12.5px;
+    --font-size-29xl: 48px;
+  
+    /* Colors */
+    --color-white: #fff;
+    --color-firebrick: #bc1823;
+    --color-dimgray-100: #6e6d69;
+    --gray-2: #4f4f4f;
+    --color-gray-100: #878787;
+    --gray-3: #828282;
+    --color-gray-200: #2b2c28;
+    --color-gray-300: #1a1a1a;
+    --color-gray-400: #181818;
+    --color-gray-500: #101010;
+    --color-gray-600: rgba(0, 0, 0, 0.54);
+    --color-gray-700: rgba(0, 0, 0, 0.87);
+    --color-gray-800: rgba(255, 255, 255, 0);
+    --blue-1: #9e8d5f;
+    --color-tan-100: rgba(158, 141, 95, 0.7);
+    --color-tan-200: rgba(158, 141, 95, 0);
+    --color-seagreen-100: #037940;
+    --color-whitesmoke-100: #f4f4f4;
+    --gray-6: #f2f2f2;
+    --color-whitesmoke-200: #eee;
+    --color-whitesmoke-300: #ececec;
+    --color-whitesmoke-400: #ebebeb;
+    --color-whitesmoke-500: #e6e9ed;
+    --color-darkslategray-100: #37352f;
+    --color-darkslategray-200: #2a363d;
+    --gray-1: #333;
+    --color-darkslategray-300: #302f2a;
+    --components-border-color: #e5e5e5;
+    --gray-5: #e0e0e0;
+    --color-gainsboro-100: #dededd;
+    --color-dodgerblue-100: #0077d8;
+    --color-dodgerblue-200: rgba(47, 128, 237, 0.05);
+    --color-dodgerblue-300: rgba(47, 128, 237, 0.1);
+    --color-black: #000;
+    --color-orange: #fbbc04;
+    --color-lemonchiffon-100: #fff9c1;
+    --color-goldenrod: #ebc257;
+    --gray-4: #bdbdbd;
+    --color-silver-100: rgba(189, 189, 189, 0.5);
+    --color-silver-200: rgba(189, 189, 189, 0.45);
+    --color-lavenderblush: rgba(255, 239, 239, 0);
+    --color-indianred-100: #eb5757;
+    --red: #dd5555;
+    --orange: #f2994a;
+    --color-mediumslateblue: #4c4ddc;
+    --medium-grey: #929fad;
+    --color-midnightblue: #000033;
+    --color-lightgray-100: #cbcaca;
+    --color-darkgray-100: #9d9c9a;
+    --color-darkgray-200: #979694;
+  
+    /* Gaps */
+    --gap-7xs: 6px;
+    --gap-29xl: 48px;
+    --gap-sm: 14px;
+    --gap-3xs: 10px;
+    --gap-5xs: 8px;
+    --gap-xl: 20px;
+    --gap-31xl: 50px;
+    --gap-82xl: 101px;
+    --gap-xs: 12px;
+    --gap-11xs: 2px;
+    --gap-61xl: 80px;
+    --gap-11xl: 30px;
+    --gap-12xs: 1px;
+    --gap-9xs: 4px;
+    --gap-2xs: 11px;
+    --gap-21xl: 40px;
+  
+    /* Paddings */
+    --padding-xs: 12px;
+    --padding-lg: 18px;
+    --padding-3xs: 10px;
+    --padding-9xs: 4px;
+    --padding-5xs: 8px;
+    --padding-2xs: 11px;
+    --padding-sm: 14px;
+    --padding-10xs: 3px;
+    --padding-13xl: 32px;
+    --padding-11xs: 2px;
+    --padding-base: 16px;
+    --padding-8xs-5: 4.5px;
+    --padding-59xl-5: 78.5px;
+    --padding-50xl-5: 69.5px;
+    --padding-7xs-5: 5.5px;
+  
+    /* Border radiuses */
+    --br-3xs: 10px;
+    --br-7xs: 6px;
+    --br-8xs: 5px;
+    --br-xl: 20px;
+    --br-xs-5: 11.5px;
+    --br-9xs: 4px;
+    --br-5xs: 8px;
+    --br-7xl: 26px;
+    --br-xs: 12px;
+    --br-10xs: 3px;
+    --br-41xl: 60px;
+  
+    /* Effects */
+    --element-hover: 0px 2px 25px rgba(0, 0, 0, 0.07);
+  }
+  
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
