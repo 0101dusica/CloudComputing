@@ -5,13 +5,21 @@ import { FooterComponent } from './footer/footer.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { RouterModule } from '@angular/router';
 import { MovieDetailsComponent } from './movie-details/movie-details.component';
+import { HomeComponent } from './home/home.component';
+import { AdminNavComponent } from './nav-bar/admin-nav/admin-nav.component';
+import { UserNavComponent } from './nav-bar/user-nav/user-nav.component';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 @NgModule({
   declarations: [
     NavBarComponent,
     FooterComponent,
     MainPageComponent,
-    MovieDetailsComponent
+    MovieDetailsComponent,
+    HomeComponent,
+    AdminNavComponent,
+    UserNavComponent,
+    NotificationsComponent
   ],
   imports: [
     CommonModule,
@@ -20,7 +28,8 @@ import { MovieDetailsComponent } from './movie-details/movie-details.component';
   exports:[
     NavBarComponent,
     FooterComponent,
-    MainPageComponent
+    MainPageComponent,
+    HomeComponent
   ]
 })
 

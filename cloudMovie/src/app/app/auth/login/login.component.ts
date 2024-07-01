@@ -15,41 +15,26 @@ export class LoginComponent {
   }
 
   loginForm = new FormGroup({
-    username: new FormControl('', Validators.required),
+    email: new FormControl('', Validators.required),
     password: new FormControl('', Validators.required)
   })
 
-  login(): void {
-    const emailControl = this.loginForm.get('username');
+  onLogin() {
+    const emailControl = this.loginForm.get('email');
     const passwordControl = this.loginForm.get('password');
 
-    if (!emailControl || !passwordControl) {
-      console.error('Form controls not found');
-      return;
-    }
-
-    const emailValue = emailControl.value?.trim();
-    const passwordValue = passwordControl.value?.trim();
-
-    if (!emailValue || !passwordValue) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Incomplete Information',
-        text: 'Please enter both email and password.',
-      });
-      return;
-    }
-
-    if (emailValue == "admin" && passwordValue == "admin"){
-      this.router.navigate(['/']);
-    }else if (emailValue == "user" && passwordValue == "user"){
-      this.router.navigate(['/']);
-    }else{
-      Swal.fire({
-        icon: 'error',
-        title: 'Incorrect Information',
-        text: 'Email or password is not correct. Try again!',
-      });
+    if (emailControl && passwordControl) {
+      const email = emailControl.value?.trim();
+    const password = passwordControl.value?.trim();
+      console.log("Ovde proveravam ",email, " ", password);
+      if (email === 'admin' && password === 'admin') {
+        this.router.navigate(['/home', 0]);
+      } else if (email === 'user' && password === 'user') {
+        this.router.navigate(['/home', 1]);
+      } else {
+        // Handle invalid login
+        console.log('Invalid login');
+      }
     }
   }
 

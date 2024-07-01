@@ -1,0 +1,54 @@
+<header>
+    <div class="header-container">
+      <img class="logo" alt="" src="../../../../assets/logo-transparent.png" routerLink="/" style="cursor: pointer;"/>
+   
+      <div class="home-nav">
+        <div class="text">HOME</div>
+        <div class="text">|</div>
+        <div class="text">MOVIES</div>
+        <div class="text">|</div>
+        <div class="text">TV SHOWS</div>
+
+      </div>
+  
+        <div class="action-buttons">
+            <div class="icon-wrap">
+                <img class="icon" src="../../../../assets/search.png">
+            </div>
+
+            <img
+                class="notification-icon"
+                alt=""
+                src="../../../../../assets/bell-icon.png"
+                id="icon"
+                (click)="onNotificationIconClick()"
+                style="width: 20px; height: 20px; margin-right: 2%;"
+                />
+            <img
+                class="profile-icon"
+                alt=""
+                src="../../../../../assets/profile-picture-user.jpg"
+                id="profile-picture-admin"
+                (click)="onProfilePictureClick()"
+            />
+        </div>
+    </div>
+    <div id="adminDropdownContainer" class="popup-overlay" *ngIf="isPopupVisible" (click)="onPopupClick($event)">
+        <div class="admin-dropdown">
+          <div class="nav-box" (click)="navigateTo('/')">
+             <img class="nav-icon" alt="" src="../../../../../assets/subscribe-icon.png" />
+             <div class="nav-text">All Subscriptions</div>
+          </div>
+  
+          <div class="nav-box" (click)="logOut()">
+             <img class="nav-icon" alt="" src="../../../../../assets/logout-icon.svg" />
+             <div class="nav-text">Sign out</div>
+          </div>
+       </div>
+  
+    </div>
+
+    <div class="popup-overlay" *ngIf="isNotificationVisible" (click)="onNotificationPopupClick($event)">
+        <app-notifications></app-notifications>
+    </div>
+</header>

@@ -3,9 +3,6 @@
     <body>
         <div class="background">
             <div class="login-container">   
-                <div class="logo">
-                    <img src="../../../../assets/logo-transparent.png" alt="Netflix">
-                </div>
                 <form class="login-form">
                     <h2>Create Your Account</h2>
                     <input type="text" placeholder="Enter first name here.." required>
@@ -17,7 +14,7 @@
                     <button type="submit" (click)="register()">Register</button>
                 </form>
                 <div class="signup">
-                    <p>New to SkyStream? <a [routerLink]="['/login']">Register now</a></p>
+                    <p>Already have account ? <a [routerLink]="['/login']">Sign in</a></p>
                 </div>
             </div>
         </div>

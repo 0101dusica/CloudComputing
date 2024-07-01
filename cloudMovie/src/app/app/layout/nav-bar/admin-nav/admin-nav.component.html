@@ -1,0 +1,57 @@
+<header>
+    <div class="header-container">
+      <img class="logo" alt="" src="../../../../assets/logo-transparent.png" routerLink="/" style="cursor: pointer;"/>
+   
+      <div class="home-nav">
+        <div class="text">HOME</div>
+        <div class="text">|</div>
+        <div class="text">MOVIES</div>
+        <div class="text">|</div>
+        <div class="text">TV SHOWS</div>
+
+      </div>
+  
+      <div class="action-buttons">
+        <div class="icon" style="margin-right: 3%;">
+          <img class="icon" src="../../../../assets/search.png">
+        </div>
+        <div class="text">EN ▼</div>
+            <img
+                class="profile-icon"
+                alt=""
+                src="../../../../../assets/profile-picture.jpg"
+                id="profile-picture-admin"
+                (click)="onProfilePictureClick()"
+            />
+        </div>
+    </div>
+    <div id="adminDropdownContainer" class="popup-overlay" *ngIf="isPopupVisible" (click)="onPopupClick($event)">
+        <div class="admin-dropdown">
+          <div class="nav-box" (click)="navigateTo('/')">
+             <img class="nav-icon" alt="" src="../../../../../assets/movie-icon.png" />
+             <div class="nav-text">Add New Film</div>
+          </div>
+  
+          <div class="nav-box" (click)="navigateTo('/accommodation-requests')">
+             <img class="nav-icon" alt="" src="../../../../../assets/show-icon.png" />
+             <div class="nav-text">Add New TV Show</div>
+          </div>
+  
+          <div class="nav-box" (click)="navigateTo('/')">
+             <img class="nav-icon" alt="" src="../../../../../assets/episode-icon.png" />
+             <div class="nav-text">Add New Episode</div>
+          </div>
+  
+          <div class="nav-box" (click)="navigateTo('/')">
+             <img class="nav-icon" alt="" src="../../../../../assets/user-icon.png" />
+             <div class="nav-text">Add People</div>
+          </div>
+  
+          <div class="nav-box" (click)="logOut()">
+             <img class="nav-icon" alt="" src="../../../../../assets/logout-icon.svg" />
+             <div class="nav-text">Sign out</div>
+          </div>
+       </div>
+  
+      </div>
+</header>
