@@ -1,1 +1,36 @@
-<p>add-new-people works!</p>
+<div class="main">
+    <app-nav-bar [id]="0"></app-nav-bar>
+
+    <div class="container">
+      <label class="title">Person Informations</label>
+      <form (ngSubmit)="onSubmit()" style="margin-top: 2%;">
+        <div class="form-group">
+          <label for="thumbnail">Image</label>
+          <input type="file" id="thumbnail" (change)="onFileSelected($event, 'thumbnail')" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" [(ngModel)]="person.firstName" name="firstName" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" [(ngModel)]="person.lastName" name="lastName" class="form-control" required />
+          </div>
+        <div class="form-group">
+          <label for="year">Year of Birth</label>
+          <input type="number" id="year" [(ngModel)]="person.yearofBirth" name="year" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Select Type of Person</label>
+            <div class="options-wrap">
+                <div class="option-box" *ngFor="let type of type">
+                <input type="checkbox" [id]="type" [value]="type" (change)="onCheckboxChange($event)"/> <!-- osoba moze da bude i glumac i reziser u isto vreme ? -->
+                <label class="options" [for]="type">{{ type }}</label>
+                </div>
+            </div>
+          </div>
+        <button type="submit" class="btn btn-primary">Add TV Show</button>
+      </form>
+    </div>
+</div>
+
