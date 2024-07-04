@@ -2,13 +2,18 @@
     <app-nav-bar [id]="0"></app-nav-bar>
 
     <div class="container">
-      <form (ngSubmit)="onSubmit()">
+      <label class="title">Movie Informations</label>
+      <form (ngSubmit)="onSubmit()" style="margin-top: 2%;">
         <div class="form-group">
           <label for="thumbnail">Thumbnail</label>
           <input type="file" id="thumbnail" (change)="onFileSelected($event, 'thumbnail')" class="form-control" />
         </div>
         <div class="form-group">
-          <label for="video">Video</label>
+          <label for="video">Trailer</label>
+          <input type="file" id="trailer" (change)="onFileSelected($event, 'trailer')" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="video">Movie</label>
           <input type="file" id="video" (change)="onFileSelected($event, 'video')" class="form-control" />
         </div>
         <div class="form-group">
