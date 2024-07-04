@@ -14,6 +14,7 @@ import { AddNewMovieComponent } from './add-new-movie/add-new-movie.component';
 import { AddNewTvShowComponent } from './add-new-tv-show/add-new-tv-show.component';
 import { AddNewEpisodeComponent } from './add-new-episode/add-new-episode.component';
 import { AddNewPeopleComponent } from './add-new-people/add-new-people.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { AddNewPeopleComponent } from './add-new-people/add-new-people.component
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule
   ],
   exports:[
     NavBarComponent,
