@@ -9,6 +9,12 @@ import { HomeComponent } from './home/home.component';
 import { AdminNavComponent } from './nav-bar/admin-nav/admin-nav.component';
 import { UserNavComponent } from './nav-bar/user-nav/user-nav.component';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { AllSubscriptionsComponent } from './all-subscriptions/all-subscriptions.component';
+import { AddNewMovieComponent } from './add-new-movie/add-new-movie.component';
+import { AddNewTvShowComponent } from './add-new-tv-show/add-new-tv-show.component';
+import { AddNewEpisodeComponent } from './add-new-episode/add-new-episode.component';
+import { AddNewPeopleComponent } from './add-new-people/add-new-people.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -19,11 +25,17 @@ import { NotificationsComponent } from './notifications/notifications.component'
     HomeComponent,
     AdminNavComponent,
     UserNavComponent,
-    NotificationsComponent
+    NotificationsComponent,
+    AllSubscriptionsComponent,
+    AddNewMovieComponent,
+    AddNewTvShowComponent,
+    AddNewEpisodeComponent,
+    AddNewPeopleComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule
   ],
   exports:[
     NavBarComponent,

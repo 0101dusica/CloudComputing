@@ -12,10 +12,9 @@
       </div>
   
       <div class="action-buttons">
-        <div class="icon" style="margin-right: 3%;">
+        <div class="icon" style="margin-right: 5%;">
           <img class="icon" src="../../../../assets/search.png">
         </div>
-        <div class="text">EN ▼</div>
             <img
                 class="profile-icon"
                 alt=""
@@ -27,22 +26,22 @@
     </div>
     <div id="adminDropdownContainer" class="popup-overlay" *ngIf="isPopupVisible" (click)="onPopupClick($event)">
         <div class="admin-dropdown">
-          <div class="nav-box" (click)="navigateTo('/')">
+          <div class="nav-box" (click)="navigateTo('/add-new-movie')">
              <img class="nav-icon" alt="" src="../../../../../assets/movie-icon.png" />
-             <div class="nav-text">Add New Film</div>
+             <div class="nav-text">Add New Movie</div>
           </div>
   
-          <div class="nav-box" (click)="navigateTo('/accommodation-requests')">
+          <div class="nav-box" (click)="navigateTo('/add-new-tv-show')">
              <img class="nav-icon" alt="" src="../../../../../assets/show-icon.png" />
              <div class="nav-text">Add New TV Show</div>
           </div>
   
-          <div class="nav-box" (click)="navigateTo('/')">
+          <div class="nav-box" (click)="navigateTo('/add-new-episode')">
              <img class="nav-icon" alt="" src="../../../../../assets/episode-icon.png" />
              <div class="nav-text">Add New Episode</div>
           </div>
   
-          <div class="nav-box" (click)="navigateTo('/')">
+          <div class="nav-box" (click)="navigateTo('/add-new-people')">
              <img class="nav-icon" alt="" src="../../../../../assets/user-icon.png" />
              <div class="nav-text">Add People</div>
           </div>
