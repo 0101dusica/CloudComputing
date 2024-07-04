@@ -10,6 +10,7 @@ import { AddNewTvShowComponent } from './app/layout/add-new-tv-show/add-new-tv-s
 import { AddNewMovieComponent } from './app/layout/add-new-movie/add-new-movie.component';
 import { AddNewEpisodeComponent } from './app/layout/add-new-episode/add-new-episode.component';
 import { AddNewPeopleComponent } from './app/layout/add-new-people/add-new-people.component';
+import { TvShowDetailsComponent } from './app/layout/tv-show-details/tv-show-details.component';
 
 const routes: Routes = [
   { path: '', component: MainPageComponent },
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'movie-details', component: MovieDetailsComponent },
+  { path: 'tv-show-details', component: TvShowDetailsComponent },
   { path: 'all-subscriptions', component: AllSubscriptionsComponent },
   { path: 'add-new-movie', component: AddNewMovieComponent },
   { path: 'add-new-tv-show', component: AddNewTvShowComponent },

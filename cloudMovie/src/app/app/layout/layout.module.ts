@@ -15,6 +15,7 @@ import { AddNewTvShowComponent } from './add-new-tv-show/add-new-tv-show.compone
 import { AddNewEpisodeComponent } from './add-new-episode/add-new-episode.component';
 import { AddNewPeopleComponent } from './add-new-people/add-new-people.component';
 import { FormsModule } from '@angular/forms';
+import { TvShowDetailsComponent } from './tv-show-details/tv-show-details.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { FormsModule } from '@angular/forms';
     AddNewMovieComponent,
     AddNewTvShowComponent,
     AddNewEpisodeComponent,
-    AddNewPeopleComponent
+    AddNewPeopleComponent,
+    TvShowDetailsComponent
   ],
   imports: [
     CommonModule,
