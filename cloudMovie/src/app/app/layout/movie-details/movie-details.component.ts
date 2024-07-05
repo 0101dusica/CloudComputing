@@ -21,6 +21,8 @@ export class MovieDetailsComponent implements OnInit {
 
   @ViewChild('bgVideo') bgVideo: ElementRef<HTMLVideoElement> | undefined;
   isImageVisible = false;
+  isUserRated = false;
+  rate: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,7 +50,8 @@ export class MovieDetailsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log(`User rated: ${result}`);
+        this.rate = result;
+        this.isUserRated = true;
       }
     });
   }
