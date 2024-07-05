@@ -1,4 +1,5 @@
 export interface Movie {
+    movieId:string;
     fileName: string;
     contentType: string;
     fileSize: string;
@@ -8,5 +9,6 @@ export interface Movie {
     director: string;
     genres: string[];
     duration: string;
-    fileContent: string;
+    createdAt: string;
+    updatedAt:string;
 }

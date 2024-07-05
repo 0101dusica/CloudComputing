@@ -3,11 +3,11 @@
       <source src="../../../../assets/trailer-1.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
-         
+
     <div class="main-content">
       <div class="content">
         <h1 [routerLink]="['/']">SKY STREAM</h1>
-        <h2>Quantumania</h2>
+        <h2>{{movie?.title}}</h2>
         <div class="info">
             <img src="../../../../assets/imdb-icon.png" class="logo">
             <span>6.1</span>
@@ -17,18 +17,16 @@
             <span>18+</span>
         </div>
         <p class="description">
-          One victim, found dead on a London street. Four detectives, in four different time periods, must solve the mystery to protect Britain's future.
+            {{movie?.description}}
         </p>
         <div class="tags">
-          <span>Crime</span>
-          <span>Drama</span>
-          <span>History</span>
+                  <span *ngFor="let genre of movie?.genres">{{ genre }}</span>
+
         </div>
         <div class="actions">
           <button (click)="notImplemented()">Watch Now</button>
-          <button (click)="notImplemented()">+ Watchlist</button>
+          <button (click)="downloadMovie()">Download</button>
         </div>
       </div>
     </div>
   </div>
-  

@@ -4,6 +4,7 @@ import {Observable, of, switchMap} from "rxjs";
 import {env} from "../../../../env/env";
 import {HttpClient} from "@angular/common/http";
 import Decimal from "decimal.js";
+import {MovieService} from "../movie.service";
 
 @Component({
   selector: 'app-add-new-movie',
@@ -21,12 +22,14 @@ export class AddNewMovieComponent {
     director: "Tom",
     genres: [],
     duration: "",
-    fileContent: ""
+    movieId: "",
+    createdAt: "",
+    updatedAt: ""
   };
 
   selectedFile: File | null = null; // Variable to store the selected file
 
-  constructor(private http: HttpClient){}
+  constructor(private http: HttpClient, private movieService: MovieService){}
 
   genres = ['Action', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Romance', 'Sci-Fi', 'Thriller'];
   actors = ['Actor 1', 'Actor 2', 'Actor 3', 'Actor 4'];
@@ -52,8 +55,9 @@ export class AddNewMovieComponent {
       movieReader.onload = () => {
         const movieContent = movieReader.result as string;
         //Because movieContent starts with data:video/mp4;base64,{base64string}
-        this.movie.fileContent = movieContent.split(',')[1];
-        this.uploadMovieService(this.movie)
+
+
+        this.movieService.uploadMovie(this.movie,movieContent)
                 .subscribe(() => {
                  alert('Movie uploaded successfully')
                 }, error => {

@@ -132,6 +132,33 @@ export class CloudProjectStack extends cdk.Stack {
     actorsTable.grantWriteData(uploadLambda);
     genresTable.grantWriteData(uploadLambda);
 
+    // Lambda function to GET all movies
+    const getMoviesLambda = new lambda.Function(this, 'getMovies', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'get_movies.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_MOVIE: moviesTable.tableName,
+      }
+    });
+
+    // Grant permissions to read from DynamoDB table
+    moviesTable.grantReadData(getMoviesLambda);
+
+
+    // Lambda function to GET a movie by ID
+    const getMovieByIdLambda = new lambda.Function(this, 'getMovieById', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'get_movie_by_id.handler', // Promeniti na stvarni handler naziv
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_MOVIE: moviesTable.tableName,
+      }
+    });
+
+    // Grant permissions to read from DynamoDB table
+    moviesTable.grantReadData(getMovieByIdLambda);
+
      // Lambda function to UPDATE a short film
      const updateLambda = new lambda.Function(this, 'update', {
       runtime: lambda.Runtime.PYTHON_3_9,
@@ -248,6 +275,16 @@ export class CloudProjectStack extends cdk.Stack {
     // Integrate upload lambda with API Gateway
     const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
     api.root.addResource('upload').addMethod('POST', uploadIntegration);
+
+    const getMoviesIntegration = new apigateway.LambdaIntegration(getMoviesLambda);
+    const moviesResource = api.root.addResource('movies');
+    moviesResource.addMethod('GET', getMoviesIntegration);
+
+    // Integrate getMovieById lambda with API Gateway
+    const getMovieByIdIntegration = new apigateway.LambdaIntegration(getMovieByIdLambda);
+    const movieByIdResource = moviesResource.addResource('{movieId}');
+    movieByIdResource.addMethod('GET', getMovieByIdIntegration);
+
 
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
