@@ -16,8 +16,13 @@ import { AddNewEpisodeComponent } from './add-new-episode/add-new-episode.compon
 import { AddNewPeopleComponent } from './add-new-people/add-new-people.component';
 import { FormsModule } from '@angular/forms';
 import {HttpClientModule} from "@angular/common/http";
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio';
 import { TvShowDetailsComponent } from './tv-show-details/tv-show-details.component';
 import { SearchComponent } from './search/search.component';
+import { ReviewDialogComponent } from './review-dialog/review-dialog.component';
 
 @NgModule({
   declarations: [
@@ -35,19 +40,24 @@ import { SearchComponent } from './search/search.component';
     AddNewEpisodeComponent,
     AddNewPeopleComponent,
     TvShowDetailsComponent,
-    SearchComponent
+    SearchComponent,
+    ReviewDialogComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatRadioModule,
   ],
   exports:[
     NavBarComponent,
     FooterComponent,
     MainPageComponent,
-    HomeComponent
+    HomeComponent,
   ]
 })
 

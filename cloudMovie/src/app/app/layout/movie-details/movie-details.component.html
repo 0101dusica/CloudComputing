@@ -1,36 +1,42 @@
+
+
 <div class="container" [ngClass]="{'background-image': isImageVisible}">
-    <video id="bgVideo" autoplay muted loop (timeupdate)="checkVideoTime()" #bgVideo>
-      <source src="../../../../assets/trailer-1.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-
-    <div class="main-content">
-      <div class="content">
-        <h1 [routerLink]="['/']">SKY STREAM</h1>
-        <h2>{{movie?.title}}</h2>
-        <div class="info">
-            <img src="../../../../assets/imdb-icon.png" class="logo">
-            <span>6.1</span>
-            <span>|</span>
-            <span>2023</span>
-            <span>|</span>
-            <span>18+</span>
-        </div>
-        <p class="description">
-            {{movie?.description}}
-        </p>
-        <div class="tags">
-                  <span *ngFor="let genre of movie?.genres">{{ genre }}</span>
-
-        </div>
-        <div class="actions">
-            <button (click)="downloadMovie()">Download</button>
-<button (click)="deleteMovie()">Delete Movie</button>
-
-        <button (click)="watchNow()">Watch Now</button>
-          <button (click)="notImplemented()">+ Watchlist</button>
-
-        </div>
+  <video id="bgVideo" autoplay muted loop (timeupdate)="checkVideoTime()" #bgVideo>
+    <source src="../../../../assets/trailer-1.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+        
+  <div class="main-content">
+    <div class="content">
+      <div class="popup-overlay" *ngIf="isNotificationVisible" (click)="onNotificationPopupClick($event)">
+        <app-review-dialog></app-review-dialog>
+      </div>
+      <h1>SKY STREAM</h1>
+      <h2>{{movie?.title}}</h2>
+      <div class="info">
+          <img src="../../../../assets/imdb-icon.png" class="logo">
+          <span>6.1</span>
+          <span>|</span>
+          <span>2023</span>
+          <span>|</span>
+          <span>18+</span>
+      </div>
+      <p class="description">
+        {{movie?.description}}
+      </p>
+      <div class="tags">
+        <span *ngFor="let genre of movie?.genres">{{ genre }}</span>
+      </div>
+      <div class="actions" style="margin-bottom: 5%;">
+        <button (click)="watchNow()">Play</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="notImplemented()">+ Subscribe</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onNotificationIconClick()">Add Review</button>  
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="downloadMovie()">Download</button>
+      </div>
+      <div class="actions">
+        <button (click)="deleteMovie()">Delete</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-movie']">Edit</button>
       </div>
     </div>
   </div>
+</div>
