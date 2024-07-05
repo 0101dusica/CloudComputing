@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MovieService } from '../movie.service';
 import { Movie } from '../movie';
 import { Location } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
 
 @Component({
   selector: 'app-movie-details',
@@ -10,6 +12,8 @@ import { Location } from '@angular/common';
   styleUrls: ['./movie-details.component.css']
 })
 export class MovieDetailsComponent implements OnInit {
+  
+  isNotificationVisible = false;
   movie: Movie | undefined;
   notImplemented() {
     throw new Error('Method not implemented.');
@@ -17,13 +21,40 @@ export class MovieDetailsComponent implements OnInit {
 
   @ViewChild('bgVideo') bgVideo: ElementRef<HTMLVideoElement> | undefined;
   isImageVisible = false;
+  isUserRated = false;
+  rate: number = 0;
 
   constructor(
     private route: ActivatedRoute,
     private movieService: MovieService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private dialog: MatDialog
   ) {}
+
+  onNotificationIconClick(): void {
+    this.isNotificationVisible = !this.isNotificationVisible;
+    this.addReview(); // Ensure the dialog is opened here
+  }
+
+  onNotificationPopupClick(event: Event): void {
+    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
+       this.isNotificationVisible = false;
+    }
+  }
+
+  addReview(): void {
+    const dialogRef = this.dialog.open(ReviewDialogComponent, {
+      panelClass: 'popup-overlay'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.rate = result;
+        this.isUserRated = true;
+      }
+    });
+  }
 
   ngOnInit() {
     // Subscribe to both route params and query params

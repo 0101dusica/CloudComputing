@@ -1,4 +1,7 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface Episode {
   number: number;
@@ -13,8 +16,55 @@ interface Episode {
   templateUrl: './tv-show-details.component.html',
   styleUrls: ['./tv-show-details.component.css']
 })
-export class TvShowDetailsComponent {
+export class TvShowDetailsComponent implements OnInit {
+
+  isNotificationVisible = false;
   isImageVisible: boolean = true;
+  isUserRated = false;
+  rate: number = 0;
+  
+  constructor(private router: Router, 
+    private dialog: MatDialog) {}
+
+  ngOnInit(): void {
+    this.scrollToTop();
+
+    // Ensure the scroll to top occurs on every route change within this component
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.scrollToTop();
+      }
+    });
+  }
+
+  onNotificationIconClick(): void {
+    this.isNotificationVisible = !this.isNotificationVisible;
+    this.addReview(); // Ensure the dialog is opened here
+  }
+
+  onNotificationPopupClick(event: Event): void {
+    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
+       this.isNotificationVisible = false;
+    }
+  }
+
+  addReview(): void {
+    const dialogRef = this.dialog.open(ReviewDialogComponent, {
+      panelClass: 'popup-overlay'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.rate = result;
+        this.isUserRated = true;
+      }
+    });
+  }
+
+  scrollToTop() {
+    window.scrollTo(0, 0);
+  }
+  
 
   episodes: Episode[] = [
     { number: 1, image: '../../../../assets/episode-one.jpg', title: 'The Offer', description: 'While Haru Tawara develops a crush on a mysterious young woman at work, an unusual opportunity arises at his father\'s financially struggling brewery.', duration: '55m' },
