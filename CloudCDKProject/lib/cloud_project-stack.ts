@@ -259,7 +259,7 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
      // Lambda function to SEARCH a short film
      const searchLambda = new lambda.Function(this, 'search', {
       runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'serach.handler',
+      handler: 'search.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
         TABLE_NAME_MOVIE: moviesTable.tableName,

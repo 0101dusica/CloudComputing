@@ -12,7 +12,7 @@ export class SearchComponent {
     description: '',
     actors: '',
     directors: '',
-    genres: []
+    genres: ''
   };
 
   genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance'];
@@ -22,9 +22,11 @@ export class SearchComponent {
   constructor(private movieService: MovieService) { }
 
   searchMovies() {
+    console.log(this.searchCriteria)
     this.movieService.searchMovies(this.searchCriteria).subscribe(
       (movies: any[]) => {
         this.filteredMovies = movies;
+        console.log(movies)
       },
       error => {
         console.error('Error searching movies:', error);
