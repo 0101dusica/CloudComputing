@@ -1,1 +1,39 @@
-<p>all-subscriptions works!</p>
+<html>
+<body>
+    <div class="amenities-admin">
+        <div class="amenities-admin-child"></div>
+        <app-nav-bar [id]="1"></app-nav-bar>
+
+        <div class="main-content" id="main-content">
+          <b class="no-text" *ngIf="users.length === 0">NO RESULTS</b>
+          <div *ngFor="let user of users" class="acc-frame">
+              <img
+                class="accommodation-image"
+                alt=""
+                src={{user.photo}}
+              />
+
+              <div class="left-data">
+                  <b class="title">{{ user.firstName }} {{ user.lastName }}</b>
+
+                  <div class="location-frame">
+                    <div class="location-text"><b>Year of Birth: </b></div>
+                    <div class="location-text">{{ user.yearOfBirth }}</div>
+                  </div>
+
+                  <div class="location-frame">
+                    <img class="location-icon" alt="" src="../../../../assets/job-icon.png" />
+                    <div class="location-text">{{ user.type }}</div>
+                  </div>
+              </div>
+
+              <div class="right-buttons">
+                <div class="reject-button" id="reject-button" (click)="unsubscribe(user)">
+                    <b class="button-text">Unsubscribe</b>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+  </body>
+</html>
