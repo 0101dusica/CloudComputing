@@ -104,10 +104,10 @@ export class CloudProjectStack extends cdk.Stack {
       projectionType: ProjectionType.ALL,
     });
 
-    const reviewsTable = new Table(this, 'ReviewsTable', {
-      partitionKey: { name: 'reviewId', type: AttributeType.STRING },
+    const ratingsTable = new Table(this, 'RatingsTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
       sortKey: { name: 'movieId', type: AttributeType.STRING },
-      tableName: "cloud-project-review-table",
+      tableName: "cloud-project-rating-table",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
@@ -245,21 +245,21 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
 
 
     // Lambda function to DELETE a short film
-    const reviewLambda = new lambda.Function(this, 'review', {
+    const ratingLambda = new lambda.Function(this, 'rating', {
       runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'review.handler',
+      handler: 'rate_movie.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
-        TABLE_NAME_REVIEW:  reviewsTable.tableName,
+        TABLE_NAME_RATING:  ratingsTable.tableName,
       }
     });
 
-    reviewsTable.grantWriteData(reviewLambda);
+    ratingsTable.grantWriteData(ratingLambda);
 
      // Lambda function to SEARCH a short film
      const searchLambda = new lambda.Function(this, 'search', {
       runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'serach.handler',
+      handler: 'search.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
         TABLE_NAME_MOVIE: moviesTable.tableName,
@@ -320,6 +320,10 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
     api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
+
+    // Integrate rate_movie lambda with API Gateway
+    const ratingIntegration = new apigateway.LambdaIntegration(ratingLambda);
+    api.root.addResource('rate-movie').addMethod('POST', ratingIntegration);
   }
 }
 
