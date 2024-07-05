@@ -1,4 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 
 interface Episode {
   number: number;
@@ -13,8 +14,27 @@ interface Episode {
   templateUrl: './tv-show-details.component.html',
   styleUrls: ['./tv-show-details.component.css']
 })
-export class TvShowDetailsComponent {
+export class TvShowDetailsComponent implements OnInit {
+
   isImageVisible: boolean = true;
+  
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    this.scrollToTop();
+
+    // Ensure the scroll to top occurs on every route change within this component
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.scrollToTop();
+      }
+    });
+  }
+
+  scrollToTop() {
+    window.scrollTo(0, 0);
+  }
+  
 
   episodes: Episode[] = [
     { number: 1, image: '../../../../assets/episode-one.jpg', title: 'The Offer', description: 'While Haru Tawara develops a crush on a mysterious young woman at work, an unusual opportunity arises at his father\'s financially struggling brewery.', duration: '55m' },
