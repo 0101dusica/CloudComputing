@@ -10,12 +10,16 @@ import { AddNewTvShowComponent } from './app/layout/add-new-tv-show/add-new-tv-s
 import { AddNewMovieComponent } from './app/layout/add-new-movie/add-new-movie.component';
 import { AddNewEpisodeComponent } from './app/layout/add-new-episode/add-new-episode.component';
 import { AddNewPeopleComponent } from './app/layout/add-new-people/add-new-people.component';
+import { TvShowDetailsComponent } from './app/layout/tv-show-details/tv-show-details.component';
+import { SearchComponent } from './app/layout/search/search.component';
 
 const routes: Routes = [
   { path: '', component: MainPageComponent },
   { path: 'home/:id', component: HomeComponent },
+  { path: 'search', component: SearchComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'tv-show-details', component: TvShowDetailsComponent },
   { path: 'movie-details/:movieId', component: MovieDetailsComponent },
   { path: 'all-subscriptions', component: AllSubscriptionsComponent },
   { path: 'add-new-movie', component: AddNewMovieComponent },

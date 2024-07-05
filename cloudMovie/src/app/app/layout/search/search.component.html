@@ -1,0 +1,28 @@
+<html>
+    <body>
+        <app-nav-bar [id]="1"></app-nav-bar>
+        <div class="search-bar">
+            <input type="text" placeholder="Search by Title" [(ngModel)]="searchCriteria.title" (input)="searchMovies()" />
+            <input type="text" placeholder="Search by Description" [(ngModel)]="searchCriteria.description" (input)="searchMovies()" />
+            <input type="text" placeholder="Search by Actors" [(ngModel)]="searchCriteria.actors" (input)="searchMovies()" />
+            <input type="text" placeholder="Search by Directors" [(ngModel)]="searchCriteria.directors" (input)="searchMovies()" />
+            <div class="genre-select">
+              <div class="dropdown">
+                  <div class="dropbtn">Genres ▼</div>
+                      <select class="dropdown-content" id="genre" multiple [(ngModel)]="searchCriteria.genres" (change)="searchMovies()">
+                          <option *ngFor="let genre of genres">{{ genre }}</option>
+                      </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="movies-grid">
+              <div *ngFor="let movie of filteredMovies" class="movie-card">
+                <img [src]="movie.image" alt="{{ movie.title }}" />
+              </div>
+            </div>
+          </div>
+    </body>
+</html>
+

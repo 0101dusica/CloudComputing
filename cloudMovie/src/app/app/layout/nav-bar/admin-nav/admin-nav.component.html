@@ -3,16 +3,11 @@
       <img class="logo" alt="" src="../../../../assets/logo-transparent.png" routerLink="/" style="cursor: pointer;"/>
    
       <div class="home-nav">
-        <div class="text">HOME</div>
-        <div class="text">|</div>
-        <div class="text">MOVIES</div>
-        <div class="text">|</div>
-        <div class="text">TV SHOWS</div>
 
       </div>
   
       <div class="action-buttons">
-        <div class="icon" style="margin-right: 5%;">
+        <div class="icon" style="margin-right: 5%;" (click)="navigateTo('/search')">
           <img class="icon" src="../../../../assets/search.png">
         </div>
             <img
@@ -34,11 +29,6 @@
           <div class="nav-box" (click)="navigateTo('/add-new-tv-show')">
              <img class="nav-icon" alt="" src="../../../../../assets/show-icon.png" />
              <div class="nav-text">Add New TV Show</div>
-          </div>
-  
-          <div class="nav-box" (click)="navigateTo('/add-new-episode')">
-             <img class="nav-icon" alt="" src="../../../../../assets/episode-icon.png" />
-             <div class="nav-text">Add New Episode</div>
           </div>
   
           <div class="nav-box" (click)="navigateTo('/add-new-people')">

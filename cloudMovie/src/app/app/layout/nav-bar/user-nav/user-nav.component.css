@@ -45,6 +45,7 @@ header {
     flex-direction: row;
     height: 20px;
     margin-right: 5%;
+    cursor: pointer;
 }
 .icon{
     width: 20px;
