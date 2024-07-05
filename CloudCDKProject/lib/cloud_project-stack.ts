@@ -33,7 +33,7 @@ export class CloudProjectStack extends cdk.Stack {
             s3.HttpMethods.POST,
             s3.HttpMethods.DELETE,
           ],
-          allowedOrigins: ["http://localhost:4200"],
+          allowedOrigins: ["http://localhost:4201"],
           exposedHeaders: ["ETag"],
           maxAge: 3000,
         },
@@ -222,22 +222,22 @@ export class CloudProjectStack extends cdk.Stack {
     genresTable.grantReadData(searchLambda);
 
 
-    const seacrhPolicy = new PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['dynamodb:Query'],
-      resources: [
-        moviesTable.tableArn,
-        `${moviesTable.tableArn}/index/ind-title`,
-        `${moviesTable.tableArn}/index/ind-description`,
-        `${moviesTable.tableArn}/index/ind-director`,
-        `${moviesTable.tableArn}/index/ind-duration`,
-        genresTable.tableArn,
-        actorsTable.tableArn,
-         `${actorsTable.tableArn}/index/ind-actor`,
-        `${genresTable.tableArn}/index/ind-genre`      ],
-    });
-
-    searchLambda.addToRolePolicy(seacrhPolicy);
+    // const seacrhPolicy = new PolicyStatement({
+    //   effect: iam.Effect.ALLOW,
+    //   actions: ['dynamodb:Query'],
+    //   resources: [
+    //     moviesTable.tableArn,
+    //     `${moviesTable.tableArn}/index/ind-title`,
+    //     `${moviesTable.tableArn}/index/ind-description`,
+    //     `${moviesTable.tableArn}/index/ind-director`,
+    //     `${moviesTable.tableArn}/index/ind-duration`,
+    //     genresTable.tableArn,
+    //     actorsTable.tableArn,
+    //      `${actorsTable.tableArn}/index/ind-actor`,
+    //     `${genresTable.tableArn}/index/ind-genre`      ],
+    // });
+    //
+    // searchLambda.addToRolePolicy(seacrhPolicy);
 
     //                **************** API GATEWAY ***************** //
 
@@ -251,7 +251,7 @@ export class CloudProjectStack extends cdk.Stack {
 
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
-    api.root.addResource('download').addMethod('GET', downloadIntegration);
+    api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
   }
 }
 

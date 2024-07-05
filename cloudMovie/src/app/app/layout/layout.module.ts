@@ -15,6 +15,7 @@ import { AddNewTvShowComponent } from './add-new-tv-show/add-new-tv-show.compone
 import { AddNewEpisodeComponent } from './add-new-episode/add-new-episode.component';
 import { AddNewPeopleComponent } from './add-new-people/add-new-people.component';
 import { FormsModule } from '@angular/forms';
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     RouterModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   exports:[
     NavBarComponent,

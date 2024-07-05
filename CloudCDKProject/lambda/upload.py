@@ -2,6 +2,7 @@ import json
 import os
 import uuid
 import boto3
+import base64
 
 from datetime import datetime
 
@@ -17,6 +18,7 @@ def handler(event, context):
         file_name = body['fileName']
         content_type = body['contentType']
         file_size = body['fileSize']
+        file_content = body['fileContent']
         created_at = datetime.utcnow().isoformat()
         updated_at = datetime.utcnow().isoformat()
 
@@ -38,14 +40,9 @@ def handler(event, context):
         movie_id = str(uuid.uuid4())  # Identifier for DynamoDB and S3 bucket
 
         # Generate presigned URL for upload file to S3
-        if body['content']:
-            presigned_url = s3.generate_presigned_url(
-                'put_object',
-                Params={'Bucket': bucket_name, 'Key': movie_id},
-                ExpiresIn=3600
-            )
-        else:
-            presigned_url = ''
+
+        presigned_url = s3.generate_presigned_url('put_object', Params={'Bucket': bucket_name, 'Key': movie_id},
+                                                  ExpiresIn=3600)
 
         # Save metadata to DynamoDB
         dynamodb.Table(table_name).put_item(
@@ -65,6 +62,16 @@ def handler(event, context):
                 'duration': duration,
 
             }
+        )
+
+        decoded_file_content = base64.b64decode(file_content)
+
+        # Upload the file content to S3
+        s3.put_object(
+            Bucket=bucket_name,
+            Key=movie_id,
+            Body=decoded_file_content,
+            ContentType='application/octet-stream'
         )
 
         insert_items(dynamodb.Table(table_name_genres), genres, movie_id, created_at, 'genre')
