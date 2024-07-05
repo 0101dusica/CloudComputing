@@ -59,6 +59,10 @@ export class MovieService {
     return this.http.delete<any>(`${this.apiUrl}/movies/${movieId}?createdAt=${createdAt}`);
   }
 
+  searchMovies(queryParams: any): Observable<any[]> {
+    return this.http.post<any[]>(`${this.apiUrl}/search`, queryParams);
+  }
+
   private base64ToArrayBuffer(base64: string): Uint8Array {
     const byteCharacters = atob(base64.split(',')[1]);
     const byteNumbers = new Array(byteCharacters.length);

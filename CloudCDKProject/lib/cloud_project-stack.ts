@@ -272,6 +272,7 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     actorsTable.grantReadData(searchLambda);
     genresTable.grantReadData(searchLambda);
 
+    searchLambda.addToRolePolicy(dynamoDBPolicy)
 
     // const seacrhPolicy = new PolicyStatement({
     //   effect: iam.Effect.ALLOW,
@@ -316,6 +317,12 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     const viewIntegration = new apigateway.LambdaIntegration(viewLambda);
     const viewResource = api.root.addResource('view');
     viewResource.addResource('{movieId}').addMethod('GET', viewIntegration);
+
+     // Integrisanje searchLambda sa API Gateway-om
+    const searchIntegration = new apigateway.LambdaIntegration(searchLambda);
+    const searchResource = api.root.addResource('search');
+    searchResource.addMethod('POST', searchIntegration);
+
 
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
