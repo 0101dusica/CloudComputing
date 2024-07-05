@@ -1,0 +1,18 @@
+
+<div class="notification">
+    <div class="header">
+      <div class="text-box">
+        <div class="all-text">How would you rate this content?</div>
+      </div>
+    </div>
+  
+    <div class="rating-options">
+      <mat-radio-group [(ngModel)]="selectedRating">
+        <mat-radio-button *ngFor="let rating of ratings" [value]="rating">{{ rating }}</mat-radio-button>
+      </mat-radio-group>
+    </div>
+  
+    <div class="submit-section">
+      <button mat-button color="primary" (click)="submitRating()">Submit Rating</button>
+    </div>
+  </div>

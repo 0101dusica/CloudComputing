@@ -15,8 +15,14 @@ import { AddNewTvShowComponent } from './add-new-tv-show/add-new-tv-show.compone
 import { AddNewEpisodeComponent } from './add-new-episode/add-new-episode.component';
 import { AddNewPeopleComponent } from './add-new-people/add-new-people.component';
 import { FormsModule } from '@angular/forms';
+import {HttpClientModule} from "@angular/common/http";
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio';
 import { TvShowDetailsComponent } from './tv-show-details/tv-show-details.component';
 import { SearchComponent } from './search/search.component';
+import { ReviewDialogComponent } from './review-dialog/review-dialog.component';
 import { EditMovieComponent } from './edit-movie/edit-movie.component';
 import { EditTvShowComponent } from './edit-tv-show/edit-tv-show.component';
 
@@ -37,19 +43,25 @@ import { EditTvShowComponent } from './edit-tv-show/edit-tv-show.component';
     AddNewPeopleComponent,
     TvShowDetailsComponent,
     SearchComponent,
+    ReviewDialogComponent,
     EditMovieComponent,
     EditTvShowComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatRadioModule,
   ],
   exports:[
     NavBarComponent,
     FooterComponent,
     MainPageComponent,
-    HomeComponent
+    HomeComponent,
   ]
 })
 

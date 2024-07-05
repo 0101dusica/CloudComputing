@@ -22,9 +22,9 @@ const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-
-  { path: 'movie-details', component: MovieDetailsComponent },
+  
   { path: 'tv-show-details', component: TvShowDetailsComponent },
+  { path: 'movie-details/:movieId', component: MovieDetailsComponent },
 
   { path: 'all-subscriptions', component: AllSubscriptionsComponent },
 
