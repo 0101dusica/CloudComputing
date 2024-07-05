@@ -73,7 +73,7 @@ def handler(event, context):
         # )
 
         insert_items(dynamodb.Table(table_name_genres), genres, movie_id, created_at, 'genre')
-        insert_items(dynamodb.Table(table_name_actors), genres, movie_id, created_at, 'actor')
+        insert_items(dynamodb.Table(table_name_actors), actors, movie_id, created_at, 'actor')
 
         return {
             'statusCode': 200,

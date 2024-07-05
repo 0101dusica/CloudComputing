@@ -11,7 +11,7 @@ import { AttributeType,ProjectionType, Table } from 'aws-cdk-lib/aws-dynamodb';
 
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
-import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';  // Uvezite Effect ovde
 
 import iam from "aws-cdk-lib/aws-iam";
 
@@ -214,7 +214,31 @@ export class CloudProjectStack extends cdk.Stack {
       }
     });
 
+     const dynamoDBPolicy = new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'dynamodb:Query',
+    'dynamodb:Scan',
+    'dynamodb:GetItem',
+    'dynamodb:PutItem',
+    'dynamodb:UpdateItem',
+    'dynamodb:DeleteItem',
+  ],
+  resources: [
+    moviesTable.tableArn,
+    `${moviesTable.tableArn}/index/*`,
+    actorsTable.tableArn,
+    `${actorsTable.tableArn}/index/*`,
+    genresTable.tableArn,
+    `${genresTable.tableArn}/index/*`,
+  ],
+});
+
+
+deleteLambda.addToRolePolicy(dynamoDBPolicy);
+
     movieBucket.grantReadWrite(deleteLambda);
+    movieBucket.grantDelete(deleteLambda)
     moviesTable.grantWriteData(deleteLambda);
     actorsTable.grantWriteData(deleteLambda);
     genresTable.grantWriteData(deleteLambda);
@@ -282,9 +306,16 @@ export class CloudProjectStack extends cdk.Stack {
 
     // Integrate getMovieById lambda with API Gateway
     const getMovieByIdIntegration = new apigateway.LambdaIntegration(getMovieByIdLambda);
+    const deleteIntegration = new apigateway.LambdaIntegration(deleteLambda)
     const movieByIdResource = moviesResource.addResource('{movieId}');
     movieByIdResource.addMethod('GET', getMovieByIdIntegration);
+    movieByIdResource.addMethod('DELETE',deleteIntegration)
 
+
+    // Integrate viewLambda with API Gateway
+    const viewIntegration = new apigateway.LambdaIntegration(viewLambda);
+    const viewResource = api.root.addResource('view');
+    viewResource.addResource('{movieId}').addMethod('GET', viewIntegration);
 
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);

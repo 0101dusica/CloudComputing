@@ -1,7 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MovieService } from '../movie.service';
 import { Movie } from '../movie';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-movie-details',
@@ -19,7 +20,9 @@ export class MovieDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private movieService: MovieService
+    private movieService: MovieService,
+    private router: Router,
+    private location: Location
   ) {}
 
   ngOnInit() {
@@ -46,7 +49,7 @@ export class MovieDetailsComponent implements OnInit {
     }
   }
 
-  downloadMovie(){
+  downloadMovie() {
     this.movieService.getDownloadUrl(this.movie!.movieId).subscribe(response => {
       const presignedUrl = response.presigned_url;
       window.open(presignedUrl, '_blank');
@@ -54,5 +57,34 @@ export class MovieDetailsComponent implements OnInit {
       console.log(error);
       alert('Failed to get presigned URL');
     });
+  }
+
+  watchNow() {
+    if (this.movie) {
+      this.movieService.getWatchUrl(this.movie.movieId).subscribe(response => {
+        const presignedUrl = response.presignedUrl;
+        const video = this.bgVideo?.nativeElement;
+        if (video) {
+          video.src = presignedUrl;
+          video.load();
+          video.play();
+        }
+      }, error => {
+        console.log(error);
+        alert('Failed to get presigned URL for watching');
+      });
+    }
+  }
+
+  deleteMovie() {
+    if (this.movie) {
+      this.movieService.deleteMovie(this.movie.movieId, this.movie.createdAt).subscribe(response => {
+        alert('Movie deleted successfully');
+        this.router.navigate(['/']); // Redirect to home page
+      }, error => {
+        console.log(error);
+        alert('Failed to delete the movie');
+      });
+    }
   }
 }
