@@ -11,10 +11,12 @@ import { AddNewMovieComponent } from './app/layout/add-new-movie/add-new-movie.c
 import { AddNewEpisodeComponent } from './app/layout/add-new-episode/add-new-episode.component';
 import { AddNewPeopleComponent } from './app/layout/add-new-people/add-new-people.component';
 import { TvShowDetailsComponent } from './app/layout/tv-show-details/tv-show-details.component';
+import { SearchComponent } from './app/layout/search/search.component';
 
 const routes: Routes = [
   { path: '', component: MainPageComponent },
   { path: 'home/:id', component: HomeComponent },
+  { path: 'search', component: SearchComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'movie-details', component: MovieDetailsComponent },
