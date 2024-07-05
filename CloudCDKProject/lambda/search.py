@@ -20,7 +20,11 @@ def handler(event, context):
         director = body.get('director')
         genres = body.get('genres')
         # duration = body.get('duration')
-
+        print(title)
+        print(description)
+        print(actors)
+        print(genres)
+        print(director)
         result = query(title=title, description=description, director=director, genres=genres, actors=actors)
 
         return {
@@ -59,25 +63,35 @@ def query(title=None, description=None, director=None, genres=None, actors=None)
     response_from_actors = None
     response_from_movies = None
 
-    if genres:
-        response_from_genres = query_movies_by_attribute('genre', genres)
-    if actors:
-        response_from_actors = query_movies_by_attribute('actors', actors)
 
     # Adding additional search conditions if provided
     if title:
-        add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values, 'title',
-                             title)
+        key_condition_expression, expression_attribute_values, filter_expressions = add_search_condition(params,
+                                                                                                         key_condition_expression,
+                                                                                                         filter_expressions,
+                                                                                                         expression_attribute_values,
+                                                                                                         'title',
+                                                                                                         title)
+    print("izvan funkcije: ", key_condition_expression)
     if director:
-        add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values,
-                             'director', director)
+        key_condition_expression, expression_attribute_values, filter_expressions = add_search_condition(params,
+                                                                                                         key_condition_expression,
+                                                                                                         filter_expressions,
+                                                                                                         expression_attribute_values,
+                                                                                                         'director',
+                                                                                                         director)
     if description:
-        add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values,
-                             'description', description, contains=True)
-
+        key_condition_expression, expression_attribute_values, filter_expressions = add_search_condition(params,
+                                                                                                         key_condition_expression,
+                                                                                                         filter_expressions,
+                                                                                                         expression_attribute_values,
+                                                                                                         'description',
+                                                                                                         description,
+                                                                                                         contains=True)
+    print(key_condition_expression)
     # If no basic conditions and no items from genre/actors query, raise an error
-    if not key_condition_expression and not filter_expressions and not (response_from_genres or response_from_actors):
-        raise ValueError("At least one search criteria must be provided.")
+    # if not key_condition_expression and not filter_expressions and not (response_from_genres or response_from_actors):
+    #     raise ValueError("At least one search criteria must be provided.")
 
     if key_condition_expression:
         params['KeyConditionExpression'] = key_condition_expression
@@ -87,6 +101,14 @@ def query(title=None, description=None, director=None, genres=None, actors=None)
 
     if not response_from_movies:
         response_from_movies = table.query(**params)['Items']
+
+    if genres:
+        response_from_genres = query_movies_by_attribute('genre', genres)
+    if actors:
+        response_from_actors = query_movies_by_attribute('actors', actors)
+
+
+
 
     # Perform intersection based on genres and actors queries
     items = []
@@ -124,7 +146,11 @@ def add_search_condition(params, key_condition_expression, filter_expressions, e
         filter_expressions.append(f"{'contains' if contains else '='}({attribute}, :{attribute})")
     else:
         key_condition_expression = f"{attribute} = :{attribute}"
+        print("iz funkcije: ", key_condition_expression)
+        params['IndexName'] = f'ind-{attribute}'
     expression_attribute_values[f":{attribute}"] = value
+
+    return key_condition_expression, expression_attribute_values, filter_expressions
 
 
 def query_movies_by_attribute(attribute, value):
@@ -134,7 +160,7 @@ def query_movies_by_attribute(attribute, value):
         table_name = table_name_actor
     table = dynamodb.Table(table_name)
     response = table.query(
-        IndexName=f'{attribute}-index',
+        IndexName=f'ind-{attribute}',
         KeyConditionExpression=f'{attribute} = :{attribute}',
         ExpressionAttributeValues={f':{attribute}': value}
     )
