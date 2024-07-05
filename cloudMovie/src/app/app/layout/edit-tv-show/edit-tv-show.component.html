@@ -1,84 +1,108 @@
 <div class="main">
-    <app-nav-bar [id]="0"></app-nav-bar>
-  
-    <div class="container">
-      <label class="title">Edit Movie Information</label>
-      <form (ngSubmit)="onSubmit()" style="margin-top: 2%;">
-        <div class="form-group">
-          <label for="thumbnail">Thumbnail</label>
-          <div *ngIf="loadedFiles['thumbnail']; else thumbnailInput">
-            <span class="file-name">{{ loadedFiles['thumbnail']?.name }}</span>
-            <button class="btn-delete" type="button" (click)="deleteFile('thumbnail')">Delete Thumbnail</button>
+  <app-nav-bar [id]="0"></app-nav-bar>
+
+  <div class="container">
+    <label class="title">Edit TV Show Information</label>
+    <form (ngSubmit)="onSubmit()" style="margin-top: 2%;">
+      <div class="form-group">
+        <label for="thumbnail">Thumbnail</label>
+        <div *ngIf="loadedFiles['thumbnail']; else thumbnailInput">
+          <span class="file-name">{{ loadedFiles['thumbnail']?.name }}</span>
+          <button class="btn-delete" type="button" (click)="deleteFile('thumbnail')">Delete Thumbnail</button>
+        </div>
+        <ng-template #thumbnailInput>
+          <input type="file" id="thumbnail" (change)="onFileSelected($event, 'thumbnail')" class="form-control" />
+        </ng-template>
+      </div>
+      <div class="form-group">
+        <label for="trailer">Trailer</label>
+        <div *ngIf="loadedFiles['trailer']; else trailerInput">
+          <span class="file-name">{{ loadedFiles['trailer']?.name }}</span>
+          <button class="btn-delete" type="button" (click)="deleteFile('trailer')">Delete Trailer</button>
+        </div>
+        <ng-template #trailerInput>
+          <input type="file" id="trailer" (change)="onFileSelected($event, 'trailer')" class="form-control" />
+        </ng-template>
+      </div>
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" [(ngModel)]="show.title" name="title" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="year">Release Year</label>
+        <input type="number" id="year" [(ngModel)]="show.year" name="year" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" [(ngModel)]="show.description" name="description" class="form-control" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="seasons">Number of Seasons</label>
+        <input type="number" id="seasons" [(ngModel)]="show.seasons" name="seasons" class="form-control" required (ngModelChange)="updateSeasonsArray()" />
+      </div>
+      <div class="form-group">
+        <label>Actors</label>
+        <div class="options-wrap">
+          <div class="option-box" *ngFor="let actor of actors">
+            <input type="checkbox" [id]="actor" [value]="actor" (change)="onCheckboxChange($event, 'actors')" [checked]="show.actors.includes(actor)" />
+            <label class="options" [for]="actor">{{ actor }}</label>
           </div>
-          <ng-template #thumbnailInput>
-            <input type="file" id="thumbnail" (change)="onFileSelected($event, 'thumbnail')" class="form-control" />
-          </ng-template>
         </div>
-        <div class="form-group">
-          <label for="trailer">Trailer</label>
-          <div *ngIf="loadedFiles['trailer']; else trailerInput">
-            <span class="file-name">{{ loadedFiles['trailer']?.name }}</span>
-            <button class="btn-delete" type="button" (click)="deleteFile('trailer')">Delete Trailer</button>
+      </div>
+      <div class="form-group">
+        <label>Directors</label>
+        <div class="options-wrap">
+          <div class="option-box" *ngFor="let director of directors">
+            <input type="checkbox" [id]="director" [value]="director" (change)="onCheckboxChange($event, 'directors')" [checked]="show.directors.includes(director)" />
+            <label class="options" [for]="director">{{ director }}</label>
           </div>
-          <ng-template #trailerInput>
-            <input type="file" id="trailer" (change)="onFileSelected($event, 'trailer')" class="form-control" />
-          </ng-template>
         </div>
-        <div class="form-group">
-          <label for="video">Movie</label>
-          <div *ngIf="loadedFiles['video']; else videoInput">
-            <span class="file-name">{{ loadedFiles['video']?.name }}</span>
-            <button class="btn-delete" type="button" (click)="deleteFile('video')">Delete Movie</button>
+      </div>
+      <div class="form-group">
+        <label>Genres</label>
+        <div class="options-wrap">
+          <div class="option-box" *ngFor="let genre of genres">
+            <input type="checkbox" [id]="genre" [value]="genre" (change)="onCheckboxChange($event, 'genres')" [checked]="show.genres.includes(genre)" />
+            <label class="options" [for]="genre">{{ genre }}</label>
           </div>
-          <ng-template #videoInput>
-            <input type="file" id="video" (change)="onFileSelected($event, 'video')" class="form-control" />
-          </ng-template>
         </div>
-        <div class="form-group">
-          <label for="title">Title</label>
-          <input type="text" id="title" [(ngModel)]="show.title" name="title" class="form-control" required />
-        </div>
-        <div class="form-group">
-          <label for="year">Release Year</label>
-          <input type="number" id="year" [(ngModel)]="show.year" name="year" class="form-control" required />
-        </div>
-        <div class="form-group">
-          <label for="description">Description</label>
-          <textarea id="description" [(ngModel)]="show.description" name="description" class="form-control" required></textarea>
-        </div>
-        <div class="form-group">
-            <label for="seasons">Number of Seasons</label>
-            <input type="number" id="seasons" [(ngModel)]="show.seasons" name="seasons" class="form-control" required />
-          </div>
-        <div class="form-group">
-          <label>Actors</label>
-          <div class="options-wrap">
-            <div class="option-box" *ngFor="let actor of actors">
-              <input type="checkbox" [id]="actor" [value]="actor" (change)="onCheckboxChange($event, 'actors')" [checked]="show.actors.includes(actor)" />
-              <label class="options" [for]="actor">{{ actor }}</label>
+      </div>
+
+      <div class="seasons" *ngFor="let season of seasonsArray; let i = index">
+        <h2>Season {{ i + 1 }}</h2>
+        <div class="episode" *ngFor="let episode of episodes[i + 1]">
+          <div class="form-group">
+            <label for="episode-thumbnail-{{i}}-{{episode.number}}">Episode Thumbnail</label>
+            <div *ngIf="loadedEpisodeFiles[i + 1] && loadedEpisodeFiles[i + 1][episode.number] && loadedEpisodeFiles[i + 1][episode.number]['thumbnail']; else episodeThumbnailInput">
+              <span class="file-name">{{ loadedEpisodeFiles[i + 1][episode.number]['thumbnail']?.name }}</span>
+              <button class="btn-delete" type="button" (click)="deleteEpisodeFile(i + 1, episode.number, 'thumbnail')">Delete Thumbnail</button>
             </div>
+            <ng-template #episodeThumbnailInput>
+              <input type="file" id="episode-thumbnail-{{i}}-{{episode.number}}" (change)="onEpisodeFileSelected($event, i + 1, episode.number, 'thumbnail')" class="form-control" />
+            </ng-template>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Directors</label>
-          <div class="options-wrap">
-            <div class="option-box" *ngFor="let director of directors">
-              <input type="checkbox" [id]="director" [value]="director" (change)="onCheckboxChange($event, 'directors')" [checked]="show.directors.includes(director)" />
-              <label class="options" [for]="director">{{ director }}</label>
+          <div class="form-group">
+            <label for="episode-video-{{i}}-{{episode.number}}">Episode Video</label>
+            <div *ngIf="loadedEpisodeFiles[i + 1] && loadedEpisodeFiles[i + 1][episode.number] && loadedEpisodeFiles[i + 1][episode.number]['video']; else episodeVideoInput">
+              <span class="file-name">{{ loadedEpisodeFiles[i + 1][episode.number]['video']?.name }}</span>
+              <button class="btn-delete" type="button" (click)="deleteEpisodeFile(i + 1, episode.number, 'video')">Delete Video</button>
             </div>
+            <ng-template #episodeVideoInput>
+              <input type="file" id="episode-video-{{i}}-{{episode.number}}" (change)="onEpisodeFileSelected($event, i + 1, episode.number, 'video')" class="form-control" />
+            </ng-template>
+          </div>
+          <div class="form-group">
+            <label for="episode-title-{{i}}-{{episode.number}}">Title</label>
+            <input type="text" id="episode-title-{{i}}-{{episode.number}}" [(ngModel)]="episode.title" name="episode-title-{{i}}-{{episode.number}}" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="episode-description-{{i}}-{{episode.number}}">Description</label>
+            <textarea id="episode-description-{{i}}-{{episode.number}}" [(ngModel)]="episode.description" name="episode-description-{{i}}-{{episode.number}}" class="form-control" required></textarea>
           </div>
         </div>
-        <div class="form-group">
-          <label>Genres</label>
-          <div class="options-wrap">
-            <div class="option-box" *ngFor="let genre of genres">
-              <input type="checkbox" [id]="genre" [value]="genre" (change)="onCheckboxChange($event, 'genres')" [checked]="show.genres.includes(genre)" />
-              <label class="options" [for]="genre">{{ genre }}</label>
-            </div>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Movie</button>
-      </form>
-    </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Update TV Show</button>
+    </form>
   </div>
-  
+</div>
