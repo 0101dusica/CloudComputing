@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
@@ -9,36 +10,27 @@ import Swal from 'sweetalert2';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  isPasswordVisible: boolean = false;
+  loginForm: FormGroup;
 
-  constructor(private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]]
+    });
   }
 
-  loginForm = new FormGroup({
-    email: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
-  })
-
-  onLogin() {
-    const emailControl = this.loginForm.get('email');
-    const passwordControl = this.loginForm.get('password');
-
-    if (emailControl && passwordControl) {
-      const email = emailControl.value?.trim();
-    const password = passwordControl.value?.trim();
-      console.log("Ovde proveravam ",email, " ", password);
-      if (email === 'admin' && password === 'admin') {
-        this.router.navigate(['/home', 0]);
-      } else if (email === 'user' && password === 'user') {
-        this.router.navigate(['/home', 1]);
-      } else {
-        // Handle invalid login
-        console.log('Invalid login');
+  onLogin(): void {
+    const { email, password } = this.loginForm.value;
+    this.authService.authenticate(email, password, (err, result) => {
+      if (err) {
+        alert(err.message || JSON.stringify(err));
+        return;
       }
-    }
-  }
-
-  togglePasswordVisibility() {
-    this.isPasswordVisible = !this.isPasswordVisible;
+      this.router.navigate(['/all-subscriptions']);
+    });
   }
 }

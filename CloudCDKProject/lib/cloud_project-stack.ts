@@ -5,6 +5,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway'
 import path = require('path');
 import { AttributeType,ProjectionType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
@@ -351,6 +352,39 @@ getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
     api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
-  }
+
+  //COGNITO
+    // Cognito User Pool
+    const userPool = new cognito.UserPool(this, 'UserPool', {
+      userPoolName: 'cloud-project-user-pool',
+      selfSignUpEnabled: true,
+      signInAliases: { email: true },
+      autoVerify: { email: true },
+      passwordPolicy: {
+        minLength: 8,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigits: true,
+        requireSymbols: true,
+      },
+      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+    });
+
+    // Cognito User Pool Client
+    const userPoolClient = new cognito.UserPoolClient(this, 'UserPoolClient', {
+      userPool,
+      generateSecret: false,
+    });
+
+    // Export User Pool and Client IDs
+    new cdk.CfnOutput(this, 'UserPoolId', {
+      value: userPool.userPoolId,
+    });
+
+    new cdk.CfnOutput(this, 'UserPoolClientId', {
+      value: userPoolClient.userPoolClientId,
+    });
+
+}
 }
 
