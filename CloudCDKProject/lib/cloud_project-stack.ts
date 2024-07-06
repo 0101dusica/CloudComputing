@@ -97,10 +97,37 @@ export class CloudProjectStack extends cdk.Stack {
       projectionType: ProjectionType.ALL,
     });
 
-    const reviewsTable = new Table(this, 'ReviewsTable', {
-      partitionKey: { name: 'reviewId', type: AttributeType.STRING },
+    const ratingsTable = new Table(this, 'RatingsTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
       sortKey: { name: 'movieId', type: AttributeType.STRING },
-      tableName: "cloud-project-review-table",
+      tableName: "cloud-project-rating-table",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    ratingsTable.addGlobalSecondaryIndex({
+      indexName: 'ind-rating',
+      partitionKey: { name: 'user_id', type: AttributeType.STRING },
+      sortKey: { name: 'movieId', type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    const subscriptionTable = new Table(this, 'SubscriptionTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
+      sortKey: { name: 'user_id', type: AttributeType.STRING },
+      tableName: "cloud-project-subscription-table",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    subscriptionTable.addGlobalSecondaryIndex({
+      indexName: 'ind-subscription',
+      partitionKey: { name: 'user_id', type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    const downloadsTable = new Table(this, 'DownloadsTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
+      sortKey: { name: 'user_id', type: AttributeType.STRING },
+      tableName: "cloud-project-downloads-table",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
@@ -113,7 +140,21 @@ export class CloudProjectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    //jos interatctions, feed, subscription
+    downloadsTable.addGlobalSecondaryIndex({
+      indexName: 'ind-downloads',
+      partitionKey: { name: 'user_id', type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    const feedTable = new Table(this, 'feedTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
+      sortKey: { name: 'user_id', type: AttributeType.STRING },
+      tableName: "cloud-project-feed-table",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+
+    //jos interatctions, feed
     //                **************** LAMBDA ***************** //
 
     // Lambda function to UPLOAD a short film
@@ -203,7 +244,7 @@ export class CloudProjectStack extends cdk.Stack {
     });
 
     movieBucket.grantRead(viewLambda);
-    
+
     // Lambda function to DOWNLOAD a short film
     const downloadLambda = new lambda.Function(this, 'download', {
       runtime: lambda.Runtime.PYTHON_3_9,
@@ -211,9 +252,11 @@ export class CloudProjectStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
         BUCKET_NAME: movieBucket.bucketName,
+        TABLE_NAME_DOWNLOADS:  downloadsTable.tableName
       }
     });
 
+    downloadsTable.grantReadWriteData(downloadLambda)
     movieBucket.grantRead(downloadLambda);
 
      // Lambda function to DELETE a short film
@@ -256,7 +299,6 @@ export class CloudProjectStack extends cdk.Stack {
 
 deleteLambda.addToRolePolicy(dynamoDBPolicy);
 getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
-    updateLambda.addToRolePolicy(dynamoDBPolicy);
 
     movieBucket.grantReadWrite(deleteLambda);
     movieBucket.grantDelete(deleteLambda)
@@ -265,17 +307,58 @@ getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
     genresTable.grantWriteData(deleteLambda);
 
 
-    // Lambda function to DELETE a short film
-    const reviewLambda = new lambda.Function(this, 'review', {
+    // Lambda function to rate a film
+    const ratingLambda = new lambda.Function(this, 'rating', {
       runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'review.handler',
+      handler: 'rate_movie.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
-        TABLE_NAME_REVIEW:  reviewsTable.tableName,
+        TABLE_NAME_RATING:  ratingsTable.tableName,
       }
     });
+    ratingsTable.grantReadWriteData(ratingLambda);
 
-    reviewsTable.grantWriteData(reviewLambda);
+    // Lambda function to subscribe to the film
+    const subscribeLambda = new lambda.Function(this, 'subscription', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'subscribe.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_SUBSCRIPTION:  subscriptionTable.tableName,
+      }
+    });
+    subscriptionTable.grantReadWriteData(subscribeLambda);
+
+    // Lambda function to unsubscribe to the film
+    const unsubscribeLambda = new lambda.Function(this, 'unsubscription', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'unsubscribe.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_SUBSCRIPTION:  subscriptionTable.tableName,
+      }
+    });
+    subscriptionTable.grantReadWriteData(unsubscribeLambda);
+
+    // Lambda function to generate the user feed
+    const generateFeedLambda = new lambda.Function(this, 'feed', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'generate_feed.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+          TABLE_NAME_FEED:  feedTable.tableName,
+          TABLE_NAME_MOVIE: moviesTable.tableName,
+          TABLE_NAME_DOWNLOADS: downloadsTable.tableName,
+          TABLE_NAME_SUBSCRIPTION: subscriptionTable.tableName,
+          TABLE_NAME_RATING: ratingsTable.tableName
+
+      }
+    });
+    feedTable.grantReadWriteData(generateFeedLambda);
+    moviesTable.grantReadData(generateFeedLambda);
+    downloadsTable.grantReadData(generateFeedLambda);
+    subscriptionTable.grantReadData(generateFeedLambda);
+    ratingsTable.grantReadData(generateFeedLambda);
 
      // Lambda function to SEARCH a short film
      const searchLambda = new lambda.Function(this, 'search', {
@@ -352,6 +435,22 @@ getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
     api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
+
+    // Integrate rate_movie lambda with API Gateway
+    const ratingIntegration = new apigateway.LambdaIntegration(ratingLambda);
+    api.root.addResource('rate-movie').addMethod('POST', ratingIntegration);
+
+    // Integrate subscribe lambda with API Gateway
+    const subscriptionIntegration = new apigateway.LambdaIntegration(subscribeLambda);
+    api.root.addResource('subscribe').addMethod('POST', subscriptionIntegration);
+
+    // Integrate unsubscribe lambda with API Gateway
+    const unsubscriptionIntegration = new apigateway.LambdaIntegration(unsubscribeLambda);
+    api.root.addResource('unsubscribe').addMethod('POST', unsubscriptionIntegration);
+
+    // Integrate feed lambda with API Gateway
+    const generateFeedIntegration = new apigateway.LambdaIntegration(generateFeedLambda);
+    api.root.addResource('user-feed').addMethod('POST', generateFeedIntegration);
 
     // Integration of Lambda function with API Gateway
     const updateIntegration = new apigateway.LambdaIntegration(updateLambda);
