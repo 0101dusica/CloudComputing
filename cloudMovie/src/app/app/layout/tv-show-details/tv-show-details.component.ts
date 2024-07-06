@@ -80,6 +80,7 @@ export class TvShowDetailsComponent implements OnInit {
   loadEpisodes(seriesId: string) {
     this.movieService.getEpisodesBySeriesId(seriesId).subscribe(episodes => {
       this.episodes = episodes;
+      console.log(episodes)
     }, error => {
       console.error('Error loading episodes:', error);
     });

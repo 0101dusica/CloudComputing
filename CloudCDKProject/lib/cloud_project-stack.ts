@@ -113,12 +113,6 @@ export class CloudProjectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    episodesTable.addGlobalSecondaryIndex({
-      indexName: 'ind-series', // Ime globalnog sekundarnog indeksa
-      partitionKey: { name: 'seriesId', type: AttributeType.STRING },
-      projectionType: ProjectionType.ALL,
-    });
-
     //jos interatctions, feed, subscription
     //                **************** LAMBDA ***************** //
 
@@ -262,6 +256,7 @@ export class CloudProjectStack extends cdk.Stack {
 
 deleteLambda.addToRolePolicy(dynamoDBPolicy);
 getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
+
     movieBucket.grantReadWrite(deleteLambda);
     movieBucket.grantDelete(deleteLambda)
     moviesTable.grantWriteData(deleteLambda);
