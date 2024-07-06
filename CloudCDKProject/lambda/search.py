@@ -143,7 +143,10 @@ def intersection_items(items1, items2):
 def add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values, attribute,
                          value, contains=False):
     if key_condition_expression:
-        filter_expressions.append(f"{'contains' if contains else '='}({attribute}, :{attribute})")
+        if contains:
+            filter_expressions.append(f"contains({attribute}, :{attribute})")
+        else:
+            filter_expressions.append(f"{attribute} = :{attribute}")
     else:
         key_condition_expression = f"{attribute} = :{attribute}"
         print("iz funkcije: ", key_condition_expression)
