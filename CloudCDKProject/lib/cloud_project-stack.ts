@@ -104,14 +104,28 @@ export class CloudProjectStack extends cdk.Stack {
       projectionType: ProjectionType.ALL,
     });
 
-    const reviewsTable = new Table(this, 'ReviewsTable', {
-      partitionKey: { name: 'reviewId', type: AttributeType.STRING },
+    const ratingsTable = new Table(this, 'RatingsTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
       sortKey: { name: 'movieId', type: AttributeType.STRING },
-      tableName: "cloud-project-review-table",
+      tableName: "cloud-project-rating-table",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    //jos interatctions, feed, subscription
+    ratingsTable.addGlobalSecondaryIndex({
+      indexName: 'ind-rating',
+      partitionKey: { name: 'user_id', type: AttributeType.STRING },
+      sortKey: { name: 'movieId', type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    const subscriptionTable = new Table(this, 'SubscriptionTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
+      sortKey: { name: 'user_id', type: AttributeType.STRING },
+      tableName: "cloud-project-subscription-table",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    //jos interatctions, feed
     //                **************** LAMBDA ***************** //
 
     // Lambda function to UPLOAD a short film
@@ -244,17 +258,27 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     genresTable.grantWriteData(deleteLambda);
 
 
-    // Lambda function to DELETE a short film
-    const reviewLambda = new lambda.Function(this, 'review', {
+    // Lambda function to rate a film
+    const ratingLambda = new lambda.Function(this, 'rating', {
       runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'review.handler',
+      handler: 'rate_movie.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
-        TABLE_NAME_REVIEW:  reviewsTable.tableName,
+        TABLE_NAME_RATING:  ratingsTable.tableName,
       }
     });
+    ratingsTable.grantReadWriteData(ratingLambda);
 
-    reviewsTable.grantWriteData(reviewLambda);
+    // Lambda function to subscribe to the film
+    const subscribeLambda = new lambda.Function(this, 'subscription', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'subscribe.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_SUBSCRIPTION:  subscriptionTable.tableName,
+      }
+    });
+    subscriptionTable.grantReadWriteData(subscribeLambda);
 
      // Lambda function to SEARCH a short film
      const searchLambda = new lambda.Function(this, 'search', {
@@ -327,6 +351,14 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
     api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
+
+    // Integrate rate_movie lambda with API Gateway
+    const ratingIntegration = new apigateway.LambdaIntegration(ratingLambda);
+    api.root.addResource('rate-movie').addMethod('POST', ratingIntegration);
+
+    // Integrate subscribe lambda with API Gateway
+    const subscriptionIntegration = new apigateway.LambdaIntegration(subscribeLambda);
+    api.root.addResource('subscribe').addMethod('POST', subscriptionIntegration);
   }
 }
 
