@@ -17,23 +17,16 @@
             <input type="number" id="seasons" [(ngModel)]="show.numberOfSeasons" name="seasons" class="form-control" required />
           </div>
         <div class="form-group">
-            <label>Actors</label>
-            <div class="options-wrap">
-                <div class="option-box" *ngFor="let actor of actors">
-                <input type="checkbox" [id]="actor" [value]="actor" (change)="onCheckboxChange($event, 'actors')"/>
-                <label class="options" [for]="actor">{{ actor }}</label>
-                </div>
-            </div>
-          </div>
+          <label for="actors">Actors </label>
+          <textarea id="actors" [(ngModel)]="actorsInput" name="actors" class="form-control" required></textarea>
+        </div>
+
           <div class="form-group">
-            <label>Directors</label>
-            <div class="options-wrap">
-                <div class="option-box" *ngFor="let director of directors">
-                <input type="checkbox" [id]="director" [value]="director"/>
-                <label class="options" [for]="director">{{ director }}</label>
-                </div>
-            </div>
-          </div>
+          <label for="director">Director</label>
+          <select id="director" [(ngModel)]="show.director" name="director" class="form-control" required>
+            <option *ngFor="let director of directors" [value]="director">{{ director }}</option>
+          </select>
+        </div>
           <div class="form-group">
             <label>Genres</label>
             <div class="options-wrap">
