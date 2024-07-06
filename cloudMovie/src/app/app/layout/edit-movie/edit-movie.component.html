@@ -7,7 +7,7 @@
         <div class="form-group">
           <label for="video">Movie</label>
           <div *ngIf="loadedFiles['video']; else videoInput">
-            <span class="file-name">{{ loadedFiles['video']?.name }}</span>
+            <span class="file-name">{{ loadedFiles['video'].name }}</span>
             <button class="btn-delete" type="button" (click)="deleteFile('video')">Delete Movie</button>
           </div>
           <ng-template #videoInput>
