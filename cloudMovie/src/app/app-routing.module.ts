@@ -34,7 +34,7 @@ const routes: Routes = [
   { path: 'add-new-people', component: AddNewPeopleComponent },
 
   { path: 'edit-movie/:movieId', component: EditMovieComponent },
-  { path: 'edit-show', component: EditTvShowComponent },
+  { path: 'edit-show/:movieId', component: EditTvShowComponent },
 
 ];
 
