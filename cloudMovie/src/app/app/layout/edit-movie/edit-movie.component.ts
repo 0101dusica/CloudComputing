@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MovieService} from "../movie.service";
 import {Location} from "@angular/common";
 import {MatDialog} from "@angular/material/dialog";
-import {Movie} from "../movie";
+import {Episode, Movie} from "../movie";
 import {Director} from "../director.enum";
 import Decimal from "decimal.js";
 
@@ -14,6 +14,8 @@ import Decimal from "decimal.js";
 })
 export class EditMovieComponent implements OnInit {
   movie: Movie | undefined;
+  episode: Episode | undefined;
+
   selectedFile: File | null = null; // Variable to store the selected file
 
     generatePresignedUrl: boolean = false;
@@ -55,6 +57,7 @@ export class EditMovieComponent implements OnInit {
 
         // Call service method to get movie details
         this.movieService.getMovieById(movieId, createdAt).subscribe(data => {
+
           this.movie = data;
           console.log(this.movie)
           this.actorsString = this.movie!.actors.join(', '); // Convert actors array to string

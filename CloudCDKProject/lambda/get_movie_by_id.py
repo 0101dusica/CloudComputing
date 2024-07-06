@@ -15,11 +15,19 @@ def handler(event, context):
         table_name = os.environ['TABLE_NAME_MOVIE']  # DynamoDB
         table = dynamodb.Table(table_name)
 
+        table_name_E = os.environ['TABLE_NAME_EPISODE']  # DynamoDB
+        table_e = dynamodb.Table(table_name_E)
+
         # Build query condition
         key_condition = Key('movieId').eq(movie_id) & Key('createdAt').eq(created_at)
-        response = table.query(KeyConditionExpression=key_condition)
+        key_condition_e = Key('episodeId').eq(movie_id) & Key('createdAt').eq(created_at)
 
-        if len(response['Items']) == 0:
+        response = table.query(KeyConditionExpression=key_condition)
+        response_e = table_e.query(KeyConditionExpression=key_condition_e)
+
+
+        print(len(response_e['Items']))
+        if len(response['Items']) == 0 and len(response_e['Items']) == 0:
             return {
                 'statusCode': 404,
                 'headers': {
@@ -30,7 +38,10 @@ def handler(event, context):
                 'body': json.dumps({'error': 'Movie not found'})
             }
 
-        movie_item = response['Items'][0]  # Assuming only one item per query
+        if(len(response['Items']) != 0):
+            movie_item = response['Items'][0]  # Assuming only one item per query
+        else:
+            movie_item = response_e['Items'][0]  # Assuming only one item per query
 
         return {
             'statusCode': 200,
