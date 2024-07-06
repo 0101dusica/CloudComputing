@@ -40,12 +40,20 @@ export class SearchComponent implements OnInit {
   }
 
   searchMovies() {
-    console.log(this.searchCriteria)
-    // this.searchCriteria.genres = this.selectedGenres.join(',');
-    this.movieService.searchMovies(this.searchCriteria).subscribe(
+    // Konvertovanje unosa u mala slova
+    const criteria = {
+      title: this.searchCriteria.title.toLowerCase(),
+      description: this.searchCriteria.description.toLowerCase(),
+      actors: this.searchCriteria.actors.toLowerCase(),
+      director: this.searchCriteria.director.toLowerCase(),
+      genres: this.selectedGenres.map(genre => genre.toLowerCase()).join(',')
+    };
+
+    console.log(criteria);
+    this.movieService.searchMovies(criteria).subscribe(
       (movies: any[]) => {
         this.filteredMovies = movies;
-        console.log(movies)
+        console.log(movies);
       },
       error => {
         console.error('Error searching movies:', error);
@@ -53,7 +61,7 @@ export class SearchComponent implements OnInit {
     );
   }
 
-  //  updateSelectedGenres(event: any, genre: string) {
+  // updateSelectedGenres(event: any, genre: string) {
   //   const checked = event.target.checked;
   //   if (checked) {
   //     this.selectedGenres.push(genre);

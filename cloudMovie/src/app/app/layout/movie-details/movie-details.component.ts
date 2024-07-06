@@ -13,23 +13,23 @@ import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.c
   styleUrls: ['./movie-details.component.css']
 })
 export class MovieDetailsComponent implements OnInit {
-  
+
   isNotificationVisible = false;
   movie: Movie | undefined;
-  
+
   @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
-  
+
   isVideoVisible = false;
-  
+
   isImageVisible = false;
   isUserRated = false;
   rate: number = 0;
   subscribe: {} | null = null;
 
   isInfoBoxVisible: boolean = false;
-  actors: string[] = ["actor 1", "actor 2"];
-  directors: string[] = ["director 1", "director 2"];
+  actors: string[] | undefined;
+  directors: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -74,7 +74,7 @@ export class MovieDetailsComponent implements OnInit {
       }
     });
   }
-  
+
   onNotificationIconClick(): void {
     this.isNotificationVisible = !this.isNotificationVisible;
     this.addReview(); // Ensure the dialog is opened here
@@ -110,7 +110,10 @@ export class MovieDetailsComponent implements OnInit {
         // Call service method to get movie details
         this.movieService.getMovieById(movieId, createdAt).subscribe(data => {
           this.movie = data;
-          console.log(data)
+          this.actors = this.movie!.actors;
+          this.directors = [this.movie!.director];
+
+          console.log(data);
         });
       });
     });
