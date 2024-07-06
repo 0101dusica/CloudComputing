@@ -256,6 +256,7 @@ export class CloudProjectStack extends cdk.Stack {
 
 deleteLambda.addToRolePolicy(dynamoDBPolicy);
 getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
+    updateLambda.addToRolePolicy(dynamoDBPolicy);
 
     movieBucket.grantReadWrite(deleteLambda);
     movieBucket.grantDelete(deleteLambda)
@@ -351,6 +352,10 @@ getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
     api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
+
+    // Integration of Lambda function with API Gateway
+    const updateIntegration = new apigateway.LambdaIntegration(updateLambda);
+    movieByIdResource.addMethod('PUT',updateIntegration)
   }
 }
 

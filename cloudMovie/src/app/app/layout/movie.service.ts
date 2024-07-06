@@ -55,6 +55,32 @@ export class MovieService {
     );
   }
 
+ updateMovie(movieId: string, movie: Movie | Episode, movieContent: string,generatePresignedUrl: boolean ): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/movies/${movieId}?generatePresignedUrl=${generatePresignedUrl}`, movie).pipe(
+      switchMap(response => {
+        const presignedUrl = response.presignedUrl;
+        const movieId = response.id;
+        if (presignedUrl != '') {
+        console.log(movieContent)
+          const byteArray = this.base64ToArrayBuffer(movieContent);
+          const blob = new Blob([byteArray], { type: 'video/mp4' });
+
+          // Upload the file to S3 using the presigned URL
+          return this.http.put(presignedUrl, blob, {
+            headers: {
+              'Content-Type': 'application/octet-stream'
+            }
+          }).pipe(
+            switchMap(() => {
+              return of({ message: 'File uploaded successfully', movieId: movieId });
+            })
+          );
+        } else {
+          return of({ message: 'No presigned url, added to db only' });
+        }
+      })
+    );
+  }
   deleteMovie(movieId: string, createdAt: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/movies/${movieId}?createdAt=${createdAt}`);
   }
@@ -68,7 +94,6 @@ getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
 
   return this.http.get<any[]>(`${this.apiUrl}/episodes/${seriesId}`);
 }
-
   private base64ToArrayBuffer(base64: string): Uint8Array {
     const byteCharacters = atob(base64.split(',')[1]);
     const byteNumbers = new Array(byteCharacters.length);
