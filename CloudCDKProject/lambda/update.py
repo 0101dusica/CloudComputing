@@ -100,14 +100,6 @@ def handler(event, context):
 
 
 
-        # Generate presigned URL for upload file to S3
-        if movieType != 'show':
-            presigned_url = s3.generate_presigned_url('put_object', Params={'Bucket': bucket_name, 'Key': movie_id},
-                                                  ExpiresIn=3600)
-        else:
-            presigned_url = ''
-
-
         return {
             'statusCode': 200,
             'headers': {
