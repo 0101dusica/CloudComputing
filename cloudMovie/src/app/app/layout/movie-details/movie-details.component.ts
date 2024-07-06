@@ -91,6 +91,7 @@ export class MovieDetailsComponent implements OnInit {
       if (result) {
         this.rate = result;
         this.isUserRated = true;
+        alert('You have successfully added your rating!');
       }
     });
   }
