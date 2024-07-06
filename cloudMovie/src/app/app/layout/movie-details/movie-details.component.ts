@@ -17,7 +17,11 @@ export class MovieDetailsComponent implements OnInit {
   isNotificationVisible = false;
   movie: Movie | undefined;
   
-  @ViewChild('bgVideo') bgVideo: ElementRef<HTMLVideoElement> | undefined;
+  @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
+  
+  isVideoVisible = false;
+  
   isImageVisible = false;
   isUserRated = false;
   rate: number = 0;
@@ -134,16 +138,26 @@ export class MovieDetailsComponent implements OnInit {
     if (this.movie) {
       this.movieService.getWatchUrl(this.movie.movieId).subscribe(response => {
         const presignedUrl = response.presignedUrl;
-        const video = this.bgVideo?.nativeElement;
+        const video = this.fullScreenVideo.nativeElement;
         if (video) {
           video.src = presignedUrl;
           video.load();
           video.play();
+          this.isVideoVisible = true;
         }
       }, error => {
         console.log(error);
         alert('Failed to get presigned URL for watching');
       });
+    }
+  }
+
+  closeVideo() {
+    const video = this.fullScreenVideo.nativeElement;
+    if (video) {
+      video.pause();
+      video.src = '';
+      this.isVideoVisible = false;
     }
   }
 
