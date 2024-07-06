@@ -56,7 +56,7 @@
         <div class="actions" style="margin-top: 2%;"> <!-- vidljivo samo adminu -->
           <button (click)="delete()">Delete</button>
             <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode', series.movieId]">Add New Episode</button>
-            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/edit-show', series.movieId]" [queryParams]="{ createdAt: series.createdAt }">Edit</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-show', series!.movieId]" [queryParams]="{ createdAt: series!.createdAt }">Edit</button>
         </div>
       </div>
     </div>
@@ -75,7 +75,6 @@
           </div>
           <div class="episode-actions">
             <button (click)="playEpisode(episode)">Play</button>
-            <button (click)="editEpisode(episode)" [routerLink]="['/edit-episode', episode.episodeId]">Edit</button>
             <button (click)="deleteEpisode(episode)">Delete</button>
               <button (click)="downloadEpisode(episode)">Download</button>
 
