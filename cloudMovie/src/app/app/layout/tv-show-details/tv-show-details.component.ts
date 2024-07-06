@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
 import { MovieService } from '../movie.service';
 import {Episode, Movie} from '../movie';
+import Swal from "sweetalert2";
 
 
 @Component({
@@ -212,6 +213,39 @@ if (episode) {
   }
 
   deleteEpisode(episode: Episode) {
+    if (episode) {
+      this.movieService.deleteMovie(episode.episodeId, episode.createdAt).subscribe(response => {
+        alert('Movie deleted successfully');
+        this.router.navigate(['/']); // Redirect to home page
+      }, error => {
+        console.log(error);
+        alert('Failed to delete the movie');
+      });
+    }
+  }
 
+  delete() {
+    console.log(this.episodes.length)
+     if (this.episodes.length != 0) {
+           console.log((this.episodes.length))
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Cannot Delete',
+        text: 'This series cannot be deleted because it has episodes.',
+        confirmButtonText: 'Close'
+      });
+    } else {
+           console.log((this.episodes.length + '>>>'))
+
+      // Poziv za brisanje serije
+      // Tvoj kod za brisanje serije ovde
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted',
+        text: 'The series has been deleted successfully!',
+        confirmButtonText: 'OK'
+      });
+    }
   }
 }
