@@ -353,38 +353,100 @@ getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
     api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
 
-  //COGNITO
-    // Cognito User Pool
+  // Cognito User Pool
     const userPool = new cognito.UserPool(this, 'UserPool', {
-      userPoolName: 'cloud-project-user-pool',
       selfSignUpEnabled: true,
-      signInAliases: { email: true },
-      autoVerify: { email: true },
+      signInAliases: { email: true, username: true},
       passwordPolicy: {
         minLength: 8,
         requireLowercase: true,
         requireUppercase: true,
         requireDigits: true,
-        requireSymbols: true,
       },
-      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+      autoVerify: { email: true },
+      userVerification:{
+        emailSubject: "Verify your email address",
+        emailBody: "Hello, Thanks for signing up to our app! Click here to verify your email address {##Verify Email##}",
+        emailStyle: cognito.VerificationEmailStyle.LINK,
+      },
+
+      standardAttributes: {
+        email: {
+          mutable: true,
+          required: true,
+        },
+        familyName: {
+          mutable: true,
+          required: true,
+        },
+        givenName: {
+          mutable: true,
+          required: true,
+        },
+        birthdate: {
+          mutable: true,
+          required: true,
+        },
+      },
     });
 
-    // Cognito User Pool Client
+    const adminGroup = new cognito.CfnUserPoolGroup(this, 'AdminGroup', {
+      userPoolId: userPool.userPoolId,
+      groupName: 'admin',
+      description: 'Admin group',
+    });
+
+    const userGroup = new cognito.CfnUserPoolGroup(this, 'UserGroup', {
+      userPoolId: userPool.userPoolId,
+      groupName: 'user',
+      description: 'User group',
+    });
+
+    // Create IAM roles for each group
+    const adminRole = new iam.Role(this, 'AdminRole', {
+      assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
+        'StringEquals': { 'cognito-identity.amazonaws.com:aud': userPool.userPoolId },
+        'ForAnyValue:StringLike': { 'cognito-identity.amazonaws.com:amr': 'authenticated' },
+      }, 'sts:AssumeRoleWithWebIdentity'),
+      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')],
+    });
+
+    const userRole = new iam.Role(this, 'UserRole', {
+      assumedBy: new iam.FederatedPrincipal('cognito-identity.amazonaws.com', {
+        'StringEquals': { 'cognito-identity.amazonaws.com:aud': userPool.userPoolId },
+        'ForAnyValue:StringLike': { 'cognito-identity.amazonaws.com:amr': 'authenticated' },
+      }, 'sts:AssumeRoleWithWebIdentity'),
+      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3ReadOnlyAccess')],
+    });
+
+    // Attach roles to groups
+    adminGroup.roleArn = adminRole.roleArn;
+    userGroup.roleArn = userRole.roleArn;
+
+    // App Client
     const userPoolClient = new cognito.UserPoolClient(this, 'UserPoolClient', {
       userPool,
       generateSecret: false,
     });
 
-    // Export User Pool and Client IDs
+    // User Pool Domain
+    const userPoolDomain = new cognito.UserPoolDomain(this, 'UserPoolDomain', {
+      userPool,
+      cognitoDomain: {
+        domainPrefix: 'cine-cloud-auth', // replace with a unique domain prefix
+      },
+    });
+
+    // Output values for reference
     new cdk.CfnOutput(this, 'UserPoolId', {
       value: userPool.userPoolId,
     });
-
     new cdk.CfnOutput(this, 'UserPoolClientId', {
       value: userPoolClient.userPoolClientId,
     });
-
+    new cdk.CfnOutput(this, 'UserPoolDomainOutput', {
+      value: userPoolDomain.domainName,
+    });
 }
 }
 

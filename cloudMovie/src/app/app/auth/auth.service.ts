@@ -21,18 +21,45 @@ const userPool = new CognitoUserPool(poolData);
 export class AuthService {
   constructor() {}
 
-  register(email: string, password: string, callback: (err: any, result: any) => void): void {
+  register(firstName: string, lastName: string, dobDate: Date, email: string, password: string, type: boolean, callback: (err: any, result: any) => void): void {
     const attributeList = [];
+  
     const dataEmail = {
       Name: 'email',
       Value: email
     };
-
+    const dataFirstName = {
+      Name: 'given_name',
+      Value: firstName
+    };
+    const dataLastName = {
+      Name: 'family_name',
+      Value: lastName
+    };
+    const dataDOB = {
+      Name: 'birthdate',
+      Value: dobDate.toISOString().split('T')[0] // Formatted as YYYY-MM-DD
+    };
+    const dataUserType = {
+      Name: 'type',
+      Value: type ? 'admin' : 'basic'
+    };
+  
     const attributeEmail = new CognitoUserAttribute(dataEmail);
+    const attributeFirstName = new CognitoUserAttribute(dataFirstName);
+    const attributeLastName = new CognitoUserAttribute(dataLastName);
+    const attributeDOB = new CognitoUserAttribute(dataDOB);
+    const attributeUserType = new CognitoUserAttribute(dataUserType);
+  
     attributeList.push(attributeEmail);
-
+    attributeList.push(attributeFirstName);
+    attributeList.push(attributeLastName);
+    attributeList.push(attributeDOB);
+    attributeList.push(attributeUserType);
+  
     userPool.signUp(email, password, attributeList, [], callback);
   }
+  
 
   authenticate(email: string, password: string, callback: (err: any, result: any) => void): void {
     const authenticationDetails = new AuthenticationDetails({
