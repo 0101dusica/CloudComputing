@@ -5,7 +5,7 @@ import { env } from "../../../../env/env";
 import { HttpClient } from "@angular/common/http";
 import Decimal from "decimal.js";
 import { MovieService } from "../movie.service";
-import {Director} from "../director.enum";
+import { Director } from "../director.enum";
 
 @Component({
   selector: 'app-add-new-movie',
@@ -33,8 +33,7 @@ export class AddNewMovieComponent {
   actorsInput: string = ""; // Variable to store the input for actors
   selectedFile: File | null = null; // Variable to store the selected file
 
-  constructor(private http: HttpClient, private movieService: MovieService) {
-  }
+  constructor(private http: HttpClient, private movieService: MovieService) { }
 
   genres = ['Action', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Romance', 'Sci-Fi', 'Thriller'];
   actors = ['Actor 1', 'Actor 2', 'Actor 3', 'Actor 4'];
@@ -49,13 +48,17 @@ export class AddNewMovieComponent {
     this.getMovieDuration(file!).then(duration => {
       this.movie.duration = new Decimal(duration).toString()
     });
-    this.movie.fileName = file!.name;
+    this.movie.fileName = file!.name.toLowerCase(); // Convert file name to lower case
   }
 
   onSubmit() {
-    // Convert actors input to an array
-    this.movie.actors = this.actorsInput.split(',').map(actor => actor.trim());
-    // The movie.director property is already bound to the selected value in the template
+    // Convert actors input to an array and lowercase
+    this.movie.actors = this.actorsInput.split(',').map(actor => actor.trim().toLowerCase());
+    // Convert title, description, director, and genres to lowercase
+    this.movie.title = this.movie.title.toLowerCase();
+    this.movie.description = this.movie.description.toLowerCase();
+    this.movie.director = this.movie.director.toLowerCase();
+    this.movie.genres = this.movie.genres.map(genre => genre.toLowerCase());
 
     console.log('Movie data:', this.movie);
     const movieReader = new FileReader();
@@ -75,7 +78,7 @@ export class AddNewMovieComponent {
   }
 
   onCheckboxChange(event: any, type: 'actors' | 'genres') {
-    const value = event.target.value;
+    const value = event.target.value.toLowerCase(); // Convert checkbox value to lower case
     if (event.target.checked) {
       this.movie[type].push(value);
     } else {
