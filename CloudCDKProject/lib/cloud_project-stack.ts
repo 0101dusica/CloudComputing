@@ -299,6 +299,8 @@ export class CloudProjectStack extends cdk.Stack {
 
 deleteLambda.addToRolePolicy(dynamoDBPolicy);
 getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
+updateLambda.addToRolePolicy(dynamoDBPolicy);
+
 
     movieBucket.grantReadWrite(deleteLambda);
     movieBucket.grantDelete(deleteLambda)
