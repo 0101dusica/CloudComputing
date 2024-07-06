@@ -77,6 +77,8 @@
             <button (click)="playEpisode(episode)">Play</button>
             <button (click)="editEpisode(episode)" [routerLink]="['/edit-episode', episode.episodeId]">Edit</button>
             <button (click)="deleteEpisode(episode)">Delete</button>
+              <button (click)="downloadEpisode(episode)">Download</button>
+
           </div>
         </div>
       </div>
