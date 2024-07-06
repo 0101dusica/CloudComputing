@@ -8,7 +8,6 @@ import { Component } from '@angular/core';
 export class AddNewTvShowComponent {
   show = {
     title: '',
-    year: 0,
     description: '',
     seasons: 0, 
     actors: [] as string[],

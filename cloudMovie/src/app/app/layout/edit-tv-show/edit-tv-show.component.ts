@@ -8,7 +8,6 @@ import { Component, OnInit } from '@angular/core';
 export class EditTvShowComponent implements OnInit {
   show = {
     title: '',
-    year: 0,
     description: '',
     seasons: 0,
     actors: [] as string[],
@@ -41,7 +40,6 @@ export class EditTvShowComponent implements OnInit {
     // This is a placeholder example
     this.show = {
       title: 'Sample TV Show',
-      year: 2023,
       description: 'This is a sample show description.',
       seasons: 3,
       actors: ['Actor 1', 'Actor 3'],
@@ -51,10 +49,6 @@ export class EditTvShowComponent implements OnInit {
 
     this.updateSeasonsArray();
 
-    // Simulate loaded files
-    this.loadedFiles['thumbnail'] = { name: 'sample-thumbnail.jpg' } as File;
-    this.loadedFiles['trailer'] = { name: 'sample-trailer.mp4' } as File;
-
     // Simulate episodes
     for (let i = 1; i <= this.show.seasons; i++) {
       this.episodes[i] = [
@@ -63,8 +57,8 @@ export class EditTvShowComponent implements OnInit {
       ];
 
       this.loadedEpisodeFiles[i] = {
-        1: { thumbnail: { name: 'episode1-thumbnail.jpg' } as File, video: { name: 'episode1-video.mp4' } as File },
-        2: { thumbnail: { name: 'episode2-thumbnail.jpg' } as File, video: { name: 'episode2-video.mp4' } as File }
+        1: {video: { name: 'episode1-video.mp4' } as File },
+        2: {video: { name: 'episode2-video.mp4' } as File }
       };
     }
   }

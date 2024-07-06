@@ -5,26 +5,6 @@
       <label class="title">Edit Movie Information</label>
       <form (ngSubmit)="onSubmit()" style="margin-top: 2%;">
         <div class="form-group">
-          <label for="thumbnail">Thumbnail</label>
-          <div *ngIf="loadedFiles['thumbnail']; else thumbnailInput">
-            <span class="file-name">{{ loadedFiles['thumbnail']?.name }}</span>
-            <button class="btn-delete" type="button" (click)="deleteFile('thumbnail')">Delete Thumbnail</button>
-          </div>
-          <ng-template #thumbnailInput>
-            <input type="file" id="thumbnail" (change)="onFileSelected($event, 'thumbnail')" class="form-control" />
-          </ng-template>
-        </div>
-        <div class="form-group">
-          <label for="trailer">Trailer</label>
-          <div *ngIf="loadedFiles['trailer']; else trailerInput">
-            <span class="file-name">{{ loadedFiles['trailer']?.name }}</span>
-            <button class="btn-delete" type="button" (click)="deleteFile('trailer')">Delete Trailer</button>
-          </div>
-          <ng-template #trailerInput>
-            <input type="file" id="trailer" (change)="onFileSelected($event, 'trailer')" class="form-control" />
-          </ng-template>
-        </div>
-        <div class="form-group">
           <label for="video">Movie</label>
           <div *ngIf="loadedFiles['video']; else videoInput">
             <span class="file-name">{{ loadedFiles['video']?.name }}</span>
@@ -37,10 +17,6 @@
         <div class="form-group">
           <label for="title">Title</label>
           <input type="text" id="title" [(ngModel)]="movie.title" name="title" class="form-control" required />
-        </div>
-        <div class="form-group">
-          <label for="year">Release Year</label>
-          <input type="number" id="year" [(ngModel)]="movie.year" name="year" class="form-control" required />
         </div>
         <div class="form-group">
           <label for="description">Description</label>
