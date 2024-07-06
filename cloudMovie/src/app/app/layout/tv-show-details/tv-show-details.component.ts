@@ -4,15 +4,9 @@ import { ReviewDialogComponent } from '../review-dialog/review-dialog.component'
 import { MatDialog } from '@angular/material/dialog';
 import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
 import { MovieService } from '../movie.service';
-import { Movie } from '../movie';
+import {Episode, Movie} from '../movie';
+import Swal from "sweetalert2";
 
-interface Episode {
-  number: number;
-  image: string;
-  title: string;
-  description: string;
-  duration: string;
-}
 
 @Component({
   selector: 'app-tv-show-details',
@@ -187,5 +181,80 @@ export class TvShowDetailsComponent implements OnInit {
 
   notImplemented() {
 
+  }
+
+ ceilValue(value: string): number {
+    const numberValue = parseFloat(value);
+    return Math.ceil(numberValue);
+  }
+
+  playEpisode(episode: Episode) {
+if (episode) {
+      this.movieService.getWatchUrl(episode.episodeId).subscribe(response => {
+        const presignedUrl = response.presignedUrl;
+        const video = this.fullScreenVideo.nativeElement;
+        if (video) {
+          video.src = presignedUrl;
+          video.load();
+          video.play();
+          this.isVideoVisible = true;
+        }
+      }, error => {
+        console.log(error);
+        alert('Failed to get presigned URL for watching');
+      });
+    }
+  }
+
+
+
+  editEpisode(episode: Episode) {
+
+  }
+
+  deleteEpisode(episode: Episode) {
+    if (episode) {
+      this.movieService.deleteMovie(episode.episodeId, episode.createdAt).subscribe(response => {
+        alert('Movie deleted successfully');
+        this.router.navigate(['/']); // Redirect to home page
+      }, error => {
+        console.log(error);
+        alert('Failed to delete the movie');
+      });
+    }
+  }
+
+  delete() {
+    console.log(this.episodes.length)
+     if (this.episodes.length != 0) {
+           console.log((this.episodes.length))
+
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Cannot Delete',
+        text: 'This series cannot be deleted because it has episodes.',
+        confirmButtonText: 'Close'
+      });
+    } else {
+           console.log((this.episodes.length + '>>>'))
+        if (this.series) {
+              this.movieService.deleteMovie(this.series.movieId, this.series.createdAt).subscribe(response => {
+                alert('Movie deleted successfully');
+                this.router.navigate(['/']); // Redirect to home page
+              }, error => {
+                console.log(error);
+                alert('Failed to delete the movie');
+              });
+            }
+      // Poziv za brisanje serije
+      // Tvoj kod za brisanje serije ovde
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted',
+        text: 'The series has been deleted successfully!',
+        confirmButtonText: 'OK'
+      });
+    }
   }
 }
