@@ -67,9 +67,9 @@
             <label class="season">Season 1</label>
         </div>
         <div class="episode" *ngFor="let episode of episodes; let i = index">
-          <div class="episode-number">{{i + 1}}</div>
+          <div class="episode-number">{{episode.number}}</div>
           <div class="episode-content">
-            <img [src]="episode.image" class="episode-image">
+            <img src="../../../../assets/episode-four.jpg" class="episode-image" alt="">
             <div class="episode-details">
               <h3>{{episode.title}}</h3>
               <p>{{episode.description}}</p>
