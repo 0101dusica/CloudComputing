@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
 
 interface Episode {
   number: number;
@@ -18,10 +19,20 @@ interface Episode {
 })
 export class TvShowDetailsComponent implements OnInit {
 
+  @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
+  
+  isVideoVisible = false;
+
   isNotificationVisible = false;
   isImageVisible: boolean = true;
   isUserRated = false;
   rate: number = 0;
+  subscribe: {} | null = null;
+  isInfoBoxVisible: boolean = false;
+
+  actors: string[] = ["actor 1", "actor 2"];
+  directors: string[] = ["director 1", "director 2"];
   
   constructor(private router: Router, 
     private dialog: MatDialog) {}
@@ -33,6 +44,38 @@ export class TvShowDetailsComponent implements OnInit {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.scrollToTop();
+      }
+    });
+  }
+
+  showInfoBox() {
+    this.isInfoBoxVisible = true;
+  }
+
+  hideInfoBox() {
+    this.isInfoBoxVisible = false;
+  }
+
+  onSubscribeIconClick(): void {
+    this.isNotificationVisible = !this.isNotificationVisible;
+    this.addSubscribe(); // Ensure the dialog is opened here
+  }
+
+  onSubscribePopupClick(event: Event): void {
+    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
+       this.isNotificationVisible = false;
+    }
+  }
+
+  addSubscribe(): void {
+    const dialogRef = this.dialog.open(SubscribeDialogComponent, {
+      panelClass: 'popup-overlay'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.subscribe = result;
+        console.log("You are subscribed at: ", result);
       }
     });
   }
@@ -57,6 +100,7 @@ export class TvShowDetailsComponent implements OnInit {
       if (result) {
         this.rate = result;
         this.isUserRated = true;
+        alert('You have successfully added your rating!');
       }
     });
   }
@@ -77,8 +121,6 @@ export class TvShowDetailsComponent implements OnInit {
     alert('This feature is not implemented yet.');
   }
 
-  @ViewChild('bgVideo') bgVideo: ElementRef<HTMLVideoElement> | undefined;
-
   checkVideoTime() {
     const video = this.bgVideo?.nativeElement;
     if (video != undefined) {
@@ -86,6 +128,34 @@ export class TvShowDetailsComponent implements OnInit {
         video.pause();
         this.isImageVisible = true;
       }
+    }
+  }
+
+  watchNow() {
+    alert('This feature is not implemented yet.');
+    // if (this.movie) {
+    //   this.movieService.getWatchUrl(this.movie.movieId).subscribe(response => {
+    //     const presignedUrl = response.presignedUrl;
+    //     const video = this.fullScreenVideo.nativeElement;
+    //     if (video) {
+    //       video.src = presignedUrl;
+    //       video.load();
+    //       video.play();
+    //       this.isVideoVisible = true;
+    //     }
+    //   }, error => {
+    //     console.log(error);
+    //     alert('Failed to get presigned URL for watching');
+    //   });
+    // }
+  }
+
+  closeVideo() {
+    const video = this.fullScreenVideo.nativeElement;
+    if (video) {
+      video.pause();
+      video.src = '';
+      this.isVideoVisible = false;
     }
   }
 

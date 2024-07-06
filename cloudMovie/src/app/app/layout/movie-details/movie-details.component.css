@@ -20,6 +20,54 @@ video {
   z-index: -2;
 }
 
+#bgVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.video-container.hidden {
+  display: none;
+}
+
+.video-container {
+  display: flex;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  justify-content: center;
+  align-items: center;
+}
+.fullscreen-video {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+}
+
+.close-btn {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 15px;
+  right: 15px;
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 4px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  z-index: 1001;
+}
+
 .overlay {
   position: absolute;
   top: 0;
@@ -85,6 +133,39 @@ h2 {
 .logo {
   width: 40px;
   height: 20px;
+}
+.question-logo{
+  width: 20px;
+  height: 20px;
+}
+
+.hover-container {
+  position: relative;
+  display: inline-block;
+}
+
+.info-box {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px; /* Adjust as needed */
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  text-align: center;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.info-box p {
+  margin: 0;
+}
+
+.info-box ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
 }
 
 .rating {

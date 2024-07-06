@@ -1,3 +1,3 @@
 export const env = {
-  apiGatewayHost: 'https://8995lc5kf9.execute-api.eu-central-1.amazonaws.com/prod',
+  apiGatewayHost: 'https://b0idzz4i3k.execute-api.eu-central-1.amazonaws.com/prod/',
 }

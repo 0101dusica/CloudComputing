@@ -5,6 +5,11 @@
       <source src="assets/trailer-1.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+
+    <div class="video-container" id="videoContainer" [ngClass]="{'hidden': !isVideoVisible}">
+      <video #fullScreenVideo class="fullscreen-video" controls></video>
+      <button class="close-btn" (click)="closeVideo()">X</button>
+    </div>
   <div class="vignette"></div>
     <div class="main-content">
         <div class="content">
@@ -21,6 +26,21 @@
               <span>18+</span>
               <span *ngIf="isUserRated">|</span>
               <span *ngIf="isUserRated">Your Rating: {{rate}}</span>
+              <span>|</span>
+              <div class="hover-container">
+                <img src="../../../../assets/question-icon.png" class="question-logo" (mouseenter)="showInfoBox()" (mouseleave)="hideInfoBox()">
+                <div class="info-box" *ngIf="isInfoBoxVisible">
+                  <p><strong>Cast:</strong></p>
+                  <p><strong>Actors:</strong></p>
+                  <ul>
+                    <li *ngFor="let actor of actors">{{ actor }}</li>
+                  </ul>
+                  <p><strong>Directors:</strong></p>
+                  <ul>
+                    <li *ngFor="let director of directors">{{ director }}</li>
+                  </ul>
+                </div>
+              </div>
           </div>
           <p class="description">
             One victim, found dead on a London street. Four detectives, in four different time periods, must solve the mystery to protect Britain's future.
@@ -32,8 +52,8 @@
           </div>
         <div class="actions">
           <button>Play</button>
-          <button style="background-color: rgba(0, 0, 0, 0.5); " >+ Subscribe</button>
-          <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onNotificationIconClick()">Add Review</button> <!-- vidljivo samo user-u -->
+          <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onSubscribeIconClick()">+ Subscribe</button>
+          <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onNotificationIconClick()" *ngIf="!isUserRated">Add Review</button> <!-- vidljivo samo user-u -->
         </div>
         <div class="actions" style="margin-top: 2%;"> <!-- vidljivo samo adminu -->
             <button (click)="notImplemented()">Delete</button>

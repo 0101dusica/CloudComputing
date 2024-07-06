@@ -5,6 +5,7 @@ import { Movie } from '../movie';
 import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
+import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
 
 @Component({
   selector: 'app-movie-details',
@@ -15,14 +16,20 @@ export class MovieDetailsComponent implements OnInit {
   
   isNotificationVisible = false;
   movie: Movie | undefined;
-  notImplemented() {
-    throw new Error('Method not implemented.');
-  }
-
-  @ViewChild('bgVideo') bgVideo: ElementRef<HTMLVideoElement> | undefined;
+  
+  @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
+  
+  isVideoVisible = false;
+  
   isImageVisible = false;
   isUserRated = false;
   rate: number = 0;
+  subscribe: {} | null = null;
+
+  isInfoBoxVisible: boolean = false;
+  actors: string[] = ["actor 1", "actor 2"];
+  directors: string[] = ["director 1", "director 2"];
 
   constructor(
     private route: ActivatedRoute,
@@ -32,6 +39,42 @@ export class MovieDetailsComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
+  notImplemented() {
+    throw new Error('Method not implemented.');
+  }
+
+  showInfoBox() {
+    this.isInfoBoxVisible = true;
+  }
+
+  hideInfoBox() {
+    this.isInfoBoxVisible = false;
+  }
+
+  onSubscribeIconClick(): void {
+    this.isNotificationVisible = !this.isNotificationVisible;
+    this.addSubscribe(); // Ensure the dialog is opened here
+  }
+
+  onSubscribePopupClick(event: Event): void {
+    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
+       this.isNotificationVisible = false;
+    }
+  }
+
+  addSubscribe(): void {
+    const dialogRef = this.dialog.open(SubscribeDialogComponent, {
+      panelClass: 'popup-overlay'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.subscribe = result;
+        console.log("You are subscribed at: ", result);
+      }
+    });
+  }
+  
   onNotificationIconClick(): void {
     this.isNotificationVisible = !this.isNotificationVisible;
     this.addReview(); // Ensure the dialog is opened here
@@ -52,6 +95,7 @@ export class MovieDetailsComponent implements OnInit {
       if (result) {
         this.rate = result;
         this.isUserRated = true;
+        alert('You have successfully added your rating!');
       }
     });
   }
@@ -94,16 +138,26 @@ export class MovieDetailsComponent implements OnInit {
     if (this.movie) {
       this.movieService.getWatchUrl(this.movie.movieId).subscribe(response => {
         const presignedUrl = response.presignedUrl;
-        const video = this.bgVideo?.nativeElement;
+        const video = this.fullScreenVideo.nativeElement;
         if (video) {
           video.src = presignedUrl;
           video.load();
           video.play();
+          this.isVideoVisible = true;
         }
       }, error => {
         console.log(error);
         alert('Failed to get presigned URL for watching');
       });
+    }
+  }
+
+  closeVideo() {
+    const video = this.fullScreenVideo.nativeElement;
+    if (video) {
+      video.pause();
+      video.src = '';
+      this.isVideoVisible = false;
     }
   }
 

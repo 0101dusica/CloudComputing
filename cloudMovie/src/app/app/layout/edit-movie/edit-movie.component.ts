@@ -8,7 +8,6 @@ import { Component, OnInit } from '@angular/core';
 export class EditMovieComponent implements OnInit {
   movie = {
     title: '',
-    year: 0,
     description: '',
     actors: [] as string[],
     directors: [] as string[],
@@ -34,7 +33,6 @@ export class EditMovieComponent implements OnInit {
     // This is a placeholder example
     this.movie = {
       title: 'Sample Movie',
-      year: 2023,
       description: 'This is a sample movie description.',
       actors: ['Actor 1', 'Actor 3'],
       directors: ['Director 1'],
@@ -42,8 +40,6 @@ export class EditMovieComponent implements OnInit {
     };
 
     // Simulate loaded files
-    this.loadedFiles['thumbnail'] = { name: 'sample-thumbnail.jpg' } as File;
-    this.loadedFiles['trailer'] = { name: 'sample-trailer.mp4' } as File;
     this.loadedFiles['video'] = { name: 'sample-movie.mp4' } as File;
   }
 
