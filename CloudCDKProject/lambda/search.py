@@ -19,9 +19,13 @@ def handler(event, context):
         actors = body.get('actors')
         director = body.get('director')
         genres = body.get('genres')
-        duration = body.get('duration')
-
-        result = query(title=title, director=director, genres=genres, actors=actors, description=description)
+        # duration = body.get('duration')
+        print(title)
+        print(description)
+        print(actors)
+        print(genres)
+        print(director)
+        result = query(title=title, description=description, director=director, genres=genres, actors=actors)
 
         return {
             'statusCode': 200,
@@ -44,7 +48,7 @@ def handler(event, context):
         }
 
 
-def query(title=None, director=None, genres=None, actors=None, description=None):
+def query(title=None, description=None, director=None, genres=None, actors=None):
     table = dynamodb.Table(table_name_movie)
 
     params = {
@@ -55,30 +59,39 @@ def query(title=None, director=None, genres=None, actors=None, description=None)
     filter_expressions = []
     expression_attribute_values = {}
 
-    # Query based on genre and actors
-    if genres and actors:
-        items = query_movies_by_genre_and_actors(genres, actors)
-    elif genres:
-        items = query_movies_by_attribute('genre', genres)
-    elif actors:
-        items = query_movies_by_attribute('actors', actors)
-    else:
-        items = []
+    response_from_genres = None
+    response_from_actors = None
+    response_from_movies = None
+
 
     # Adding additional search conditions if provided
     if title:
-        add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values, 'title',
-                             title)
+        key_condition_expression, expression_attribute_values, filter_expressions = add_search_condition(params,
+                                                                                                         key_condition_expression,
+                                                                                                         filter_expressions,
+                                                                                                         expression_attribute_values,
+                                                                                                         'title',
+                                                                                                         title)
+    print("izvan funkcije: ", key_condition_expression)
     if director:
-        add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values,
-                             'director', director)
+        key_condition_expression, expression_attribute_values, filter_expressions = add_search_condition(params,
+                                                                                                         key_condition_expression,
+                                                                                                         filter_expressions,
+                                                                                                         expression_attribute_values,
+                                                                                                         'director',
+                                                                                                         director)
     if description:
-        add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values,
-                             'description', description, contains=True)
-
+        key_condition_expression, expression_attribute_values, filter_expressions = add_search_condition(params,
+                                                                                                         key_condition_expression,
+                                                                                                         filter_expressions,
+                                                                                                         expression_attribute_values,
+                                                                                                         'description',
+                                                                                                         description,
+                                                                                                         contains=True)
+    print(key_condition_expression)
     # If no basic conditions and no items from genre/actors query, raise an error
-    if not key_condition_expression and not filter_expressions and not items:
-        raise ValueError("At least one search criteria must be provided.")
+    # if not key_condition_expression and not filter_expressions and not (response_from_genres or response_from_actors):
+    #     raise ValueError("At least one search criteria must be provided.")
 
     if key_condition_expression:
         params['KeyConditionExpression'] = key_condition_expression
@@ -86,25 +99,66 @@ def query(title=None, director=None, genres=None, actors=None, description=None)
     if filter_expressions:
         params['FilterExpression'] = ' AND '.join(filter_expressions)
 
-    response = table.query(**params)
+    if key_condition_expression or len(filter_expressions) != 0:
+        response_from_movies = table.query(**params)['Items']
 
-    if items:
-        # Find intersection between items and response['Items']
-        intersection_items = [item for item in items if item in response['Items']]
-        items = intersection_items
-    else:
-        items = response['Items']
+    print("Response from movies: ", response_from_movies)
+
+    if genres:
+        response_from_genres = query_movies_by_attribute('genre', genres)
+        print("Response from genres: ", response_from_genres)
+    if actors:
+        response_from_actors = query_movies_by_attribute('actor', actors)
+        print("Response from actors: ", response_from_actors)
+
+
+
+
+
+    # Perform intersection based on genres and actors queries
+    items = []
+    switch_case = (response_from_movies is not None, response_from_genres is not None, response_from_actors is not None)
+
+    # Switch case logic
+    if switch_case == (True, True, True):
+        items = intersection_items(response_from_movies, response_from_genres)
+        items = intersection_items(items, response_from_actors)
+    elif switch_case == (True, True, False):
+        items = intersection_items(response_from_movies, response_from_genres)
+    elif switch_case == (True, False, True):
+        items = intersection_items(response_from_movies, response_from_actors)
+    elif switch_case == (False, True, True):
+        items = intersection_items(response_from_genres, response_from_actors)
+    elif switch_case == (True, False, False):
+        items = response_from_movies
+    elif switch_case == (False, True, False):
+        items = response_from_genres
+    elif switch_case == (False, False, True):
+        items = response_from_actors
+    elif switch_case == (False, False, False):
+        items = []
 
     return items
+
+
+def intersection_items(items1, items2):
+    return [item for item in items1 if item in items2]
 
 
 def add_search_condition(params, key_condition_expression, filter_expressions, expression_attribute_values, attribute,
                          value, contains=False):
     if key_condition_expression:
-        filter_expressions.append(f"{'contains' if contains else '='}({attribute}, :{attribute})")
+        if contains:
+            filter_expressions.append(f"contains({attribute}, :{attribute})")
+        else:
+            filter_expressions.append(f"{attribute} = :{attribute}")
     else:
         key_condition_expression = f"{attribute} = :{attribute}"
+        print("iz funkcije: ", key_condition_expression)
+        params['IndexName'] = f'ind-{attribute}'
     expression_attribute_values[f":{attribute}"] = value
+
+    return key_condition_expression, expression_attribute_values, filter_expressions
 
 
 def query_movies_by_attribute(attribute, value):
@@ -112,24 +166,46 @@ def query_movies_by_attribute(attribute, value):
         table_name = table_name_genre
     else:
         table_name = table_name_actor
+
     table = dynamodb.Table(table_name)
-    response = table.query(
-        IndexName=f'{attribute}-index',
-        KeyConditionExpression=f'{attribute} = :{attribute}',
-        ExpressionAttributeValues={f':{attribute}': value}
-    )
-    movie_id_timestamps = [(item['movieId'], item['createdAt']) for item in response['Items']]
-    return get_movies_by_ids(movie_id_timestamps)
+    movie_ids_list = []
+    movie_id_timestamps = []
+    items = value.split(',')
+    for item in items:
+        response = table.query(
+            IndexName=f'ind-{attribute}',
+            KeyConditionExpression=f'{attribute} = :{attribute}',
+            ExpressionAttributeValues={f':{attribute}': item.strip()}
+        )
+        movie_ids = {item['movieId'] for item in response['Items']}
+        movie_ids_list.extend(movie_ids)
+        movie_id_timestamps.extend([(item['movieId'], item['createdAt']) for item in response['Items']])
+
+    # Count occurrences of each movie ID
+    movie_id_count = {}
+    for movie_id in movie_ids_list:
+        if movie_id in movie_id_count:
+            movie_id_count[movie_id] += 1
+        else:
+            movie_id_count[movie_id] = 1
+
+    # Find movie IDs that appear exactly len(items) times
+    common_movie_ids = {movie_id for movie_id, count in movie_id_count.items() if count == len(items)}
+
+    # Filter movie_id_timestamps to include only common movie IDs
+    filtered_movie_id_timestamps = [(movie_id, created_at) for movie_id, created_at in movie_id_timestamps if
+                                    movie_id in common_movie_ids]
+    return get_movies_by_ids(filtered_movie_id_timestamps)
 
 
-def query_movies_by_genre_and_actors(genres, actors):
-    genre_items = query_movies_by_attribute('genre', genres)
-    actor_items = query_movies_by_attribute('actors', actors)
-    genre_movie_ids = {item['movieId'] for item in genre_items}
-    actor_movie_ids = {item['movieId'] for item in actor_items}
-    intersection_movie_ids = genre_movie_ids.intersection(actor_movie_ids)
-    intersection_items = [item for item in actor_items if item['movieId'] in intersection_movie_ids]
-    return intersection_items
+# def query_movies_by_genre_and_actors(genres, actors):
+#     genre_items = query_movies_by_attribute('genre', genres)
+#     actor_items = query_movies_by_attribute('actors', actors)
+#     genre_movie_ids = {item['movieId'] for item in genre_items}
+#     actor_movie_ids = {item['movieId'] for item in actor_items}
+#     intersection_movie_ids = genre_movie_ids.intersection(actor_movie_ids)
+#     intersection_items = [item for item in actor_items if item['movieId'] in intersection_movie_ids]
+#     return intersection_items
 
 
 def get_movies_by_ids(movie_id_timestamps):
@@ -138,5 +214,6 @@ def get_movies_by_ids(movie_id_timestamps):
     for movie_id, created_at in movie_id_timestamps:
         response = table.get_item(Key={'movieId': movie_id, 'createdAt': created_at})
         if 'Item' in response:
-            items.append(response['Item'])
+            if response['Item'] not in items:
+                items.append(response['Item'])
     return items
