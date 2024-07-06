@@ -33,7 +33,7 @@ const routes: Routes = [
   { path: 'add-new-episode/:seriesId', component: AddNewEpisodeComponent },
   { path: 'add-new-people', component: AddNewPeopleComponent },
 
-  { path: 'edit-movie', component: EditMovieComponent },
+  { path: 'edit-movie/:movieId', component: EditMovieComponent },
   { path: 'edit-show', component: EditTvShowComponent },
 
 ];

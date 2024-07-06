@@ -55,7 +55,7 @@
       </div>
       <div class="actions">
         <button (click)="deleteMovie()">Delete</button>
-        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-movie']">Edit</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-movie', movie!.movieId]" [queryParams]="{ createdAt: movie!.createdAt }">Edit</button>
       </div>
     </div>
   </div>

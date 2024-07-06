@@ -2,8 +2,8 @@ import json
 import os
 import uuid
 import boto3
-from botocore.exceptions import ClientError
 import base64
+
 from datetime import datetime
 
 s3 = boto3.client('s3')
@@ -18,53 +18,87 @@ def handler(event, context):
         file_name = body['fileName']
         content_type = body['contentType']
         file_size = body['fileSize']
-        created_at = event['queryStringParameters'].get('createdAt')  # get created date
+        created_at = body['createdAt']
         updated_at = datetime.utcnow().isoformat()
 
         # Data defined by admin
         title = body['title']
         description = body['description']
-        actors = body['actors']
-        director = body['director']
-        genres = body['genres']
         duration = body['duration']
-        # image = body['image'] ??
+        movieType = body['type']
+        movie_id = str(uuid.uuid4())  # Identifier for DynamoDB and S3 bucket
+
 
         bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
         table_name = os.environ['TABLE_NAME_MOVIE']  # DynamoDB
+        table_name_genres = os.environ['TABLE_NAME_GENRE']
+        table_name_actors = os.environ['TABLE_NAME_ACTOR']
+        table_name_episodes = os.environ['TABLE_NAME_EPISODE']
 
-        # Get a unique identifier for the movie
-        movie_id = event['pathParameters']['movieId']  # Identifier for DynamoDB and S3 bucket
+        generate_presigned_url = event['queryStringParameters'].get('generatePresignedUrl', '').lower() == 'true'
 
-        # Generate presigned URL for upload file to S3
-        if body['content']:
+        # Generate presigned URL for upload file to S3 if requested
+        presigned_url = ''
+        if generate_presigned_url:
             presigned_url = s3.generate_presigned_url(
                 'put_object',
                 Params={'Bucket': bucket_name, 'Key': movie_id},
                 ExpiresIn=3600
             )
+
+        if movieType == "episode":
+            season_number = body['seasonNumber']
+            episode_number = body['episodeNumber']
+            series_id = body['seriesId']
+
+            dynamodb.Table(table_name_episodes).put_item(
+                TableName=table_name_episodes,
+                Item={
+                    'episodeId': movie_id,
+                    'fileName': file_name,
+                    'contentType': content_type,
+                    "fileSize": file_size,
+                    'createdAt': created_at,
+                    'updatedAt': updated_at,
+                    'title': title,
+                    'description': description,
+                    'duration': duration,
+                    'type': movieType,
+                    'seasonNumber': season_number,
+                    'episodeNumber': episode_number,
+                    'seriesId': series_id
+                }
+            )
         else:
-            presigned_url = ''
+            actors = body['actors']
+            director = body['director']
+            genres = body['genres']
+            number_of_seasons = body['numberOfSeasons']
+            # Save metadata to DynamoDB
+            dynamodb.Table(table_name).put_item(
+                TableName=table_name,
+                Item={
+                    'movieId': movie_id,
+                    'fileName': file_name,
+                    'contentType': content_type,
+                    "fileSize": file_size,
+                    'createdAt': created_at,
+                    'updatedAt': updated_at,
+                    'title': title,
+                    'description': description,
+                    'actors': actors,
+                    'director': director,
+                    'genres': genres,
+                    'duration': duration,
+                    'type': movieType,
+                    'numberOfSeasons': number_of_seasons
+                }
+            )
 
-        # Save metadata to DynamoDB
-        dynamodb.Table(table_name).put_item(
-            TableName=table_name,
-            Item={
-                'movieId': movie_id,
-                'fileName': file_name,
-                'contentType': content_type,
-                "fileSize": file_size,
-                'createdAt': created_at,
-                'updatedAt': updated_at,
-                'title': title,
-                'description': description,
-                'actors': actors,
-                'director': director,
-                'genres': genres,
-                'duration': duration,
+            insert_items(dynamodb.Table(table_name_genres), genres, movie_id, created_at, 'genre')
+            insert_items(dynamodb.Table(table_name_actors), actors, movie_id, created_at, 'actor')
 
-            }
-        )
+
 
         return {
             'statusCode': 200,
@@ -86,3 +120,14 @@ def handler(event, context):
             },
             'body': json.dumps({'message': 'Error uploading file', 'error': str(e)})
         }
+
+
+def insert_items(table, items, movie_id, created_at, attribute_name):
+    for item in items:
+        table.put_item(
+            Item={
+                'movieId': movie_id,
+                attribute_name: item,
+                'createdAt': created_at
+            }
+        )

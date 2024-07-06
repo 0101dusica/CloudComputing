@@ -257,4 +257,14 @@ if (episode) {
       });
     }
   }
+
+  downloadEpisode(episode: Episode) {
+    this.movieService.getDownloadUrl(episode.episodeId).subscribe(response => {
+      const presignedUrl = response.presigned_url;
+      window.open(presignedUrl, '_blank');
+    }, error => {
+      console.log(error);
+      alert('Failed to get presigned URL');
+    });
+  }
 }
