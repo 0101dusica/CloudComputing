@@ -24,7 +24,9 @@ export class AddNewMovieComponent {
     duration: "",
     movieId: "",
     createdAt: "",
-    updatedAt: ""
+    updatedAt: "",
+    type: "movie",
+    numberOfSeasons: "0"
   };
 
   selectedFile: File | null = null; // Variable to store the selected file

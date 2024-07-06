@@ -22,15 +22,15 @@ const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  
-  { path: 'tv-show-details', component: TvShowDetailsComponent },
+
+  { path: 'tv-show-details/:movieId', component: TvShowDetailsComponent },
   { path: 'movie-details/:movieId', component: MovieDetailsComponent },
 
   { path: 'all-subscriptions', component: AllSubscriptionsComponent },
 
   { path: 'add-new-movie', component: AddNewMovieComponent },
   { path: 'add-new-tv-show', component: AddNewTvShowComponent },
-  { path: 'add-new-episode', component: AddNewEpisodeComponent },
+  { path: 'add-new-episode/:seriesId', component: AddNewEpisodeComponent },
   { path: 'add-new-people', component: AddNewPeopleComponent },
 
   { path: 'edit-movie', component: EditMovieComponent },

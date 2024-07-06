@@ -69,13 +69,6 @@ export class CloudProjectStack extends cdk.Stack {
       projectionType: ProjectionType.ALL,
     });
 
-    moviesTable.addGlobalSecondaryIndex({
-      indexName: 'ind-duration',
-      partitionKey: { name: 'duration', type: AttributeType.STRING },
-      projectionType: ProjectionType.ALL,
-    });
-   
-   
     // DynamoDB Table ACTOR
     const actorsTable = new Table(this, 'ActorsTable', {
       partitionKey: { name: 'movieId', type: AttributeType.STRING },
@@ -111,6 +104,14 @@ export class CloudProjectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    //Episodes DB
+    const episodesTable = new Table(this, 'EpisodesTable', {
+      partitionKey: { name: 'episodeId', type: AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: AttributeType.STRING },
+      tableName: 'cloud-project-episode-table',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     //jos interatctions, feed, subscription
     //                **************** LAMBDA ***************** //
 
@@ -123,7 +124,8 @@ export class CloudProjectStack extends cdk.Stack {
         BUCKET_NAME: movieBucket.bucketName,
         TABLE_NAME_MOVIE: moviesTable.tableName,
         TABLE_NAME_ACTOR: actorsTable.tableName,
-        TABLE_NAME_GENRE: genresTable.tableName
+        TABLE_NAME_GENRE: genresTable.tableName,
+        TABLE_NAME_EPISODE: episodesTable.tableName
       }
     });
 
@@ -131,6 +133,7 @@ export class CloudProjectStack extends cdk.Stack {
     moviesTable.grantWriteData(uploadLambda);
     actorsTable.grantWriteData(uploadLambda);
     genresTable.grantWriteData(uploadLambda);
+    episodesTable.grantWriteData(uploadLambda);
 
     // Lambda function to GET all movies
     const getMoviesLambda = new lambda.Function(this, 'getMovies', {
@@ -168,7 +171,8 @@ export class CloudProjectStack extends cdk.Stack {
         BUCKET_NAME: movieBucket.bucketName,
         TABLE_NAME_MOVIE: moviesTable.tableName,
         TABLE_NAME_ACTOR: actorsTable.tableName,
-        TABLE_NAME_GENRE: genresTable.tableName
+        TABLE_NAME_GENRE: genresTable.tableName,
+        TABLE_NAME_EPISODE: episodesTable.tableName
       }
     });
 
@@ -210,7 +214,9 @@ export class CloudProjectStack extends cdk.Stack {
         BUCKET_NAME: movieBucket.bucketName,
         TABLE_NAME_MOVIE: moviesTable.tableName,
         TABLE_NAME_ACTOR: actorsTable.tableName,
-        TABLE_NAME_GENRE: genresTable.tableName
+        TABLE_NAME_GENRE: genresTable.tableName,
+        TABLE_NAME_EPISODE: episodesTable.tableName
+
       }
     });
 

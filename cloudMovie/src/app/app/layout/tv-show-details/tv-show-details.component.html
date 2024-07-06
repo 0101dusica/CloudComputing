@@ -1,6 +1,6 @@
 <html>
 <body>
-  <div class="container">
+  <div class="container" *ngIf="series">
     <video id="bgVideo" autoplay muted loop>
       <source src="assets/trailer-1.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -57,8 +57,8 @@
         </div>
         <div class="actions" style="margin-top: 2%;"> <!-- vidljivo samo adminu -->
             <button (click)="notImplemented()">Delete</button>
-            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode']">Add New Episode</button>
-            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/edit-show']">Edit</button>
+            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode', series.movieId]">Add New Episode</button>
+            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/edit-show', series.movieId]" [queryParams]="{ createdAt: series.createdAt }">Edit</button>
         </div>
       </div>
     </div>
