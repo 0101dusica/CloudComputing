@@ -18,7 +18,7 @@ def handler(event, context):
         file_name = body['fileName']
         content_type = body['contentType']
         file_size = body['fileSize']
-        created_at = datetime.utcnow().isoformat()
+        created_at = body['createdAt']
         updated_at = datetime.utcnow().isoformat()
 
         # Data defined by admin
