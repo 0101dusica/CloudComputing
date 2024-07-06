@@ -105,11 +105,18 @@ export class CloudProjectStack extends cdk.Stack {
     });
 
     //Episodes DB
+   //Episodes DB
     const episodesTable = new Table(this, 'EpisodesTable', {
       partitionKey: { name: 'episodeId', type: AttributeType.STRING },
       sortKey: { name: 'createdAt', type: AttributeType.STRING },
       tableName: 'cloud-project-episode-table',
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    episodesTable.addGlobalSecondaryIndex({
+      indexName: 'ind-series', // Ime globalnog sekundarnog indeksa
+      partitionKey: { name: 'seriesId', type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
     });
 
     //jos interatctions, feed, subscription
@@ -161,6 +168,16 @@ export class CloudProjectStack extends cdk.Stack {
 
     // Grant permissions to read from DynamoDB table
     moviesTable.grantReadData(getMovieByIdLambda);
+
+     const getEpisodesBySeriesIdLambda = new lambda.Function(this, 'getEpisodesBySeriesId', {
+            runtime: lambda.Runtime.PYTHON_3_9,
+            handler: 'get_episodes_by_id.handler',
+            code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+            environment: {
+                TABLE_NAME_EPISODE: episodesTable.tableName,
+            }
+        });
+     episodesTable.grantReadData(getEpisodesBySeriesIdLambda);
 
      // Lambda function to UPDATE a short film
      const updateLambda = new lambda.Function(this, 'update', {
@@ -237,12 +254,14 @@ export class CloudProjectStack extends cdk.Stack {
     `${actorsTable.tableArn}/index/*`,
     genresTable.tableArn,
     `${genresTable.tableArn}/index/*`,
+      episodesTable.tableArn,
+    `${episodesTable.tableArn}/index/*`,
   ],
 });
 
 
 deleteLambda.addToRolePolicy(dynamoDBPolicy);
-
+getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
     movieBucket.grantReadWrite(deleteLambda);
     movieBucket.grantDelete(deleteLambda)
     moviesTable.grantWriteData(deleteLambda);
@@ -329,6 +348,10 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     const searchResource = api.root.addResource('search');
     searchResource.addMethod('POST', searchIntegration);
 
+    // Integrate getEpisodesBySeriesIdLambda sa API Gateway
+    const getEpisodesIntegration = new apigateway.LambdaIntegration(getEpisodesBySeriesIdLambda);
+    const episodesResource = api.root.addResource('episodes');
+    episodesResource.addResource('{seriesId}').addMethod('GET', getEpisodesIntegration);
 
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);

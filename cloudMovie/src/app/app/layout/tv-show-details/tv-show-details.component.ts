@@ -1,10 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
-import {MovieService} from "../movie.service";
-import {Movie} from "../movie";
+import { MovieService } from '../movie.service';
+import { Movie } from '../movie';
 
 interface Episode {
   number: number;
@@ -25,7 +25,7 @@ export class TvShowDetailsComponent implements OnInit {
   @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
 
   isVideoVisible = false;
-  series: Movie | undefined
+  series: Movie | undefined;
   isNotificationVisible = false;
   isImageVisible: boolean = true;
   isUserRated = false;
@@ -35,11 +35,14 @@ export class TvShowDetailsComponent implements OnInit {
 
   actors: string[] | undefined;
   directors: string[] = [];
+  episodes: Episode[] = [];
 
-  constructor(private router: Router,
-              private dialog: MatDialog,
-              private route: ActivatedRoute,
-              private movieService: MovieService) {}
+  constructor(
+    private router: Router,
+    private dialog: MatDialog,
+    private route: ActivatedRoute,
+    private movieService: MovieService
+  ) {}
 
   ngOnInit() {
     // Subscribe to both route params and query params
@@ -54,8 +57,13 @@ export class TvShowDetailsComponent implements OnInit {
           this.actors = this.series!.actors;
           this.directors = [this.series!.director];
 
-          console.log("sta je series"+data)
-          console.log(data)
+          // Load episodes for the series
+          if (this.series && this.series.movieId) {
+            this.loadEpisodes(this.series.movieId);
+          }
+
+          console.log("sta je series"+data);
+          console.log(data);
         });
       });
     });
@@ -69,6 +77,13 @@ export class TvShowDetailsComponent implements OnInit {
     });
   }
 
+  loadEpisodes(seriesId: string) {
+    this.movieService.getEpisodesBySeriesId(seriesId).subscribe(episodes => {
+      this.episodes = episodes;
+    }, error => {
+      console.error('Error loading episodes:', error);
+    });
+  }
 
   showInfoBox() {
     this.isInfoBoxVisible = true;
@@ -131,18 +146,6 @@ export class TvShowDetailsComponent implements OnInit {
     window.scrollTo(0, 0);
   }
 
-
-  episodes: Episode[] = [
-    { number: 1, image: '../../../../assets/episode-one.jpg', title: 'The Offer', description: 'While Haru Tawara develops a crush on a mysterious young woman at work, an unusual opportunity arises at his father\'s financially struggling brewery.', duration: '55m' },
-    { number: 2, image: '../../../../assets/episode-two.jpg', title: 'The Trail', description: 'Haru accompanies Karen to investigate a whistleblower\'s apartment. Meanwhile, several other Tawaras are tempted to step out of their ordinary lives.', duration: '52m' },
-    { number: 3, image: '../../../../assets/episode-three.jpg', title: 'The Flower', description: 'As Haru and Yoko\'s respective missions take unexpected turns, Nagi\'s mischievous adventures start attracting unwanted attention.', duration: '53m' },
-    { number: 4, image: '../../../../assets/episode-four.jpg', title: 'The Resurrection', description: 'Karen confides in Haru about a longstanding suspicion. In the meantime, Soichi receives a shocking phone call that keeps him up at night.', duration: '52m' },
-  ];
-
-  notImplemented() {
-    alert('This feature is not implemented yet.');
-  }
-
   checkVideoTime() {
     const video = this.bgVideo?.nativeElement;
     if (video != undefined) {
@@ -181,6 +184,7 @@ export class TvShowDetailsComponent implements OnInit {
     }
   }
 
+  notImplemented() {
 
-
+  }
 }

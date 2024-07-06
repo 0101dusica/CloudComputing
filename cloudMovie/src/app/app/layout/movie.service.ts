@@ -63,6 +63,13 @@ export class MovieService {
     return this.http.post<any[]>(`${this.apiUrl}/search`, queryParams);
   }
 
+getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
+  const queryParams = { seriesId: seriesId }; // Pravi objekat sa query parametrima
+  const options = { params: queryParams }; // Postavlja opcije za HTTP zahtev
+
+  return this.http.get<any[]>(`${this.apiUrl}/episodes`, options);
+}
+
   private base64ToArrayBuffer(base64: string): Uint8Array {
     const byteCharacters = atob(base64.split(',')[1]);
     const byteNumbers = new Array(byteCharacters.length);
