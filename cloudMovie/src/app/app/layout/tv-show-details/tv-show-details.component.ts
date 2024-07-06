@@ -229,6 +229,7 @@ if (episode) {
      if (this.episodes.length != 0) {
            console.log((this.episodes.length))
 
+
       Swal.fire({
         icon: 'warning',
         title: 'Cannot Delete',
@@ -237,7 +238,15 @@ if (episode) {
       });
     } else {
            console.log((this.episodes.length + '>>>'))
-
+        if (this.series) {
+              this.movieService.deleteMovie(this.series.movieId, this.series.createdAt).subscribe(response => {
+                alert('Movie deleted successfully');
+                this.router.navigate(['/']); // Redirect to home page
+              }, error => {
+                console.log(error);
+                alert('Failed to delete the movie');
+              });
+            }
       // Poziv za brisanje serije
       // Tvoj kod za brisanje serije ovde
       Swal.fire({
