@@ -13,15 +13,15 @@ import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.c
   styleUrls: ['./movie-details.component.css']
 })
 export class MovieDetailsComponent implements OnInit {
-  
+
   isNotificationVisible = false;
   movie: Movie | undefined;
-  
+
   @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
-  
+
   isVideoVisible = false;
-  
+
   isImageVisible = false;
   isUserRated = false;
   rate: number = 0;
@@ -74,7 +74,7 @@ export class MovieDetailsComponent implements OnInit {
       }
     });
   }
-  
+
   onNotificationIconClick(): void {
     this.isNotificationVisible = !this.isNotificationVisible;
     this.addReview(); // Ensure the dialog is opened here
@@ -125,7 +125,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   downloadMovie() {
-    this.movieService.getDownloadUrl(this.movie!.movieId).subscribe(response => {
+    this.movieService.getDownloadUrl(this.movie!.movieId, "1").subscribe(response => {
       const presignedUrl = response.presigned_url;
       window.open(presignedUrl, '_blank');
     }, error => {

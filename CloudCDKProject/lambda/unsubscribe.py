@@ -1,6 +1,5 @@
 import json
 import os
-import uuid
 
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -13,9 +12,7 @@ def handler(event, context):
         body = json.loads(event['body'])
 
         user_id = body['user_id']
-        genre = body['genre']
-        actors = body['actors']
-        director = body['director']
+        subscription_name = body['subscription_name']
 
         table_name = os.environ['TABLE_NAME_SUBSCRIPTION']
         table = dynamodb.Table(table_name)
@@ -26,24 +23,31 @@ def handler(event, context):
             KeyConditionExpression=Key('user_id').eq(user_id)
         )
 
-        items = response.get('Items', [])
-        print(f"QueryResult: {items}")
+        results = response.get('Items', [])
+        # print(f"Query results: {results}")
 
-        if len(items) > 0:
-            existing_item = items[0]
+        if len(results) > 0:
+            existing_item = results[0]
             existing_genres = existing_item.get('genres', [])
             existing_actors = existing_item.get('actors', [])
             existing_directors = existing_item.get('directors', [])
 
-            if genre not in existing_genres:
-                existing_genres.append(genre)
+            found = False
 
-            for actor in actors:
-                if actor not in existing_actors:
-                    existing_actors.append(actor)
+            if subscription_name in existing_genres:
+                existing_genres.remove(subscription_name)
+                found = True
 
-            if director not in existing_directors:
-                existing_directors.append(director)
+            if subscription_name in existing_actors:
+                existing_actors.remove(subscription_name)
+                found = True
+
+            if subscription_name in existing_directors:
+                existing_directors.remove(subscription_name)
+                found = True
+
+            if not found:
+                return not_found_handler()
 
             table.update_item(
                 Key={
@@ -57,26 +61,19 @@ def handler(event, context):
                     ':directors': existing_directors
                 }
             )
-        else:
-            table.put_item(
-                Item={
-                    "id": str(uuid.uuid4()),
-                    "user_id": user_id,
-                    "genres": [genre],
-                    "actors": actors,
-                    "directors": [director]
-                }
-            )
 
-        return {
-            'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-            },
-            'body': json.dumps("subscribe successful")
-        }
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                },
+                'body': json.dumps("Subscription deleted successfully")
+            }
+
+        else:
+            return not_found_handler()
 
     except Exception as e:
         return {
@@ -88,3 +85,15 @@ def handler(event, context):
             },
             'body': json.dumps({'message': 'Error uploading file', 'error': str(e)})
         }
+
+
+def not_found_handler():
+    return {
+        'statusCode': 404,
+        'headers': {
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        },
+        'body': json.dumps("User subscription not found")
+    }

@@ -21,8 +21,8 @@ export class MovieService {
     return this.http.get<any>(`${this.apiUrl}/movies/${movieId}?createdAt=${createdAt}`);
   }
 
-  getDownloadUrl(movieId: string) {
-    return this.http.get<any>(`${this.apiUrl}/download/${movieId}`);
+  getDownloadUrl(movieId: string, user_id: string) {
+    return this.http.get<any>(`${this.apiUrl}/download/${movieId}?user_id=${user_id}`);
   }
 
   getWatchUrl(movieId: string): Observable<any> {

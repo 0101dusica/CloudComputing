@@ -125,6 +125,33 @@ export class CloudProjectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    subscriptionTable.addGlobalSecondaryIndex({
+      indexName: 'ind-subscription',
+      partitionKey: { name: 'user_id', type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    const downloadsTable = new Table(this, 'DownloadsTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
+      sortKey: { name: 'user_id', type: AttributeType.STRING },
+      tableName: "cloud-project-downloads-table",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    downloadsTable.addGlobalSecondaryIndex({
+      indexName: 'ind-downloads',
+      partitionKey: { name: 'user_id', type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    const feedTable = new Table(this, 'feedTable', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
+      sortKey: { name: 'user_id', type: AttributeType.STRING },
+      tableName: "cloud-project-feed-table",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+
     //jos interatctions, feed
     //                **************** LAMBDA ***************** //
 
@@ -210,9 +237,11 @@ export class CloudProjectStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
         BUCKET_NAME: movieBucket.bucketName,
+        TABLE_NAME_DOWNLOADS:  downloadsTable.tableName
       }
     });
 
+    downloadsTable.grantReadWriteData(downloadLambda)
     movieBucket.grantRead(downloadLambda);
 
      // Lambda function to DELETE a short film
@@ -279,6 +308,28 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
       }
     });
     subscriptionTable.grantReadWriteData(subscribeLambda);
+
+    // Lambda function to unsubscribe to the film
+    const unsubscribeLambda = new lambda.Function(this, 'unsubscription', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'unsubscribe.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_SUBSCRIPTION:  subscriptionTable.tableName,
+      }
+    });
+    subscriptionTable.grantReadWriteData(unsubscribeLambda);
+
+    // Lambda function to generate the user feed
+    const generateFeedLambda = new lambda.Function(this, 'feed', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'generate_feed.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_FEED:  feedTable.tableName,
+      }
+    });
+    subscriptionTable.grantReadWriteData(unsubscribeLambda);
 
      // Lambda function to SEARCH a short film
      const searchLambda = new lambda.Function(this, 'search', {
@@ -359,6 +410,14 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     // Integrate subscribe lambda with API Gateway
     const subscriptionIntegration = new apigateway.LambdaIntegration(subscribeLambda);
     api.root.addResource('subscribe').addMethod('POST', subscriptionIntegration);
+
+    // Integrate unsubscribe lambda with API Gateway
+    const unsubscriptionIntegration = new apigateway.LambdaIntegration(unsubscribeLambda);
+    api.root.addResource('unsubscribe').addMethod('POST', unsubscriptionIntegration);
+
+    // Integrate feed lambda with API Gateway
+    const generateFeedIntegration = new apigateway.LambdaIntegration(generateFeedLambda);
+    api.root.addResource('user-feed').addMethod('POST', generateFeedIntegration);
   }
 }
 
