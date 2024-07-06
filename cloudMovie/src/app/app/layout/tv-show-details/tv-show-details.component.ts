@@ -19,6 +19,11 @@ interface Episode {
 })
 export class TvShowDetailsComponent implements OnInit {
 
+  @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
+  
+  isVideoVisible = false;
+
   isNotificationVisible = false;
   isImageVisible: boolean = true;
   isUserRated = false;
@@ -116,8 +121,6 @@ export class TvShowDetailsComponent implements OnInit {
     alert('This feature is not implemented yet.');
   }
 
-  @ViewChild('bgVideo') bgVideo: ElementRef<HTMLVideoElement> | undefined;
-
   checkVideoTime() {
     const video = this.bgVideo?.nativeElement;
     if (video != undefined) {
@@ -125,6 +128,34 @@ export class TvShowDetailsComponent implements OnInit {
         video.pause();
         this.isImageVisible = true;
       }
+    }
+  }
+
+  watchNow() {
+    alert('This feature is not implemented yet.');
+    // if (this.movie) {
+    //   this.movieService.getWatchUrl(this.movie.movieId).subscribe(response => {
+    //     const presignedUrl = response.presignedUrl;
+    //     const video = this.fullScreenVideo.nativeElement;
+    //     if (video) {
+    //       video.src = presignedUrl;
+    //       video.load();
+    //       video.play();
+    //       this.isVideoVisible = true;
+    //     }
+    //   }, error => {
+    //     console.log(error);
+    //     alert('Failed to get presigned URL for watching');
+    //   });
+    // }
+  }
+
+  closeVideo() {
+    const video = this.fullScreenVideo.nativeElement;
+    if (video) {
+      video.pause();
+      video.src = '';
+      this.isVideoVisible = false;
     }
   }
 

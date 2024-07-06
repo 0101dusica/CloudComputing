@@ -20,6 +20,54 @@
     object-fit: cover;
     z-index: -2;
   }
+
+  #bgVideo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+  
+  .video-container.hidden {
+    display: none;
+  }
+  
+  .video-container {
+    display: flex;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+  }
+  .fullscreen-video {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+  }
+  
+  .close-btn {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 15px;
+    right: 15px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 4px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 1001;
+  }
   
   .overlay {
     position: absolute;

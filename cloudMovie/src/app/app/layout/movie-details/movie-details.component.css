@@ -30,16 +30,6 @@ video {
   z-index: -1;
 }
 
-.hover-container .info-box {
-  position: absolute;
-  top: -100px;
-  left: 0;
-  background-color: white;
-  padding: 10px;
-  border: 1px solid black;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
 .video-container.hidden {
   display: none;
 }
@@ -76,16 +66,6 @@ video {
   cursor: pointer;
   border-radius: 5px;
   z-index: 1001;
-}
-
-.hover-container .info-box {
-  position: absolute;
-  top: -100px;
-  left: 0;
-  background-color: white;
-  padding: 10px;
-  border: 1px solid black;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .overlay {

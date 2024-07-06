@@ -5,6 +5,11 @@
       <source src="assets/trailer-1.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+
+    <div class="video-container" id="videoContainer" [ngClass]="{'hidden': !isVideoVisible}">
+      <video #fullScreenVideo class="fullscreen-video" controls></video>
+      <button class="close-btn" (click)="closeVideo()">X</button>
+    </div>
   <div class="vignette"></div>
     <div class="main-content">
         <div class="content">
