@@ -4,15 +4,8 @@ import { ReviewDialogComponent } from '../review-dialog/review-dialog.component'
 import { MatDialog } from '@angular/material/dialog';
 import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
 import { MovieService } from '../movie.service';
-import { Movie } from '../movie';
+import {Episode, Movie} from '../movie';
 
-interface Episode {
-  number: number;
-  image: string;
-  title: string;
-  description: string;
-  duration: string;
-}
 
 @Component({
   selector: 'app-tv-show-details',
@@ -186,6 +179,39 @@ export class TvShowDetailsComponent implements OnInit {
   }
 
   notImplemented() {
+
+  }
+
+ ceilValue(value: string): number {
+    const numberValue = parseFloat(value);
+    return Math.ceil(numberValue);
+  }
+
+  playEpisode(episode: Episode) {
+if (episode) {
+      this.movieService.getWatchUrl(episode.episodeId).subscribe(response => {
+        const presignedUrl = response.presignedUrl;
+        const video = this.fullScreenVideo.nativeElement;
+        if (video) {
+          video.src = presignedUrl;
+          video.load();
+          video.play();
+          this.isVideoVisible = true;
+        }
+      }, error => {
+        console.log(error);
+        alert('Failed to get presigned URL for watching');
+      });
+    }
+  }
+
+
+
+  editEpisode(episode: Episode) {
+
+  }
+
+  deleteEpisode(episode: Episode) {
 
   }
 }

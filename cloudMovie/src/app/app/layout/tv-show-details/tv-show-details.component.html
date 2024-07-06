@@ -6,10 +6,10 @@
       Your browser does not support the video tag.
     </video>
 
-    <div class="video-container" id="videoContainer" [ngClass]="{'hidden': !isVideoVisible}">
-      <video #fullScreenVideo class="fullscreen-video" controls></video>
-      <button class="close-btn" (click)="closeVideo()">X</button>
-    </div>
+  <div class="video-container" id="videoContainer" [ngClass]="{'hidden': !isVideoVisible}">
+    <video #fullScreenVideo class="fullscreen-video" controls></video>
+    <button class="close-btn" (click)="closeVideo()">X</button>
+  </div>
   <div class="vignette"></div>
     <div class="main-content">
         <div class="content">
@@ -50,7 +50,6 @@
 
           </div>
         <div class="actions">
-          <button>Play</button>
           <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onSubscribeIconClick()">+ Subscribe</button>
           <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onNotificationIconClick()" *ngIf="!isUserRated">Add Review</button> <!-- vidljivo samo user-u -->
         </div>
@@ -61,22 +60,26 @@
         </div>
       </div>
     </div>
-    <div class="episodes">
-        <div class="top-box">
-            <label class="title">Episodes</label>
-            <label class="season">Season 1</label>
-        </div>
-        <div class="episode" *ngFor="let episode of episodes; let i = index">
-          <div class="episode-number">{{episode.number}}</div>
-          <div class="episode-content">
-            <img src="../../../../assets/episode-four.jpg" class="episode-image" alt="">
-            <div class="episode-details">
-              <h3>{{episode.title}}</h3>
-              <p>{{episode.description}}</p>
-              <span class="episode-duration">{{episode.duration}}</span>
-            </div>
+        <div class="episodes">
+      <div class="top-box">
+        <label class="title">Episodes</label>
+      </div>
+      <div class="episode" *ngFor="let episode of episodes; let i = index">
+        <div class="episode-number">{{episode.episodeNumber}}</div>
+        <div class="episode-content">
+          <img src="../../../../assets/episode-four.jpg" class="episode-image" alt="">
+          <div class="episode-details">
+            <b><h3>Season {{episode.seasonNumber}}: {{episode.title}}</h3></b>
+            <p><i class="fas fa-info-circle"></i> {{episode.description}}</p>
+            <p><i class="fas fa-clock"></i> {{ ceilValue(episode.duration) }} min</p>
+          </div>
+          <div class="episode-actions">
+            <button (click)="playEpisode(episode)">Play</button>
+            <button (click)="editEpisode(episode)" [routerLink]="['/edit-episode', episode.episodeId]">Edit</button>
+            <button (click)="deleteEpisode(episode)">Delete</button>
           </div>
         </div>
+      </div>
     </div>
   </div>
 </body>
