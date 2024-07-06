@@ -20,13 +20,14 @@ def handler(event, context):
         file_size = body['fileSize']
         created_at = body['createdAt']
         updated_at = datetime.utcnow().isoformat()
+        movie_id = body['movieId']
+
 
         # Data defined by admin
         title = body['title']
         description = body['description']
         duration = body['duration']
         movieType = body['type']
-        movie_id = str(uuid.uuid4())  # Identifier for DynamoDB and S3 bucket
 
 
         bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
