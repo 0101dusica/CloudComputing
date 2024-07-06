@@ -23,6 +23,10 @@ export class MovieDetailsComponent implements OnInit {
   rate: number = 0;
   subscribe: {} | null = null;
 
+  isInfoBoxVisible: boolean = false;
+  actors: string[] = ["actor 1", "actor 2"];
+  directors: string[] = ["director 1", "director 2"];
+
   constructor(
     private route: ActivatedRoute,
     private movieService: MovieService,
@@ -33,6 +37,14 @@ export class MovieDetailsComponent implements OnInit {
 
   notImplemented() {
     throw new Error('Method not implemented.');
+  }
+
+  showInfoBox() {
+    this.isInfoBoxVisible = true;
+  }
+
+  hideInfoBox() {
+    this.isInfoBoxVisible = false;
   }
 
   onSubscribeIconClick(): void {

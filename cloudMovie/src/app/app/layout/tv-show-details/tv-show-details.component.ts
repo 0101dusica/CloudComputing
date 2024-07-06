@@ -24,6 +24,10 @@ export class TvShowDetailsComponent implements OnInit {
   isUserRated = false;
   rate: number = 0;
   subscribe: {} | null = null;
+  isInfoBoxVisible: boolean = false;
+
+  actors: string[] = ["actor 1", "actor 2"];
+  directors: string[] = ["director 1", "director 2"];
   
   constructor(private router: Router, 
     private dialog: MatDialog) {}
@@ -37,6 +41,14 @@ export class TvShowDetailsComponent implements OnInit {
         this.scrollToTop();
       }
     });
+  }
+
+  showInfoBox() {
+    this.isInfoBoxVisible = true;
+  }
+
+  hideInfoBox() {
+    this.isInfoBoxVisible = false;
   }
 
   onSubscribeIconClick(): void {

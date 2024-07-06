@@ -21,6 +21,21 @@
               <span>18+</span>
               <span *ngIf="isUserRated">|</span>
               <span *ngIf="isUserRated">Your Rating: {{rate}}</span>
+              <span>|</span>
+              <div class="hover-container">
+                <img src="../../../../assets/question-icon.png" class="question-logo" (mouseenter)="showInfoBox()" (mouseleave)="hideInfoBox()">
+                <div class="info-box" *ngIf="isInfoBoxVisible">
+                  <p><strong>Cast:</strong></p>
+                  <p><strong>Actors:</strong></p>
+                  <ul>
+                    <li *ngFor="let actor of actors">{{ actor }}</li>
+                  </ul>
+                  <p><strong>Directors:</strong></p>
+                  <ul>
+                    <li *ngFor="let director of directors">{{ director }}</li>
+                  </ul>
+                </div>
+              </div>
           </div>
           <p class="description">
             One victim, found dead on a London street. Four detectives, in four different time periods, must solve the mystery to protect Britain's future.
