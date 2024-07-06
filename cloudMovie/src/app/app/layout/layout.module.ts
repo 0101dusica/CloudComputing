@@ -25,6 +25,7 @@ import { SearchComponent } from './search/search.component';
 import { ReviewDialogComponent } from './review-dialog/review-dialog.component';
 import { EditMovieComponent } from './edit-movie/edit-movie.component';
 import { EditTvShowComponent } from './edit-tv-show/edit-tv-show.component';
+import { SubscribeDialogComponent } from './subscribe-dialog/subscribe-dialog.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { EditTvShowComponent } from './edit-tv-show/edit-tv-show.component';
     SearchComponent,
     ReviewDialogComponent,
     EditMovieComponent,
-    EditTvShowComponent
+    EditTvShowComponent,
+    SubscribeDialogComponent
   ],
   imports: [
     CommonModule,

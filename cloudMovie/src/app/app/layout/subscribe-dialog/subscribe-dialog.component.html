@@ -1,0 +1,34 @@
+
+<div class="notification">
+    <div class="header">
+      <div class="text-box">
+        <div class="all-text">Which content would you like to subscribe to from the options below?</div>
+      </div>
+    </div>
+  
+    <label>Actors</label>
+    <div class="rating-options">
+      <mat-radio-group [(ngModel)]="selectedActor">
+        <mat-radio-button *ngFor="let actor of actors" [value]="actor">{{ actor }}</mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    
+    <label>Directors</label>
+    <div class="rating-options">
+        <mat-radio-group [(ngModel)]="selectedDirector">
+          <mat-radio-button *ngFor="let director of directors" [value]="director">{{ director }}</mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <label>Genres</label>
+      <div class="rating-options">
+        <mat-radio-group [(ngModel)]="selectedGenre">
+          <mat-radio-button *ngFor="let genre of genres" [value]="genre">{{ genre }}</mat-radio-button>
+        </mat-radio-group>
+      </div>
+  
+    <div class="submit-section">
+      <button mat-button class="btn" (click)="submitRating()">Subscribe</button>
+    </div>
+  </div>

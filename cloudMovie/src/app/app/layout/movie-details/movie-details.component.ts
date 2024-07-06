@@ -5,6 +5,7 @@ import { Movie } from '../movie';
 import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
+import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
 
 @Component({
   selector: 'app-movie-details',
@@ -15,14 +16,12 @@ export class MovieDetailsComponent implements OnInit {
   
   isNotificationVisible = false;
   movie: Movie | undefined;
-  notImplemented() {
-    throw new Error('Method not implemented.');
-  }
-
+  
   @ViewChild('bgVideo') bgVideo: ElementRef<HTMLVideoElement> | undefined;
   isImageVisible = false;
   isUserRated = false;
   rate: number = 0;
+  subscribe: {} | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,6 +31,34 @@ export class MovieDetailsComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
+  notImplemented() {
+    throw new Error('Method not implemented.');
+  }
+
+  onSubscribeIconClick(): void {
+    this.isNotificationVisible = !this.isNotificationVisible;
+    this.addSubscribe(); // Ensure the dialog is opened here
+  }
+
+  onSubscribePopupClick(event: Event): void {
+    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
+       this.isNotificationVisible = false;
+    }
+  }
+
+  addSubscribe(): void {
+    const dialogRef = this.dialog.open(SubscribeDialogComponent, {
+      panelClass: 'popup-overlay'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.subscribe = result;
+        console.log("You are subscribed at: ", result);
+      }
+    });
+  }
+  
   onNotificationIconClick(): void {
     this.isNotificationVisible = !this.isNotificationVisible;
     this.addReview(); // Ensure the dialog is opened here

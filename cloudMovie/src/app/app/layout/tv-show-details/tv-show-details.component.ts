@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
 
 interface Episode {
   number: number;
@@ -22,6 +23,7 @@ export class TvShowDetailsComponent implements OnInit {
   isImageVisible: boolean = true;
   isUserRated = false;
   rate: number = 0;
+  subscribe: {} | null = null;
   
   constructor(private router: Router, 
     private dialog: MatDialog) {}
@@ -33,6 +35,30 @@ export class TvShowDetailsComponent implements OnInit {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.scrollToTop();
+      }
+    });
+  }
+
+  onSubscribeIconClick(): void {
+    this.isNotificationVisible = !this.isNotificationVisible;
+    this.addSubscribe(); // Ensure the dialog is opened here
+  }
+
+  onSubscribePopupClick(event: Event): void {
+    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
+       this.isNotificationVisible = false;
+    }
+  }
+
+  addSubscribe(): void {
+    const dialogRef = this.dialog.open(SubscribeDialogComponent, {
+      panelClass: 'popup-overlay'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.subscribe = result;
+        console.log("You are subscribed at: ", result);
       }
     });
   }
