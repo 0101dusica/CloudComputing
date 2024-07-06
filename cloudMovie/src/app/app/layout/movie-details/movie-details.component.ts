@@ -28,8 +28,8 @@ export class MovieDetailsComponent implements OnInit {
   subscribe: {} | null = null;
 
   isInfoBoxVisible: boolean = false;
-  actors: string[] = ["actor 1", "actor 2"];
-  directors: string[] = ["director 1", "director 2"];
+  actors: string[] | undefined;
+  directors: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -110,7 +110,10 @@ export class MovieDetailsComponent implements OnInit {
         // Call service method to get movie details
         this.movieService.getMovieById(movieId, createdAt).subscribe(data => {
           this.movie = data;
-          console.log(data)
+          this.actors = this.movie!.actors;
+          this.directors = [this.movie!.director];
+
+          console.log(data);
         });
       });
     });

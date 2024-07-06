@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { env } from '../../../env/env';
-import { Movie } from './movie';
+import {Episode, Movie} from './movie';
 
 @Injectable({
   providedIn: 'root'
@@ -29,12 +29,12 @@ export class MovieService {
     return this.http.get<any>(`${this.apiUrl}/view/${movieId}`);
   }
 
-  uploadMovie(movie: Movie, movieContent: string) {
+  uploadMovie(movie: Movie | Episode, movieContent: string) {
     return this.http.post<any>(`${env.apiGatewayHost}upload`, movie).pipe(
       switchMap(response => {
         const presignedUrl = response.presignedUrl;
         const movieId = response.id;
-        if (presignedUrl) {
+        if (presignedUrl != '') {
           const byteArray = this.base64ToArrayBuffer(movieContent);
           const blob = new Blob([byteArray], { type: 'video/mp4' });
 
@@ -49,7 +49,7 @@ export class MovieService {
             })
           );
         } else {
-          return of({ message: 'Presigned URL not found' });
+          return of({ message: 'No presigned url, added to db only' });
         }
       })
     );
@@ -62,6 +62,12 @@ export class MovieService {
   searchMovies(queryParams: any): Observable<any[]> {
     return this.http.post<any[]>(`${this.apiUrl}/search`, queryParams);
   }
+
+getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
+
+
+  return this.http.get<any[]>(`${this.apiUrl}/episodes/${seriesId}`);
+}
 
   private base64ToArrayBuffer(base64: string): Uint8Array {
     const byteCharacters = atob(base64.split(',')[1]);

@@ -1,8 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
+import { MovieService } from '../movie.service';
+import { Movie } from '../movie';
 
 interface Episode {
   number: number;
@@ -21,9 +23,9 @@ export class TvShowDetailsComponent implements OnInit {
 
   @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
-  
-  isVideoVisible = false;
 
+  isVideoVisible = false;
+  series: Movie | undefined;
   isNotificationVisible = false;
   isImageVisible: boolean = true;
   isUserRated = false;
@@ -31,13 +33,40 @@ export class TvShowDetailsComponent implements OnInit {
   subscribe: {} | null = null;
   isInfoBoxVisible: boolean = false;
 
-  actors: string[] = ["actor 1", "actor 2"];
-  directors: string[] = ["director 1", "director 2"];
-  
-  constructor(private router: Router, 
-    private dialog: MatDialog) {}
+  actors: string[] | undefined;
+  directors: string[] = [];
+  episodes: Episode[] = [];
 
-  ngOnInit(): void {
+  constructor(
+    private router: Router,
+    private dialog: MatDialog,
+    private route: ActivatedRoute,
+    private movieService: MovieService
+  ) {}
+
+  ngOnInit() {
+    // Subscribe to both route params and query params
+    this.route.params.subscribe(params => {
+      const movieId = params['movieId']; // Get movieId from route params
+      this.route.queryParams.subscribe(queryParams => {
+        const createdAt = queryParams['createdAt']; // Get createdAt from query params
+
+        // Call service method to get movie details
+        this.movieService.getMovieById(movieId, createdAt).subscribe(data => {
+          this.series = data;
+          this.actors = this.series!.actors;
+          this.directors = [this.series!.director];
+
+          // Load episodes for the series
+          if (this.series && this.series.movieId) {
+            this.loadEpisodes(this.series.movieId);
+          }
+
+          console.log("sta je series"+data);
+          console.log(data);
+        });
+      });
+    });
     this.scrollToTop();
 
     // Ensure the scroll to top occurs on every route change within this component
@@ -45,6 +74,15 @@ export class TvShowDetailsComponent implements OnInit {
       if (event instanceof NavigationEnd) {
         this.scrollToTop();
       }
+    });
+  }
+
+  loadEpisodes(seriesId: string) {
+    this.movieService.getEpisodesBySeriesId(seriesId).subscribe(episodes => {
+      this.episodes = episodes;
+      console.log(episodes)
+    }, error => {
+      console.error('Error loading episodes:', error);
     });
   }
 
@@ -108,18 +146,6 @@ export class TvShowDetailsComponent implements OnInit {
   scrollToTop() {
     window.scrollTo(0, 0);
   }
-  
-
-  episodes: Episode[] = [
-    { number: 1, image: '../../../../assets/episode-one.jpg', title: 'The Offer', description: 'While Haru Tawara develops a crush on a mysterious young woman at work, an unusual opportunity arises at his father\'s financially struggling brewery.', duration: '55m' },
-    { number: 2, image: '../../../../assets/episode-two.jpg', title: 'The Trail', description: 'Haru accompanies Karen to investigate a whistleblower\'s apartment. Meanwhile, several other Tawaras are tempted to step out of their ordinary lives.', duration: '52m' },
-    { number: 3, image: '../../../../assets/episode-three.jpg', title: 'The Flower', description: 'As Haru and Yoko\'s respective missions take unexpected turns, Nagi\'s mischievous adventures start attracting unwanted attention.', duration: '53m' },
-    { number: 4, image: '../../../../assets/episode-four.jpg', title: 'The Resurrection', description: 'Karen confides in Haru about a longstanding suspicion. In the meantime, Soichi receives a shocking phone call that keeps him up at night.', duration: '52m' },
-  ];
-
-  notImplemented() {
-    alert('This feature is not implemented yet.');
-  }
 
   checkVideoTime() {
     const video = this.bgVideo?.nativeElement;
@@ -159,4 +185,7 @@ export class TvShowDetailsComponent implements OnInit {
     }
   }
 
+  notImplemented() {
+
+  }
 }

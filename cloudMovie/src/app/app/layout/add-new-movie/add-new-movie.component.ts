@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import {Movie} from "../movie";
-import {Observable, of, switchMap} from "rxjs";
-import {env} from "../../../../env/env";
-import {HttpClient} from "@angular/common/http";
+import { Movie } from "../movie";
+import { Observable, of, switchMap } from "rxjs";
+import { env } from "../../../../env/env";
+import { HttpClient } from "@angular/common/http";
 import Decimal from "decimal.js";
-import {MovieService} from "../movie.service";
+import { MovieService } from "../movie.service";
+import { Director } from "../director.enum";
 
 @Component({
   selector: 'app-add-new-movie',
@@ -12,28 +13,31 @@ import {MovieService} from "../movie.service";
   styleUrls: ['./add-new-movie.component.css']
 })
 export class AddNewMovieComponent {
-  movie : Movie = {
+  movie: Movie = {
     fileName: "",
     contentType: "video",
     fileSize: "",
     title: "",
     description: "",
     actors: [],
-    director: "Tom",
+    director: "", // Initial director value should be an empty string
     genres: [],
     duration: "",
     movieId: "",
     createdAt: "",
-    updatedAt: ""
+    updatedAt: "",
+    type: "movie",
+    numberOfSeasons: "0"
   };
 
+  actorsInput: string = ""; // Variable to store the input for actors
   selectedFile: File | null = null; // Variable to store the selected file
 
-  constructor(private http: HttpClient, private movieService: MovieService){}
+  constructor(private http: HttpClient, private movieService: MovieService) { }
 
   genres = ['Action', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Romance', 'Sci-Fi', 'Thriller'];
   actors = ['Actor 1', 'Actor 2', 'Actor 3', 'Actor 4'];
-  directors = ['Director 1', 'Director 2', 'Director 3', 'Director 4'];
+  directors = Object.values(Director); // Get the list of directors from the enum
 
   onFileSelected(event: any, type: string) {
     const fileInput = event.target as HTMLInputElement;
@@ -44,32 +48,37 @@ export class AddNewMovieComponent {
     this.getMovieDuration(file!).then(duration => {
       this.movie.duration = new Decimal(duration).toString()
     });
-    this.movie.fileName = file!.name;
-
+    this.movie.fileName = file!.name.toLowerCase(); // Convert file name to lower case
   }
 
   onSubmit() {
+    // Convert actors input to an array and lowercase
+    this.movie.actors = this.actorsInput.split(',').map(actor => actor.trim().toLowerCase());
+    // Convert title, description, director, and genres to lowercase
+    this.movie.title = this.movie.title.toLowerCase();
+    this.movie.description = this.movie.description.toLowerCase();
+    this.movie.director = this.movie.director.toLowerCase();
+    this.movie.genres = this.movie.genres.map(genre => genre.toLowerCase());
+
     console.log('Movie data:', this.movie);
     const movieReader = new FileReader();
-      movieReader.readAsDataURL(this.selectedFile!);
-      movieReader.onload = () => {
-        const movieContent = movieReader.result as string;
-        //Because movieContent starts with data:video/mp4;base64,{base64string}
+    movieReader.readAsDataURL(this.selectedFile!);
+    movieReader.onload = () => {
+      const movieContent = movieReader.result as string;
+      // Because movieContent starts with data:video/mp4;base64,{base64string}
 
-
-        this.movieService.uploadMovie(this.movie,movieContent)
-                .subscribe(() => {
-                 alert('Movie uploaded successfully')
-                }, error => {
-                  console.log(error);
-                  alert('Error uploading')
-                });
-      }
-
+      this.movieService.uploadMovie(this.movie, movieContent)
+          .subscribe(() => {
+            alert('Movie uploaded successfully')
+          }, error => {
+            console.log(error);
+            alert('Error uploading')
+          });
+    }
   }
 
   onCheckboxChange(event: any, type: 'actors' | 'genres') {
-    const value = event.target.value;
+    const value = event.target.value.toLowerCase(); // Convert checkbox value to lower case
     if (event.target.checked) {
       this.movie[type].push(value);
     } else {
@@ -79,6 +88,7 @@ export class AddNewMovieComponent {
       }
     }
   }
+
   getMovieDuration(file: File): Promise<number> {
     return new Promise((resolve, reject) => {
       const videoElement = document.createElement('video');
@@ -96,46 +106,5 @@ export class AddNewMovieComponent {
 
       videoElement.src = URL.createObjectURL(file);
     });
-  }
-
-  //   uploadMovie(): {
-  //   // return this.http.post<any>(`${env.apiGatewayHost}upload`, movie).pipe(
-  //   //   switchMap(response => {
-  //   //     const presignedUrl = response.presignedUrl;
-  //   //     const movieId = response.id;
-  //   //     if (presignedUrl) {
-  //   //       const byteArray = this.base64ToArrayBuffer(fileContent);
-  //   //       const blob = new Blob([byteArray], { type: 'video/mp4' });
-  //   //
-  //   //       // Upload the file to S3 using the presigned URL
-  //   //       return this.http.put(presignedUrl, blob, {
-  //   //         headers: {
-  //   //           'Content-Type': 'application/octet-stream'
-  //   //         }
-  //   //       }).pipe(
-  //   //         switchMap(() => {
-  //   //           return of({ message: 'File uploaded successfully', movieId: movieId });
-  //   //         })
-  //   //       );
-  //   //     } else {
-  //   //       return of({ message: 'Presigned URL not found' });
-  //   //     }
-  //   //   })
-  //   // );
-  //
-  // }
-
-
-  //   private base64ToArrayBuffer(base64: string): Uint8Array {
-  //   const byteCharacters = atob(base64.split(',')[1]);
-  //   const byteNumbers = new Array(byteCharacters.length);
-  //   for (let i = 0; i < byteCharacters.length; i++) {
-  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-  //   }
-  //   return new Uint8Array(byteNumbers);
-  // }
-
-  uploadMovieService(movie: Movie){
-    return this.http.post<any>(`${env.apiGatewayHost}upload`, movie)
   }
 }

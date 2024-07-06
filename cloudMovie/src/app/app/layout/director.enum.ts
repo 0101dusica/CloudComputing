@@ -1,0 +1,22 @@
+export enum Director {
+  ChristopherNolan = "Christopher Nolan",
+  StevenSpielberg = "Steven Spielberg",
+  QuentinTarantino = "Quentin Tarantino",
+  MartinScorsese = "Martin Scorsese",
+  RidleyScott = "Ridley Scott",
+  JamesCameron = "James Cameron",
+  PeterJackson = "Peter Jackson",
+  GeorgeLucas = "George Lucas",
+  AlfredHitchcock = "Alfred Hitchcock",
+  StanleyKubrick = "Stanley Kubrick",
+  FrancisFordCoppola = "Francis Ford Coppola",
+  ClintEastwood = "Clint Eastwood",
+  TimBurton = "Tim Burton",
+  DavidFincher = "David Fincher",
+  WesAnderson = "Wes Anderson",
+  GuillermoDelToro = "Guillermo del Toro",
+  CoenBrothers = "Coen Brothers",
+  PaulThomasAnderson = "Paul Thomas Anderson",
+  SpikeLee = "Spike Lee",
+  SofiaCoppola = "Sofia Coppola"
+}

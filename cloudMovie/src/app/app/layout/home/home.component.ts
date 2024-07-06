@@ -38,4 +38,12 @@ export class HomeComponent implements OnInit {
     );
   }
 
+  getRouterLink(movie: any): string[] {
+    if (movie.type === 'show') {
+      return ['/tv-show-details', movie.movieId];
+    } else {
+      return ['/movie-details', movie.movieId];
+    }
+  }
+
 }

@@ -1,6 +1,6 @@
 <html>
 <body>
-  <div class="container">
+  <div class="container" *ngIf="series">
     <video id="bgVideo" autoplay muted loop>
       <source src="assets/trailer-1.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -14,14 +14,14 @@
     <div class="main-content">
         <div class="content">
           <h1>SKY STREAM</h1>
-          <h2>Quantumania</h2>
+      <h2>{{ series?.title }}</h2>
           <div class="info">
               <img src="../../../../assets/imdb-icon.png" class="logo">
               <span>6.1</span>
               <span>|</span>
               <span>2023</span>
               <span>|</span>
-              <span>3 Seasons</span>
+              <span>{{series.numberOfSeasons}} Seasons</span>
               <span>|</span>
               <span>18+</span>
               <span *ngIf="isUserRated">|</span>
@@ -43,12 +43,11 @@
               </div>
           </div>
           <p class="description">
-            One victim, found dead on a London street. Four detectives, in four different time periods, must solve the mystery to protect Britain's future.
+        {{ series?.description }}
           </p>
           <div class="tags">
-            <span>Crime</span>
-            <span>Drama</span>
-            <span>History</span>
+                   <span *ngFor="let genre of series?.genres">{{ genre }}</span>
+
           </div>
         <div class="actions">
           <button>Play</button>
@@ -57,8 +56,8 @@
         </div>
         <div class="actions" style="margin-top: 2%;"> <!-- vidljivo samo adminu -->
             <button (click)="notImplemented()">Delete</button>
-            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode']">Add New Episode</button>
-            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/edit-show']">Edit</button>
+            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode', series.movieId]">Add New Episode</button>
+            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/edit-show', series.movieId]" [queryParams]="{ createdAt: series.createdAt }">Edit</button>
         </div>
       </div>
     </div>
@@ -68,9 +67,9 @@
             <label class="season">Season 1</label>
         </div>
         <div class="episode" *ngFor="let episode of episodes; let i = index">
-          <div class="episode-number">{{i + 1}}</div>
+          <div class="episode-number">{{episode.number}}</div>
           <div class="episode-content">
-            <img [src]="episode.image" class="episode-image">
+            <img src="../../../../assets/episode-four.jpg" class="episode-image" alt="">
             <div class="episode-details">
               <h3>{{episode.title}}</h3>
               <p>{{episode.description}}</p>

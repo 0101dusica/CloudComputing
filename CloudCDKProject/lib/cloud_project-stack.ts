@@ -69,13 +69,6 @@ export class CloudProjectStack extends cdk.Stack {
       projectionType: ProjectionType.ALL,
     });
 
-    moviesTable.addGlobalSecondaryIndex({
-      indexName: 'ind-duration',
-      partitionKey: { name: 'duration', type: AttributeType.STRING },
-      projectionType: ProjectionType.ALL,
-    });
-   
-   
     // DynamoDB Table ACTOR
     const actorsTable = new Table(this, 'ActorsTable', {
       partitionKey: { name: 'movieId', type: AttributeType.STRING },
@@ -138,6 +131,15 @@ export class CloudProjectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    //Episodes DB
+   //Episodes DB
+    const episodesTable = new Table(this, 'EpisodesTable', {
+      partitionKey: { name: 'episodeId', type: AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: AttributeType.STRING },
+      tableName: 'cloud-project-episode-table',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     downloadsTable.addGlobalSecondaryIndex({
       indexName: 'ind-downloads',
       partitionKey: { name: 'user_id', type: AttributeType.STRING },
@@ -164,7 +166,8 @@ export class CloudProjectStack extends cdk.Stack {
         BUCKET_NAME: movieBucket.bucketName,
         TABLE_NAME_MOVIE: moviesTable.tableName,
         TABLE_NAME_ACTOR: actorsTable.tableName,
-        TABLE_NAME_GENRE: genresTable.tableName
+        TABLE_NAME_GENRE: genresTable.tableName,
+        TABLE_NAME_EPISODE: episodesTable.tableName
       }
     });
 
@@ -172,6 +175,7 @@ export class CloudProjectStack extends cdk.Stack {
     moviesTable.grantWriteData(uploadLambda);
     actorsTable.grantWriteData(uploadLambda);
     genresTable.grantWriteData(uploadLambda);
+    episodesTable.grantWriteData(uploadLambda);
 
     // Lambda function to GET all movies
     const getMoviesLambda = new lambda.Function(this, 'getMovies', {
@@ -200,6 +204,16 @@ export class CloudProjectStack extends cdk.Stack {
     // Grant permissions to read from DynamoDB table
     moviesTable.grantReadData(getMovieByIdLambda);
 
+     const getEpisodesBySeriesIdLambda = new lambda.Function(this, 'getEpisodesBySeriesId', {
+            runtime: lambda.Runtime.PYTHON_3_9,
+            handler: 'get_episodes_by_id.handler',
+            code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+            environment: {
+                TABLE_NAME_EPISODE: episodesTable.tableName,
+            }
+        });
+     episodesTable.grantReadData(getEpisodesBySeriesIdLambda);
+
      // Lambda function to UPDATE a short film
      const updateLambda = new lambda.Function(this, 'update', {
       runtime: lambda.Runtime.PYTHON_3_9,
@@ -209,7 +223,8 @@ export class CloudProjectStack extends cdk.Stack {
         BUCKET_NAME: movieBucket.bucketName,
         TABLE_NAME_MOVIE: moviesTable.tableName,
         TABLE_NAME_ACTOR: actorsTable.tableName,
-        TABLE_NAME_GENRE: genresTable.tableName
+        TABLE_NAME_GENRE: genresTable.tableName,
+        TABLE_NAME_EPISODE: episodesTable.tableName
       }
     });
 
@@ -253,7 +268,9 @@ export class CloudProjectStack extends cdk.Stack {
         BUCKET_NAME: movieBucket.bucketName,
         TABLE_NAME_MOVIE: moviesTable.tableName,
         TABLE_NAME_ACTOR: actorsTable.tableName,
-        TABLE_NAME_GENRE: genresTable.tableName
+        TABLE_NAME_GENRE: genresTable.tableName,
+        TABLE_NAME_EPISODE: episodesTable.tableName
+
       }
     });
 
@@ -274,11 +291,14 @@ export class CloudProjectStack extends cdk.Stack {
     `${actorsTable.tableArn}/index/*`,
     genresTable.tableArn,
     `${genresTable.tableArn}/index/*`,
+      episodesTable.tableArn,
+    `${episodesTable.tableArn}/index/*`,
   ],
 });
 
 
 deleteLambda.addToRolePolicy(dynamoDBPolicy);
+getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
 
     movieBucket.grantReadWrite(deleteLambda);
     movieBucket.grantDelete(deleteLambda)
@@ -326,10 +346,19 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
       handler: 'generate_feed.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
-        TABLE_NAME_FEED:  feedTable.tableName,
+          TABLE_NAME_FEED:  feedTable.tableName,
+          TABLE_NAME_MOVIE: moviesTable.tableName,
+          TABLE_NAME_DOWNLOADS: downloadsTable.tableName,
+          TABLE_NAME_SUBSCRIPTION: subscriptionTable.tableName,
+          TABLE_NAME_RATING: ratingsTable.tableName
+
       }
     });
-    subscriptionTable.grantReadWriteData(unsubscribeLambda);
+    feedTable.grantReadWriteData(generateFeedLambda);
+    moviesTable.grantReadData(generateFeedLambda);
+    downloadsTable.grantReadData(generateFeedLambda);
+    subscriptionTable.grantReadData(generateFeedLambda);
+    ratingsTable.grantReadData(generateFeedLambda);
 
      // Lambda function to SEARCH a short film
      const searchLambda = new lambda.Function(this, 'search', {
@@ -398,6 +427,10 @@ deleteLambda.addToRolePolicy(dynamoDBPolicy);
     const searchResource = api.root.addResource('search');
     searchResource.addMethod('POST', searchIntegration);
 
+    // Integrate getEpisodesBySeriesIdLambda sa API Gateway
+    const getEpisodesIntegration = new apigateway.LambdaIntegration(getEpisodesBySeriesIdLambda);
+    const episodesResource = api.root.addResource('episodes');
+    episodesResource.addResource('{seriesId}').addMethod('GET', getEpisodesIntegration);
 
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);

@@ -24,56 +24,78 @@ def handler(event, context):
         # Data defined by admin
         title = body['title']
         description = body['description']
-        actors = body['actors']
-        director = body['director']
-        genres = body['genres']
         duration = body['duration']
-        # image = body['image'] ??
+        movieType = body['type']
+        movie_id = str(uuid.uuid4())  # Identifier for DynamoDB and S3 bucket
+
 
         bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
         table_name = os.environ['TABLE_NAME_MOVIE']  # DynamoDB
         table_name_genres = os.environ['TABLE_NAME_GENRE']
         table_name_actors = os.environ['TABLE_NAME_ACTOR']
+        table_name_episodes = os.environ['TABLE_NAME_EPISODE']
 
-        # Generate a unique identifier for the movie
-        movie_id = str(uuid.uuid4())  # Identifier for DynamoDB and S3 bucket
+        if movieType == "episode":
+            season_number = body['seasonNumber']
+            episode_number = body['episodeNumber']
+            series_id = body['seriesId']
+
+            dynamodb.Table(table_name_episodes).put_item(
+                TableName=table_name_episodes,
+                Item={
+                    'episodeId': movie_id,
+                    'fileName': file_name,
+                    'contentType': content_type,
+                    "fileSize": file_size,
+                    'createdAt': created_at,
+                    'updatedAt': updated_at,
+                    'title': title,
+                    'description': description,
+                    'duration': duration,
+                    'type': movieType,
+                    'seasonNumber': season_number,
+                    'episodeNumber': episode_number,
+                    'seriesId': series_id
+                }
+            )
+        else:
+            actors = body['actors']
+            director = body['director']
+            genres = body['genres']
+            number_of_seasons = body['numberOfSeasons']
+            # Save metadata to DynamoDB
+            dynamodb.Table(table_name).put_item(
+                TableName=table_name,
+                Item={
+                    'movieId': movie_id,
+                    'fileName': file_name,
+                    'contentType': content_type,
+                    "fileSize": file_size,
+                    'createdAt': created_at,
+                    'updatedAt': updated_at,
+                    'title': title,
+                    'description': description,
+                    'actors': actors,
+                    'director': director,
+                    'genres': genres,
+                    'duration': duration,
+                    'type': movieType,
+                    'numberOfSeasons': number_of_seasons
+                }
+            )
+
+            insert_items(dynamodb.Table(table_name_genres), genres, movie_id, created_at, 'genre')
+            insert_items(dynamodb.Table(table_name_actors), actors, movie_id, created_at, 'actor')
+
+
 
         # Generate presigned URL for upload file to S3
-
-        presigned_url = s3.generate_presigned_url('put_object', Params={'Bucket': bucket_name, 'Key': movie_id},
+        if movieType != 'show':
+            presigned_url = s3.generate_presigned_url('put_object', Params={'Bucket': bucket_name, 'Key': movie_id},
                                                   ExpiresIn=3600)
+        else:
+            presigned_url = ''
 
-        # Save metadata to DynamoDB
-        dynamodb.Table(table_name).put_item(
-            TableName=table_name,
-            Item={
-                'movieId': movie_id,
-                'fileName': file_name,
-                'contentType': content_type,
-                "fileSize": file_size,
-                'createdAt': created_at,
-                'updatedAt': updated_at,
-                'title': title,
-                'description': description,
-                'actors': actors,
-                'director': director,
-                'genres': genres,
-                'duration': duration,
-
-            }
-        )
-
-
-        # Upload the file content to S3
-        # s3.put_object(
-        #     Bucket=bucket_name,
-        #     Key=movie_id,
-        #     Body=decoded_file_content,
-        #     ContentType='application/octet-stream'
-        # )
-
-        insert_items(dynamodb.Table(table_name_genres), genres, movie_id, created_at, 'genre')
-        insert_items(dynamodb.Table(table_name_actors), actors, movie_id, created_at, 'actor')
 
         return {
             'statusCode': 200,
