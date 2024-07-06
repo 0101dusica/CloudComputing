@@ -13,7 +13,7 @@ def handler(event, context):
         body = json.loads(event['body'])
 
         user_id = body['user_id']
-        genre = body['genre']
+        genres = body['genres']
         actors = body['actors']
         director = body['director']
 
@@ -35,8 +35,9 @@ def handler(event, context):
             existing_actors = existing_item.get('actors', [])
             existing_directors = existing_item.get('directors', [])
 
-            if genre not in existing_genres:
-                existing_genres.append(genre)
+            for genre in genres:
+                if genre not in existing_genres:
+                    existing_genres.append(genre)
 
             for actor in actors:
                 if actor not in existing_actors:
@@ -62,7 +63,7 @@ def handler(event, context):
                 Item={
                     "id": str(uuid.uuid4()),
                     "user_id": user_id,
-                    "genres": [genre],
+                    "genres": genres,
                     "actors": actors,
                     "directors": [director]
                 }

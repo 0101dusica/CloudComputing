@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { env } from '../../../env/env';
 import {Episode, Movie} from './movie';
@@ -10,6 +10,10 @@ import {Episode, Movie} from './movie';
 export class MovieService {
 
   private apiUrl = env.apiGatewayHost; // Prilagodite vašoj konfiguraciji
+
+  private headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+  });
 
   constructor(private http: HttpClient) { }
 
@@ -62,6 +66,25 @@ export class MovieService {
   searchMovies(queryParams: any): Observable<any[]> {
     return this.http.post<any[]>(`${this.apiUrl}/search`, queryParams);
   }
+
+  addRating(userId: string, movieId: string, rate: number): Observable<any> {
+    const body = { user_id: userId, movie_id: movieId, rate: rate };
+    return this.http.post(`${this.apiUrl}rate-movie`, body, {
+      headers: this.headers
+    });
+  }
+
+  subscribe(userId: string, genres: [], actors: [], director: string): Observable<any> {
+    const body = { user_id: userId, genres: genres, actors: actors, director: director };
+    return this.http.post(`${this.apiUrl}subscribe`, body, {
+      headers: this.headers
+    });
+  }
+
+  // addRating(userId: string, movieId: string, rate: number): Observable<any> {
+  //   const body = { user_id: userId, movie_id: movieId, rate: rate };
+  //   return this.http.post(`${this.apiUrl}rate-movie`, body);
+  // }
 
 getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
 
