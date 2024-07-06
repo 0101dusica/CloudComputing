@@ -33,8 +33,8 @@ export class TvShowDetailsComponent implements OnInit {
   subscribe: {} | null = null;
   isInfoBoxVisible: boolean = false;
 
-  actors: string[] = ["actor 1", "actor 2"];
-  directors: string[] = ["director 1", "director 2"];
+  actors: string[] | undefined;
+  directors: string[] = [];
 
   constructor(private router: Router,
               private dialog: MatDialog,
@@ -51,6 +51,10 @@ export class TvShowDetailsComponent implements OnInit {
         // Call service method to get movie details
         this.movieService.getMovieById(movieId, createdAt).subscribe(data => {
           this.series = data;
+          this.actors = this.series!.actors;
+          this.directors = [this.series!.director];
+
+          console.log("sta je series"+data)
           console.log(data)
         });
       });
