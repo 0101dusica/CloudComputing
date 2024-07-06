@@ -6,13 +6,12 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway'
 import path = require('path');
 import { AttributeType,ProjectionType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 
 import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';  // Uvezite Effect ovde
-
-import iam from "aws-cdk-lib/aws-iam";
 
 export class CloudProjectStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -488,7 +487,7 @@ getEpisodesBySeriesIdLambda.addToRolePolicy(dynamoDBPolicy);
         birthdate: {
           mutable: true,
           required: true,
-        },
+        }
       },
     });
 

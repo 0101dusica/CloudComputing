@@ -21,7 +21,7 @@ const userPool = new CognitoUserPool(poolData);
 export class AuthService {
   constructor() {}
 
-  register(firstName: string, lastName: string, dobDate: Date, email: string, password: string, type: boolean, callback: (err: any, result: any) => void): void {
+  register(firstName: string, lastName: string, dobDate: Date, username: string,  email: string, password: string, callback: (err: any, result: any) => void): void {
     const attributeList = [];
   
     const dataEmail = {
@@ -40,24 +40,35 @@ export class AuthService {
       Name: 'birthdate',
       Value: dobDate.toISOString().split('T')[0] // Formatted as YYYY-MM-DD
     };
-    const dataUserType = {
-      Name: 'type',
-      Value: type ? 'admin' : 'basic'
-    };
   
     const attributeEmail = new CognitoUserAttribute(dataEmail);
     const attributeFirstName = new CognitoUserAttribute(dataFirstName);
     const attributeLastName = new CognitoUserAttribute(dataLastName);
     const attributeDOB = new CognitoUserAttribute(dataDOB);
-    const attributeUserType = new CognitoUserAttribute(dataUserType);
   
     attributeList.push(attributeEmail);
     attributeList.push(attributeFirstName);
     attributeList.push(attributeLastName);
     attributeList.push(attributeDOB);
-    attributeList.push(attributeUserType);
   
-    userPool.signUp(email, password, attributeList, [], callback);
+    userPool.signUp(username, password, attributeList, [], (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        // If signup successful, store additional user data in DynamoDB
+        const params = {
+          TableName: 'user-table', // Replace with your DynamoDB table name
+          Item: {
+            username: username,
+            firstName: firstName,
+            lastName: lastName,
+            dob: dobDate.toISOString(),
+            userType: 'basic' // Default to basic user type
+          }
+        };
+        callback(null, result);
+      }
+    });
   }
   
 
