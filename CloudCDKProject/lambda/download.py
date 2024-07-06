@@ -14,10 +14,7 @@ dynamodb = boto3.resource('dynamodb')
 def handler(event, context):
     # Metadata
     movie_id = event['pathParameters']['movieId']
-    print(movie_id)
     user_id = event['queryStringParameters'].get('user_id')
-
-    print(user_id)
 
     bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
 

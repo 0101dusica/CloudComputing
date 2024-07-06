@@ -107,7 +107,15 @@ export class TvShowDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.subscribe = result;
-        console.log("You are subscribed at: ", result);
+
+        // @ts-ignore
+        this.movieService.subscribe("1", this.subscribe.genres, this.subscribe.actors, this.subscribe.director).subscribe(response => {
+          console.log('Subscription successful', response);
+          alert('Successfully subscribed!');
+        }, error => {
+          console.error('Error doing subscription', error);
+          alert('Unsuccessfully subscribed. Please try again later.');
+        });
       }
     });
   }
@@ -273,5 +281,15 @@ if (episode) {
         confirmButtonText: 'OK'
       });
     }
+  }
+
+  downloadEpisode(episode: Episode) {
+    this.movieService.getDownloadUrl(episode.episodeId, "1").subscribe(response => {
+      const presignedUrl = response.presigned_url;
+      window.open(presignedUrl, '_blank');
+    }, error => {
+      console.log(error);
+      alert('Failed to get presigned URL');
+    });
   }
 }

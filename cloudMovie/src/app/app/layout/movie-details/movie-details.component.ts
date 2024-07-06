@@ -71,22 +71,8 @@ export class MovieDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.subscribe = result;
-        // Call the addRating method from the service
 
-        //  // @ts-ignore
-        // if (Array.isArray(this.subscribe.actors)) {
-        //         // Razdvojite `actors` na niz koristeći `split(",")`
-        //         // @ts-ignore
-        //   const actors = this.subscribe.actors.join(",");
-        //         console.log("actors: ", actors);
-        //     } else {
-        //         console.error("Error: `subscribe.actors` is not a string");
-        //     }
-        // // @ts-ignore
-        // console.log("genres " + this.subscribe.genres)
         // @ts-ignore
-        // console.log("director " + this.subscribe.director)
-
         this.movieService.subscribe("1", this.subscribe.genres, this.subscribe.actors, this.subscribe.director).subscribe(response => {
           console.log('Subscription successful', response);
           alert('Successfully subscribed!');

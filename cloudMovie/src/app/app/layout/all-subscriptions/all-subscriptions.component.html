@@ -5,30 +5,26 @@
         <app-nav-bar [id]="1"></app-nav-bar>
 
         <div class="main-content" id="main-content">
-          <b class="no-text" *ngIf="users.length === 0">NO RESULTS</b>
-          <div *ngFor="let user of users" class="acc-frame">
+          <b class="no-text" *ngIf="results.length === 0">NO RESULTS</b>
+          <div *ngFor="let result of results" class="acc-frame">
               <img
                 class="accommodation-image"
                 alt=""
-                src={{user.photo}}
+                src={{result.photo}}
               />
 
               <div class="left-data">
-                  <b class="title">{{ user.firstName }} {{ user.lastName }}</b>
+                  <b class="title">{{ result.name }}</b>
 
-                  <div class="location-frame">
-                    <div class="location-text"><b>Year of Birth: </b></div>
-                    <div class="location-text">{{ user.yearOfBirth }}</div>
-                  </div>
 
                   <div class="location-frame">
                     <img class="location-icon" alt="" src="../../../../assets/job-icon.png" />
-                    <div class="location-text">{{ user.type }}</div>
+                    <div class="location-text">{{ result.type }}</div>
                   </div>
               </div>
 
               <div class="right-buttons">
-                <div class="reject-button" id="reject-button" (click)="unsubscribe(user)">
+                <div class="reject-button" id="reject-button" (click)="unsubscribe(result)">
                     <b class="button-text">Unsubscribe</b>
                 </div>
               </div>
