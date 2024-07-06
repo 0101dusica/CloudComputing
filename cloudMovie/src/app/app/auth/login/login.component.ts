@@ -30,7 +30,7 @@ export class LoginComponent {
         alert(err.message || JSON.stringify(err));
         return;
       }
-      this.router.navigate(['/all-subscriptions']);
+      this.router.navigate(['/home']);
     });
   }
 }

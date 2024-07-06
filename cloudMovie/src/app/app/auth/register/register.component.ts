@@ -29,16 +29,14 @@ export class RegisterComponent {
 
   onRegisterSubmit(): void {
     const { firstName, lastName, dob, username, email, password } = this.registerForm.value;
-
-    // Convert dob to Date object if needed
     const dobDate = new Date(dob);
 
     this.authService.register(firstName, lastName, dobDate, username, email, password, (err, result) => {
       if (err) {
-        console.error('Registration error:', err);
-        // Handle error, e.g., display an error message to the user
+        alert("Registration error! Please try again!");
       } else {
-        console.log('Registration successful:', result);
+        alert("Registration successful! Please check and verify your email!");
+        this.router.navigate(['/login']);
       }
     });
   }

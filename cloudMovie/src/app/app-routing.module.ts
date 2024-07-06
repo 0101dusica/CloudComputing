@@ -17,7 +17,7 @@ import { EditMovieComponent } from './app/layout/edit-movie/edit-movie.component
 
 const routes: Routes = [
   { path: '', component: MainPageComponent },
-  { path: 'home/:id', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
   { path: 'search', component: SearchComponent },
 
   { path: 'login', component: LoginComponent },
