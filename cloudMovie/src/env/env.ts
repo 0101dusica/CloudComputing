@@ -3,7 +3,7 @@ export const env = {
   production: false,
   cognito: {
     region: 'eu-central-1',
-    userPoolId: 'eu-central-1_82RhUIAzK',
-    userPoolWebClientId: 'bevup8tr6610eplhif6svopvm',
+    userPoolId: 'eu-central-1_yPRTXUAIY',
+    userPoolWebClientId: '1lcq2baeb034e1sjqsgteurpvb',
   }
 };

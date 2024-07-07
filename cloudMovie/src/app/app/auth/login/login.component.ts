@@ -30,6 +30,7 @@ export class LoginComponent {
         alert(err.message || JSON.stringify(err));
         return;
       }
+      console.log("This is role ", this.authService.role);
       this.router.navigate(['/home']);
     });
   }

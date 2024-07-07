@@ -1,11 +1,11 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { env } from '../../../env/env';
 import {
   CognitoUserPool,
   CognitoUserAttribute,
   CognitoUser,
-  AuthenticationDetails
+  AuthenticationDetails,
+  CognitoUserSession
 } from 'amazon-cognito-identity-js';
 
 const poolData = {
@@ -19,9 +19,18 @@ const userPool = new CognitoUserPool(poolData);
   providedIn: 'root'
 })
 export class AuthService {
+  username: string | undefined;
+  role: string | undefined;
+
   constructor() {}
 
-  register(firstName: string, lastName: string, dobDate: Date, username: string,  email: string, password: string, callback: (err: any, result: any) => void): void {
+  // Method to update user information
+  setUser(username: string, role: string) {
+    this.username = username;
+    this.role = role;
+  }
+
+  register(firstName: string, lastName: string, dobDate: Date, username: string, email: string, password: string, callback: (err: any, result: any) => void): void {
     const attributeList = [];
   
     const dataEmail = {
@@ -51,42 +60,38 @@ export class AuthService {
     attributeList.push(attributeLastName);
     attributeList.push(attributeDOB);
   
-    userPool.signUp(username, password, attributeList, [], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        // If signup successful, store additional user data in DynamoDB
-        const params = {
-          TableName: 'user-table', // Replace with your DynamoDB table name
-          Item: {
-            username: username,
-            firstName: firstName,
-            lastName: lastName,
-            dob: dobDate.toISOString(),
-            userType: 'basic' // Default to basic user type
-          }
-        };
-        callback(null, result);
-      }
-    });
+    userPool.signUp(email, password, attributeList, [], callback);
   }
   
-
   authenticate(email: string, password: string, callback: (err: any, result: any) => void): void {
     const authenticationDetails = new AuthenticationDetails({
       Username: email,
       Password: password
     });
-
+  
     const userData = {
       Username: email,
       Pool: userPool
     };
-
+  
     const cognitoUser = new CognitoUser(userData);
-
+  
     cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => callback(null, result),
+      onSuccess: (session: CognitoUserSession) => {
+        // Extract and store username and role
+        const idToken = session.getIdToken();
+        const username = idToken.payload['cognito:username'];
+        let role = 'user'; // Default role if cognito:groups is not present
+        
+        if (idToken.payload['cognito:groups']) {
+          const userRoles = idToken.payload['cognito:groups'];
+          role = userRoles.includes('admin') ? 'admin' : 'user'; // Assuming 'admin' and 'user' groups exist
+        }
+        
+        this.setUser(username, role); // Store in service
+  
+        callback(null, session);
+      },
       onFailure: (err) => callback(err, null)
     });
   }
