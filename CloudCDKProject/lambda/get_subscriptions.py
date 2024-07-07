@@ -13,7 +13,6 @@ def handler(event, context):
         user_id = event['queryStringParameters'].get('user_id')
 
         table = dynamodb.Table(table_name)
-        response = table.scan()
 
         response = table.query(
             IndexName='ind-subscription',

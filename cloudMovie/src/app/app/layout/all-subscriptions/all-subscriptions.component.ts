@@ -27,13 +27,6 @@ export class AllSubscriptionsComponent {
 
     this.getSubscriptions();
 
-
-    // this.users = [
-    //   { firstName: 'John', lastName: 'Doe', yearOfBirth: 1990, type: 'Director', photo: '../../../../assets/director-one.jpg' },
-    //   { firstName: 'Jane', lastName: 'Doe', yearOfBirth: 1985, type: 'Actor', photo: '../../../../assets/actor-one.jpg' },
-    //   { firstName: 'Jim', lastName: 'Beam', yearOfBirth: 1975, type: 'Actor', photo: '../../../../assets/actor-teo.jpg' },
-    //   { firstName: 'Jack', lastName: 'Daniels', yearOfBirth: 1980, type: 'Director', photo: '../../../../assets/director-two.jpg' }
-    // ];
   }
 
   getSubscriptions() {

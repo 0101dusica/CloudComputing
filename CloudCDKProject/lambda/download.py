@@ -13,7 +13,7 @@ dynamodb = boto3.resource('dynamodb')
 
 def handler(event, context):
     # Metadata
-    movie_id = event['pathParameters']['movieId']
+    genre = event['pathParameters']['genre']
     user_id = event['queryStringParameters'].get('user_id')
 
     bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
@@ -33,20 +33,24 @@ def handler(event, context):
         existing_item = results[0]
         existing_downloads = existing_item.get('downloads', [])
 
-        if movie_id not in existing_downloads:
-            existing_downloads.append(movie_id)
+        for download in existing_downloads:
+            existing_genre = download['genre']
+            score = download['score']
+            if genre == existing_genre:
+                score += 1
+                download['score'] = score
 
-            table.update_item(
-                Key={
-                    'id': existing_item['id'],
-                    'user_id': user_id,
-                },
-                UpdateExpression="SET downloads = :downloads",
-                ExpressionAttributeValues={
-                    ':downloads': existing_downloads,
-                }
+                table.update_item(
+                    Key={
+                        'id': existing_item['id'],
+                        'user_id': user_id,
+                    },
+                    UpdateExpression="SET downloads = :downloads",
+                    ExpressionAttributeValues={
+                        ':downloads': existing_downloads,
+                    }
 
-            )
+                )
     else:
         table.put_item(
             Item={

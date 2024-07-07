@@ -1,55 +1,58 @@
 <!DOCTYPE html>
 <html>
-<body>
-  <div class="logged">
+  <body>
+    <div class="logged">
+      <app-nav-bar [id]="id"></app-nav-bar>
 
-    <app-nav-bar [id]="id"></app-nav-bar>
-
-    <div class="search-box">
-      <div class="top-container">
-        <img class="search-image" alt="" src="../../../../assets/movie-poster.jpg"/>
-        <div class="search-description">
-          Unlimited <b class="gradient-text">Entertainment</b><br>
-          Movies, TVs shows, & More.
-        </div>
-      </div>
-    </div>
-
-    <div class="populars">
-      <div class="populars-title"> <b class="gradient-text"> Just for You </b> </div>
-      <div class="populars-list">
-
-    <div class="destination-box" *ngFor="let movie of movies" [routerLink]="getRouterLink(movie)" [queryParams]="{ createdAt: movie.createdAt }">
-      <img class="destination-image" alt="" src="../../../../assets/movie-1.jpg"/>
-      <div class="box-bottom">
-        <div class="top-part">
-          <div class="destination-text">{{ movie.title }}</div>
-          <div class="year-text">2023</div>
-        </div>
-        <div class="bottom-part">
-          <div class="in-line-text">
-            <img src="../../../../assets/hd-icon.png" alt="" style="width: 30px; height: 30px;"/>
-          </div>
-          <div class="in-line-text">
-            <img src="../../../../assets/clock-icon.png" alt="" style="width: 20px; height: 20px;"/>
-            <div class="destination-text">{{ movie.duration }} min </div>
-          </div>
-          <div class="destination-rating">
-            <img src="../../../../assets/star-icon.png" alt="" style="width: 20px; height: 20px;"/>
-            <div class="destination-text">6.1</div>
+      <div class="search-box">
+        <div class="top-container">
+          <img class="search-image" alt="" src="../../../../assets/movie-poster.jpg" />
+          <div class="search-description">
+            Unlimited <b class="gradient-text">Entertainment</b><br />
+            Movies, TVs shows, & More.
           </div>
         </div>
       </div>
-    </div>
 
-
+      <div class="populars">
+        <div class="populars-title"> <b class="gradient-text"> Just for You </b> </div>
+        <div class="scroll-container">
+          <div class="scroll-button left" (click)="scrollLeft()" [ngClass]="{'hidden': movies.length <= 5}">
+            <img src="../../../../assets/left-arrow.png" alt="Scroll Left" class="scroll-arrow">
+          </div>
+          <div #widgetsContent class="populars-list">
+            <div class="destination-box" *ngFor="let movie of movies" [routerLink]="getRouterLink(movie)" [queryParams]="{ createdAt: movie.createdAt }">
+              <img class="destination-image" alt="" src="../../../../assets/movie-1.jpg" />
+              <div class="box-bottom">
+                <div class="top-part">
+                  <div class="destination-text">{{ movie.title }}</div>
+                  <div class="year-text">2023</div>
+                </div>
+                <div class="bottom-part">
+                  <div class="in-line-text">
+                    <img src="../../../../assets/hd-icon.png" alt="" style="width: 30px; height: 30px;" />
+                  </div>
+                  <div class="in-line-text">
+                    <img src="../../../../assets/clock-icon.png" alt="" style="width: 20px; height: 20px;" />
+                    <div class="destination-text">{{ movie.duration }} min </div>
+                  </div>
+                  <div class="destination-rating">
+                    <img src="../../../../assets/star-icon.png" alt="" style="width: 20px; height: 20px;" />
+                    <div class="destination-text">6.1</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="scroll-button right" (click)="scrollRight()" [ngClass]="{'hidden': movies.length <= 5}">
+            <img src="../../../../assets/right-arrow.png" alt="Scroll Right" class="scroll-arrow">
+          </div>
+        </div>
       </div>
 
+      <img class="pick-image" alt="" src="../../../../assets/section-main.png" />
+
+      <app-footer></app-footer>
     </div>
-
-    <img class="pick-image" alt="" src="../../../../assets/section-main.png"/>
-
-    <app-footer></app-footer>
-  </div>
-</body>
+  </body>
 </html>
