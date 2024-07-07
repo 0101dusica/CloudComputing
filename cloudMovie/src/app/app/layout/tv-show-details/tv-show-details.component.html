@@ -76,6 +76,8 @@
           <div class="episode-actions">
             <button (click)="playEpisode(episode)">Play</button>
             <button (click)="deleteEpisode(episode)">Delete</button>
+              <button [routerLink]="['/edit-movie', episode!.episodeId]" [queryParams]="{ createdAt: episode!.createdAt }">Edit</button>
+
               <button (click)="downloadEpisode(episode)">Download</button>
 
           </div>

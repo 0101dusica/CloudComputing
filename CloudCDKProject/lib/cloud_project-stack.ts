@@ -196,11 +196,14 @@ export class CloudProjectStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
         TABLE_NAME_MOVIE: moviesTable.tableName,
+          TABLE_NAME_EPISODE: episodesTable.tableName,
+
       }
     });
 
     // Grant permissions to read from DynamoDB table
     moviesTable.grantReadData(getMovieByIdLambda);
+    episodesTable.grantReadData(getMovieByIdLambda);
 
      const getEpisodesBySeriesIdLambda = new lambda.Function(this, 'getEpisodesBySeriesId', {
             runtime: lambda.Runtime.PYTHON_3_9,

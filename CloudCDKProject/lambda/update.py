@@ -52,6 +52,7 @@ def handler(event, context):
             )
 
         if movieType == "episode":
+            print('usao')
             season_number = body['seasonNumber']
             episode_number = body['episodeNumber']
             series_id = body['seriesId']
