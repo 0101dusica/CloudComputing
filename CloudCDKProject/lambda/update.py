@@ -6,8 +6,12 @@ import base64
 
 from datetime import datetime
 
+from boto3.dynamodb.conditions import Key
+
 s3 = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
+
+
 
 
 def handler(event, context):
@@ -20,13 +24,14 @@ def handler(event, context):
         file_size = body['fileSize']
         created_at = body['createdAt']
         updated_at = datetime.utcnow().isoformat()
+        movie_id = body['movieId']
+
 
         # Data defined by admin
         title = body['title']
         description = body['description']
         duration = body['duration']
         movieType = body['type']
-        movie_id = str(uuid.uuid4())  # Identifier for DynamoDB and S3 bucket
 
 
         bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
@@ -47,6 +52,7 @@ def handler(event, context):
             )
 
         if movieType == "episode":
+            print('usao')
             season_number = body['seasonNumber']
             episode_number = body['episodeNumber']
             series_id = body['seriesId']
@@ -95,6 +101,9 @@ def handler(event, context):
                 }
             )
 
+            delete_old_items(dynamodb.Table(table_name_genres),movie_id, 'genre')
+            delete_old_items(dynamodb.Table(table_name_actors), movie_id, 'actor')
+
             insert_items(dynamodb.Table(table_name_genres), genres, movie_id, created_at, 'genre')
             insert_items(dynamodb.Table(table_name_actors), actors, movie_id, created_at, 'actor')
 
@@ -129,5 +138,20 @@ def insert_items(table, items, movie_id, created_at, attribute_name):
                 'movieId': movie_id,
                 attribute_name: item,
                 'createdAt': created_at
+            }
+        )
+
+
+def delete_old_items(table, movie_id, attribute_name):
+    scan_response = table.scan(
+        FilterExpression=Key('movieId').eq(movie_id)
+    )
+    items = scan_response['Items']
+
+    for item in items:
+        table.delete_item(
+            Key={
+                'movieId': movie_id,
+                attribute_name: item[attribute_name]
             }
         )

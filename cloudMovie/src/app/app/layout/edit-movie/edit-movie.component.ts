@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {MovieService} from "../movie.service";
 import {Location} from "@angular/common";
 import {MatDialog} from "@angular/material/dialog";
-import {Movie} from "../movie";
+import {Episode, Movie} from "../movie";
 import {Director} from "../director.enum";
 import Decimal from "decimal.js";
 
@@ -14,6 +14,8 @@ import Decimal from "decimal.js";
 })
 export class EditMovieComponent implements OnInit {
   movie: Movie | undefined;
+  episode: Episode | undefined;
+  episodeId: string ='';
   selectedFile: File | null = null; // Variable to store the selected file
 
     generatePresignedUrl: boolean = false;
@@ -55,15 +57,23 @@ export class EditMovieComponent implements OnInit {
 
         // Call service method to get movie details
         this.movieService.getMovieById(movieId, createdAt).subscribe(data => {
+
           this.movie = data;
-          console.log(this.movie)
-          this.actorsString = this.movie!.actors.join(', '); // Convert actors array to string
+          console.log('mov')
+          console.log(this.movie )
+            this.episodeId = data['episodeId']
+            console.log(this.episodeId)
+            if(this.movie!.type == 'movie'){
+                console.log('usao')
+                this.actorsString = this.movie!.actors.join(', '); // Convert actors array to string
 
-          this.selectedDirector = this.capitalizeFirstLetters(this.movie!.director); // Set initial selected director
+                  this.selectedDirector = this.capitalizeFirstLetters(this.movie!.director); // Set initial selected director
 
-          this.genres.forEach(genre => {
-            genre.isChecked = this.movie!.genres.includes(genre.name.toLowerCase());
-          });
+                  this.genres.forEach(genre => {
+                    genre.isChecked = this.movie!.genres.includes(genre.name.toLowerCase());
+                  });
+            }
+
           console.log(data);
         });
       });
@@ -99,38 +109,45 @@ export class EditMovieComponent implements OnInit {
 
   onSubmit() {
     console.log('Updated movie data:', this.movie);
-    // Implement your submit logic here
-      this.movie!.director = this.selectedDirector!;
-      this.movie!.actors = this.actorsString.split(',').map(actor => actor.trim().toLowerCase());
-      this.movie!.genres = this.movie!.genres.map(genre => genre.toLowerCase());
+
+    if (this.movie!.type == 'movie') {
+        console.log('iusao');
+        this.movie!.director = this.selectedDirector!;
+        this.movie!.actors = this.actorsString.split(',').map(actor => actor.trim().toLowerCase());
+        this.movie!.genres = this.movie!.genres.map(genre => genre.toLowerCase());
+    }
+    else{
+                console.log('usao');
+
+        this.movie!.movieId = this.episodeId
+    }
 
 
-      if(this.generatePresignedUrl){
-          const movieReader = new FileReader();
+    if (this.generatePresignedUrl) {
+        const movieReader = new FileReader();
         movieReader.readAsDataURL(this.selectedFile!);
         movieReader.onload = () => {
-             this.movieContent = movieReader.result as string;
-            // Because movieContent starts with data:video/mp4;base64,{base64string}
-        }
-          this.movieService.updateMovie(this.movie!.movieId,this.movie!, this.movieContent,this.generatePresignedUrl)
-              .subscribe(() => {
-                alert('Movie uploaded successfully')
-              }, error => {
-                console.log(error);
-                alert('Error uploading')
-              });
+            this.movieContent = movieReader.result as string;
 
-      }else{
-           this.movieService.updateMovie(this.movie!.movieId,this.movie!, this.movieContent,this.generatePresignedUrl)
-              .subscribe(() => {
-                alert('Movie uploaded successfully')
-              }, error => {
+            this.movieService.updateMovie(this.movie!.movieId, this.movie!, this.movieContent, this.generatePresignedUrl)
+                .subscribe(() => {
+                    alert('Movie uploaded successfully');
+                }, error => {
+                    console.log(error);
+                    alert('Error uploading');
+                });
+        };
+    } else {
+        this.movieService.updateMovie(this.movie!.movieId, this.movie!, this.movieContent, this.generatePresignedUrl)
+            .subscribe(() => {
+                alert('Movie uploaded successfully');
+            }, error => {
                 console.log(error);
-                alert('Error uploading')
-              });
-      }
+                alert('Error uploading');
+            });
+    }
+}
 
-  }
 
   onCheckboxChange(event: any, genre: string) {
     const isChecked = event.target.checked;
