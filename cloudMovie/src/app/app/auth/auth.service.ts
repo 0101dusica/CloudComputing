@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { env } from '../../../env/env';
+import { env } from '../../../env/env'; // Ensure this path is correct based on your project structure
 import {
   CognitoUserPool,
   CognitoUserAttribute,
   CognitoUser,
   AuthenticationDetails,
-  CognitoUserSession
+  CognitoUserSession,
+  CognitoIdToken
 } from 'amazon-cognito-identity-js';
 
 const poolData = {
@@ -60,7 +61,7 @@ export class AuthService {
     attributeList.push(attributeLastName);
     attributeList.push(attributeDOB);
   
-    userPool.signUp(email, password, attributeList, [], callback);
+    userPool.signUp(username, password, attributeList, [], callback);
   }
   
   authenticate(email: string, password: string, callback: (err: any, result: any) => void): void {
