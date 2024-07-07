@@ -473,8 +473,7 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     // Integration of get subscriptions Lambda function with API Gateway
     const getSubscriptionsIntegration = new apigateway.LambdaIntegration(getSubscriptionsLambda);
     const subscriptionsResource = api.root.addResource('all-subscriptions');
-    subscriptionsResource.addMethod('GET',getSubscriptionsIntegration)
-    movieByIdResource.addMethod('PUT',updateIntegration)
+    subscriptionsResource.addMethod('GET',getSubscriptionsIntegration);
 
     // Cognito User Pool
     const userPool = new cognito.UserPool(this, 'UserPool', {
