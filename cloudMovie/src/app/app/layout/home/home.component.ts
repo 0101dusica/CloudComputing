@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MovieService } from '../movie.service';
-import {Movie} from "../movie"; // Adjust the path as per your project structure
+import {Movie} from "../movie";
+import {forkJoin, map, tap} from "rxjs"; // Adjust the path as per your project structure
 
 @Component({
   selector: 'app-home',
@@ -11,6 +12,7 @@ import {Movie} from "../movie"; // Adjust the path as per your project structure
 export class HomeComponent implements OnInit {
 
   movies: Movie[] = []; // Define the movies array to hold movie data
+  feedResults: any[] = [];
 
   constructor(private route: ActivatedRoute, private movieService: MovieService) { }
 
@@ -23,20 +25,48 @@ export class HomeComponent implements OnInit {
     });
 
     // Call the getMovies function when component initializes
-    this.getMovies();
+    // this.getMovies()
+    this.generateFeed()
+
+
   }
 
-  getMovies() {
-    this.movieService.getMovies().subscribe(
-      (data: any) => {
-        console.log(data)
-        this.movies = data; // Assign the retrieved movies data to the movies array
+  generateFeed() {
+    this.movieService.generateUserFeed("1").subscribe(
+      (response) => {
+        console.log('User feed generated:', response);
+        this.processMovies(response)
       },
       (error) => {
-        console.error('Error fetching movies:', error);
+        console.error('Error generating user feed:', error);
       }
     );
   }
+
+processMovies(response: any[]) {
+  // Create an array to hold observables for getMovieById calls
+  const movieObservables = response.map((item, index) => {
+    return this.movieService.getMovieById(item.movie_id, item.created_at)
+      .pipe(
+        map(movie => ({
+          index: index,
+          movie: movie
+        }))
+      );
+  });
+
+  // Wait for all getMovieById calls to complete
+  forkJoin(movieObservables).subscribe(
+    (movies) => {
+      // Sort movies by their original index
+      this.movies = movies.sort((a, b) => a.index - b.index).map(item => item.movie);
+      console.log('All movies processed:', this.movies);
+    },
+    (error) => {
+      console.error('Error processing movies:', error);
+    }
+  );
+}
 
   getRouterLink(movie: any): string[] {
     if (movie.type === 'show') {
@@ -45,5 +75,26 @@ export class HomeComponent implements OnInit {
       return ['/movie-details', movie.movieId];
     }
   }
+
+  @ViewChild('widgetsContent') widgetsContent: ElementRef | undefined;
+
+  scrollLeft() {
+  // @ts-ignore
+    const container = this.widgetsContent.nativeElement;
+  container.scrollBy({
+    left: -container.offsetWidth,
+    behavior: 'smooth'
+  });
+  }
+
+  scrollRight() {
+    // @ts-ignore
+    const container = this.widgetsContent.nativeElement;
+    container.scrollBy({
+      left: container.offsetWidth,
+      behavior: 'smooth'
+    });
+  }
+
 
 }

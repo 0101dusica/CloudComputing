@@ -111,17 +111,19 @@ export class MovieService {
     });
   }
 
-  unsubscribe(userId: string, subscription_name: string): Observable<any> {
-    const body = { user_id: userId, subscription_name: subscription_name};
+  unsubscribe(user_id: string, subscription_name: string): Observable<any> {
+    const body = { user_id: user_id, subscription_name: subscription_name};
     return this.http.post(`${this.apiUrl}unsubscribe`, body, {
       headers: this.headers
     });
   }
 
-  // addRating(userId: string, movieId: string, rate: number): Observable<any> {
-  //   const body = { user_id: userId, movie_id: movieId, rate: rate };
-  //   return this.http.post(`${this.apiUrl}rate-movie`, body);
-  // }
+  generateUserFeed(user_id: string): Observable<any> {
+    const body = { user_id: user_id};
+    return this.http.post(`${this.apiUrl}generate-user-feed`, body, {
+      headers: this.headers
+    });
+  }
 
 getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
 

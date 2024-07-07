@@ -17,10 +17,7 @@ def handler(event, context):
     try:
         body = json.loads(event['body'])
         user_id = body['user_id']
-
-        #Get FEED TABLE
-        table_name = os.environ['TABLE_NAME_FEED']
-        table = dynamodb.Table(table_name)
+        results = []
 
         #Get criterion data
         get_tables_data(user_id)
@@ -30,9 +27,13 @@ def handler(event, context):
         print(f"Subscription results: {user_subscriptions}")
         print(f"Rating results: {user_ratings}")
 
+
+
         for movie in movies:
             points = 0
             movie_id = movie['movieId']
+            # print("MOVIE ID", movie_id)
+            created_at = movie['createdAt']
             genres = movie['genres']
             actors = movie['actors']
             director = movie['director']
@@ -43,25 +44,29 @@ def handler(event, context):
 
                 if movie_id in downloads:
                     points += 30
-                    put_movie_in_feed(user_id, movie_id, points)
+
 
             #2 SUBSCRIPTIONS
             for subscription in user_subscriptions:
                 subscription_genres = subscription.get('genres', [])
                 genres_matches = list(set(genres).intersection(set(subscription_genres)))
                 if len(genres_matches) > 0:
+                    # print("ZANROVA POKLOPLJENO ", len(genres_matches))
                     points += 10
 
                 subscription_actors = subscription.get('actors', [])
                 actors_matches = list(set(actors).intersection(set(subscription_actors)))
                 if len(actors_matches) > 1:
+                    # print("GLUMACA POKLOPLJENO ", len(actors_matches))
                     points += 5
 
                 if len(actors_matches) == 1:
                     points += 2
 
-                subscription_directors = subscription.get('director', [])
-                if director in subscription_directors:
+                subscription_directors = subscription.get('directors', [])
+                # print(subscription_directors)
+                if director.lower() in (d.lower() for d in subscription_directors):
+                    # print("JEA")
                     points += 3
 
             #3 RATINGS
@@ -78,16 +83,26 @@ def handler(event, context):
                     if 3 < rate <= 5:
                         points += 6
 
-            put_movie_in_feed(user_id, movie_id, points)
+            # print(f"Movie {movie_id} points calculated: {points}")
+            results.append({
+                'movie_id': movie_id,
+                'points': points,
+                'created_at': created_at
+            })
+
+        results.sort(key=lambda x: x['points'], reverse=True)
+        print(results)
 
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             },
-            'body': json.dumps("successful load feed page!")
+            'body': json.dumps(results)
         }
 
     except Exception as e:
@@ -98,7 +113,7 @@ def handler(event, context):
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
             },
-            'body': json.dumps({'message': 'Error uploading file', 'error': str(e)})
+            'body': json.dumps({'message': 'ERROR', 'error': str(e)})
         }
 
 
@@ -140,14 +155,3 @@ def get_tables_data(user_id):
     )
 
     user_ratings = rating_response.get('Items', [])
-
-
-def put_movie_in_feed(table, user_id, movie_id, points):
-    table.put_item(
-        Item={
-            "id": str(uuid.uuid4()),
-            "user_id": user_id,
-            "movieId": movie_id,
-            "points": points
-        }
-    )

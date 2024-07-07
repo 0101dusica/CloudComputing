@@ -21,7 +21,7 @@ def handler(event, context):
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET'
             },
-            'body': json.dumps(movies)
+            'body': json.dumps("successfully loaded feed results!")
         }
     except Exception as e:
         return {

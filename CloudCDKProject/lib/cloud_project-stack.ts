@@ -144,15 +144,6 @@ export class CloudProjectStack extends cdk.Stack {
       projectionType: ProjectionType.ALL,
     });
 
-    const feedTable = new Table(this, 'feedTable', {
-      partitionKey: { name: 'id', type: AttributeType.STRING },
-      sortKey: { name: 'user_id', type: AttributeType.STRING },
-      tableName: "cloud-project-feed-table",
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
-
-
-    //jos interatctions, feed
     //                **************** LAMBDA ***************** //
 
     // Lambda function to UPLOAD a short film
@@ -360,7 +351,6 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
       handler: 'generate_feed.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       environment: {
-          TABLE_NAME_FEED:  feedTable.tableName,
           TABLE_NAME_MOVIE: moviesTable.tableName,
           TABLE_NAME_DOWNLOADS: downloadsTable.tableName,
           TABLE_NAME_SUBSCRIPTION: subscriptionTable.tableName,
@@ -368,7 +358,6 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
 
       }
     });
-    feedTable.grantReadWriteData(generateFeedLambda);
     moviesTable.grantReadData(generateFeedLambda);
     downloadsTable.grantReadData(generateFeedLambda);
     subscriptionTable.grantReadData(generateFeedLambda);
@@ -464,7 +453,7 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
 
     // Integrate feed lambda with API Gateway
     const generateFeedIntegration = new apigateway.LambdaIntegration(generateFeedLambda);
-    api.root.addResource('user-feed').addMethod('POST', generateFeedIntegration);
+    api.root.addResource('generate-user-feed').addMethod('POST', generateFeedIntegration);
 
     // Integration of Lambda function with API Gateway
     const updateIntegration = new apigateway.LambdaIntegration(updateLambda);
@@ -565,12 +554,13 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
       value: userPoolDomain.domainName,
     });
 
-    movieByIdResource.addMethod('PUT',updateIntegration);
+    // movieByIdResource.addMethod('PUT',updateIntegration);
 
     // Integration of get subscriptions Lambda function with API Gateway
     const getSubscriptionsIntegration = new apigateway.LambdaIntegration(getSubscriptionsLambda);
     const subscriptionsResource = api.root.addResource('all-subscriptions');
-    subscriptionsResource.addMethod('GET',getSubscriptionsIntegration)
+    subscriptionsResource.addMethod('GET',getSubscriptionsIntegration);
+
   }
 }
 

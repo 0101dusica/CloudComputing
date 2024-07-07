@@ -43,8 +43,11 @@ def handler(event, context):
                 if actor not in existing_actors:
                     existing_actors.append(actor)
 
-            if director not in existing_directors:
-                existing_directors.append(director)
+            if director is not None:
+                if director not in existing_directors:
+                    existing_directors.append(director)
+            else:
+                director = ''
 
             table.update_item(
                 Key={
