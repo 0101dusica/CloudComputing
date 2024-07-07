@@ -107,7 +107,15 @@ export class TvShowDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.subscribe = result;
-        console.log("You are subscribed at: ", result);
+
+        // @ts-ignore
+        this.movieService.subscribe("1", this.subscribe.genres, this.subscribe.actors, this.subscribe.director).subscribe(response => {
+          console.log('Subscription successful', response);
+          alert('Successfully subscribed!');
+        }, error => {
+          console.error('Error doing subscription', error);
+          alert('Unsuccessfully subscribed. Please try again later.');
+        });
       }
     });
   }
@@ -132,8 +140,25 @@ export class TvShowDetailsComponent implements OnInit {
       if (result) {
         this.rate = result;
         this.isUserRated = true;
-        alert('You have successfully added your rating!');
+
+
+         if (this.series && this.series.movieId) {
+                // Call the addRating method from the service
+           console.log("ID " + this.series.movieId)
+           console.log("RATE " + this.rate)
+            this.movieService.addRating("1", this.series.movieId, this.rate).subscribe(response => {
+                console.log('Rating successful', response);
+                alert('You have successfully added your rating!');
+            }, error => {
+                console.error('Error rating movie', error);
+                alert('There was an error adding your rating. Please try again later.');
+            });
+         } else {
+            console.error('Series or series.movieId is undefined');
+            alert('There was an error adding your rating. Please try again later.');
+         }
       }
+
     });
   }
 
@@ -259,7 +284,7 @@ if (episode) {
   }
 
   downloadEpisode(episode: Episode) {
-    this.movieService.getDownloadUrl(episode.episodeId).subscribe(response => {
+    this.movieService.getDownloadUrl(episode.episodeId, "1").subscribe(response => {
       const presignedUrl = response.presigned_url;
       window.open(presignedUrl, '_blank');
     }, error => {

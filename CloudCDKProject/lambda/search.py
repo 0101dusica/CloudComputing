@@ -113,8 +113,6 @@ def query(title=None, description=None, director=None, genres=None, actors=None)
 
 
 
-
-
     # Perform intersection based on genres and actors queries
     items = []
     switch_case = (response_from_movies is not None, response_from_genres is not None, response_from_actors is not None)
@@ -196,7 +194,6 @@ def query_movies_by_attribute(attribute, value):
     filtered_movie_id_timestamps = [(movie_id, created_at) for movie_id, created_at in movie_id_timestamps if
                                     movie_id in common_movie_ids]
     return get_movies_by_ids(filtered_movie_id_timestamps)
-
 
 # def query_movies_by_genre_and_actors(genres, actors):
 #     genre_items = query_movies_by_attribute('genre', genres)

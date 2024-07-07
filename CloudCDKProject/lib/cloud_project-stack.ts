@@ -188,6 +188,17 @@ export class CloudProjectStack extends cdk.Stack {
     // Grant permissions to read from DynamoDB table
     moviesTable.grantReadData(getMoviesLambda);
 
+    // Lambda function to GET all subscriptions
+    const getSubscriptionsLambda = new lambda.Function(this, 'getSubscriptions', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'get_subscriptions.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_SUBSCRIPTION: subscriptionTable.tableName,
+      }
+    });
+    subscriptionTable.grantReadData(getSubscriptionsLambda)
+
 
     // Lambda function to GET a movie by ID
     const getMovieByIdLambda = new lambda.Function(this, 'getMovieById', {
@@ -457,6 +468,12 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
 
     // Integration of Lambda function with API Gateway
     const updateIntegration = new apigateway.LambdaIntegration(updateLambda);
+    movieByIdResource.addMethod('PUT',updateIntegration);
+
+    // Integration of get subscriptions Lambda function with API Gateway
+    const getSubscriptionsIntegration = new apigateway.LambdaIntegration(getSubscriptionsLambda);
+    const subscriptionsResource = api.root.addResource('all-subscriptions');
+    subscriptionsResource.addMethod('GET',getSubscriptionsIntegration)
     movieByIdResource.addMethod('PUT',updateIntegration)
 
     // Cognito User Pool

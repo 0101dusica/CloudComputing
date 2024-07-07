@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {MovieService} from "../movie.service";
 
-interface Person {
-  firstName: string,
-  lastName: string,
-  yearOfBirth: number,
+interface Subscription {
+  name: string,
   type: string,
   photo: string
 };
@@ -15,20 +14,85 @@ interface Person {
   styleUrls: ['./all-subscriptions.component.css']
 })
 export class AllSubscriptionsComponent {
-  users: Person[] = [];
-
-  constructor(private router: Router) { }
+  results: Subscription[] = [];
+  subscriptions : [] | undefined;
+  id: number | null = null;
+  constructor(private route: ActivatedRoute, private movieService: MovieService) { }
 
   ngOnInit(): void {
-    this.users = [
-      { firstName: 'John', lastName: 'Doe', yearOfBirth: 1990, type: 'Director', photo: '../../../../assets/director-one.jpg' },
-      { firstName: 'Jane', lastName: 'Doe', yearOfBirth: 1985, type: 'Actor', photo: '../../../../assets/actor-one.jpg' },
-      { firstName: 'Jim', lastName: 'Beam', yearOfBirth: 1975, type: 'Actor', photo: '../../../../assets/actor-teo.jpg' },
-      { firstName: 'Jack', lastName: 'Daniels', yearOfBirth: 1980, type: 'Director', photo: '../../../../assets/director-two.jpg' }
-    ];
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      this.id = idParam !== null ? +idParam : null;
+    });
+
+    this.getSubscriptions();
+
+
+    // this.users = [
+    //   { firstName: 'John', lastName: 'Doe', yearOfBirth: 1990, type: 'Director', photo: '../../../../assets/director-one.jpg' },
+    //   { firstName: 'Jane', lastName: 'Doe', yearOfBirth: 1985, type: 'Actor', photo: '../../../../assets/actor-one.jpg' },
+    //   { firstName: 'Jim', lastName: 'Beam', yearOfBirth: 1975, type: 'Actor', photo: '../../../../assets/actor-teo.jpg' },
+    //   { firstName: 'Jack', lastName: 'Daniels', yearOfBirth: 1980, type: 'Director', photo: '../../../../assets/director-two.jpg' }
+    // ];
   }
 
-  unsubscribe(user: Person): void {
-    this.users = this.users.filter(u => u !== user);
+  getSubscriptions() {
+    this.movieService.getSubscriptions("1").subscribe(
+      (data: any) => {
+        console.log(data)
+        // this.subscriptions = data;
+        this.processSubscriptions(data);
+      },
+      (error) => {
+        console.error('Error fetching subscriptions:', error);
+      }
+    );
+  }
+
+  processSubscriptions(subscriptions: any[]): void {
+    this.results = [];
+
+    subscriptions.forEach(subscription => {
+      const { genres, actors, directors } = subscription;
+
+      actors.forEach((actor: string) => {
+        this.results.push({
+          name: actor,
+          type: 'Actor',
+          photo: '../../../../assets/bell-icon.png'
+        });
+      });
+
+      directors.forEach((director: string) => {
+        this.results.push({
+          name: director,
+          type: 'Director',
+          photo: '../../../../assets/bell-icon.png'
+        });
+      });
+
+      genres.forEach((genre: string) => {
+        this.results.push({
+          name: genre,
+          type: 'Genre',
+          photo: '../../../../assets/bell-icon.png'
+        });
+      });
+
+
+    });
+  }
+
+  unsubscribe(subscribe: Subscription): void {
+    this.movieService.unsubscribe("1", subscribe.name).subscribe(
+      () => {
+        this.results = this.results.filter(s => s !== subscribe);
+        alert('Successfully unsubscribed!');
+      },
+      (error) => {
+        console.error('Error unsubscribing:', error);
+        alert('Unsuccessfully unsubscribed. Please try again later.');
+      }
+    );
   }
 }

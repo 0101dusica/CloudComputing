@@ -26,6 +26,7 @@ import { ReviewDialogComponent } from './review-dialog/review-dialog.component';
 import { EditMovieComponent } from './edit-movie/edit-movie.component';
 import { EditTvShowComponent } from './edit-tv-show/edit-tv-show.component';
 import { SubscribeDialogComponent } from './subscribe-dialog/subscribe-dialog.component';
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -49,16 +50,17 @@ import { SubscribeDialogComponent } from './subscribe-dialog/subscribe-dialog.co
     EditTvShowComponent,
     SubscribeDialogComponent
   ],
-  imports: [
-    CommonModule,
-    RouterModule,
-    FormsModule,
-    HttpClientModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-    MatRadioModule,
-  ],
+    imports: [
+        CommonModule,
+        RouterModule,
+        FormsModule,
+        HttpClientModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatIconModule,
+        MatRadioModule,
+        MatCheckboxModule,
+    ],
   exports:[
     NavBarComponent,
     FooterComponent,

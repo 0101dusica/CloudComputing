@@ -18,5 +18,5 @@ export class ReviewDialogComponent {
       this.dialogRef.close(this.selectedRating);
     }
   }
-  
+
 }
