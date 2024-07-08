@@ -579,10 +579,22 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
       value: userPoolDomain.domainName,
     });
 
+    const pythonLayer = new lambda.LayerVersion(
+      this,
+      "pythonLayer",
+      {
+          code: lambda.Code.fromAsset(
+              path.join(__dirname, "../layer", "python.zip")
+          ),
+          compatibleArchitectures: [lambda.Architecture.ARM_64],
+      }
+  );
+
     const authorizerLambda = new lambda.Function(this, 'authorizeLambda', {
       runtime: lambda.Runtime.PYTHON_3_9,
       handler: 'authorize.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      layers: [pythonLayer],
       environment: {
         USER_POOL_ID: 'eu-central-1_9MVHrNggH',
         CLIENT_ID: '27arrkdlj699c70k6skmm6cn74',
