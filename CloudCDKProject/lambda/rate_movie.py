@@ -44,7 +44,7 @@ def handler(event, context):
                     '#r': 'rate'
                 },
                 ExpressionAttributeValues={
-                    ':rate': rate
+                    ':rate': str(rate)
                 }
             )
         else:
@@ -54,7 +54,7 @@ def handler(event, context):
                     "id": str(uuid.uuid4()),
                     "user_id": user_id,
                     "movieId": movie_id,
-                    "rate": rate
+                    "rate": str(rate)
                 }
             )
 

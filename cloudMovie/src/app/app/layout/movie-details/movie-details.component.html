@@ -24,7 +24,7 @@
         <span>|</span>
         <span>18+</span>
         <span *ngIf="isUserRated">|</span>
-        <span *ngIf="isUserRated">Your Rating: {{ rate }}</span>
+        <span *ngIf="isUserRated">Your Rating: {{ rate }}★</span>
         <span>|</span>
         <div class="hover-container">
           <img src="../../../../assets/question-icon.png" class="question-logo" (mouseenter)="showInfoBox()" (mouseleave)="hideInfoBox()">
@@ -50,7 +50,7 @@
       <div class="actions" style="margin-bottom: 5%;">
         <button (click)="watchNow()">Play</button>
         <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onSubscribeIconClick()">+ Subscribe</button>
-        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onNotificationIconClick()" *ngIf="!isUserRated">Add Review</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onNotificationIconClick()">Add Review</button>
         <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="downloadMovie()">Download</button>
       </div>
       <div class="actions">

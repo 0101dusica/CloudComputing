@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { env } from '../../../env/env';
 import {Episode, Movie} from './movie';
+import {SubscribeDialogComponent} from "./subscribe-dialog/subscribe-dialog.component";
 
 @Injectable({
   providedIn: 'root'
@@ -25,12 +26,20 @@ export class MovieService {
     return this.http.get<any[]>(`${this.apiUrl}all-subscriptions?user_id=${user_id}`);
   }
 
+  getMovieRate(user_id: string, movie_id: string): Observable<any> {
+    const body = { user_id: user_id, movie_id: movie_id};
+    return this.http.post(`${this.apiUrl}get-movie-rate`, body, {
+      headers: this.headers
+    });
+  }
+
   getMovieById(movieId: string, createdAt: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/movies/${movieId}?createdAt=${createdAt}`);
   }
 
-  getDownloadUrl(movieId: string, user_id: string) {
-    return this.http.get<any>(`${this.apiUrl}/download/${movieId}?user_id=${user_id}`);
+  getDownloadUrl(movieId: string, user_id: string, genres: string[]) {
+    const body = { user_id: user_id, genres: genres};
+    return this.http.post<any>(`${this.apiUrl}/download/${movieId}`, body);
   }
 
   getWatchUrl(movieId: string): Observable<any> {
@@ -125,11 +134,11 @@ export class MovieService {
     });
   }
 
-getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
+  getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
 
 
-  return this.http.get<any[]>(`${this.apiUrl}/episodes/${seriesId}`);
-}
+    return this.http.get<any[]>(`${this.apiUrl}/episodes/${seriesId}`);
+  }
   private base64ToArrayBuffer(base64: string): Uint8Array {
     const byteCharacters = atob(base64.split(',')[1]);
     const byteNumbers = new Array(byteCharacters.length);
@@ -138,4 +147,6 @@ getEpisodesBySeriesId(seriesId: string): Observable<any[]> {
     }
     return new Uint8Array(byteNumbers);
   }
+
+
 }

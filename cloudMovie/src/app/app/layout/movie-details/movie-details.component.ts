@@ -56,12 +56,6 @@ export class MovieDetailsComponent implements OnInit {
     this.addSubscribe(); // Ensure the dialog is opened here
   }
 
-  onSubscribePopupClick(event: Event): void {
-    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
-       this.isNotificationVisible = false;
-    }
-  }
-
   addSubscribe(): void {
     const dialogRef = this.dialog.open(SubscribeDialogComponent, {
             panelClass: 'popup-overlay',
@@ -108,8 +102,6 @@ export class MovieDetailsComponent implements OnInit {
 
         if (this.movie && this.movie.movieId) {
            // Call the addRating method from the service
-           console.log("ID " + this.movie.movieId)
-           console.log("RATE " + this.rate)
             this.movieService.addRating("1", this.movie.movieId, this.rate).subscribe(response => {
                 console.log('Rating successful', response);
                 alert('You have successfully added your rating!');
@@ -139,10 +131,32 @@ export class MovieDetailsComponent implements OnInit {
           this.directors = [this.movie!.director];
 
           console.log(data);
+          this.getMovieRate('1', movieId);
+          console.log(this.isUserRated)
         });
       });
     });
   }
+
+  getMovieRate(user_id: string, movie_id: string) {
+  this.movieService.getMovieRate(user_id, movie_id).subscribe(
+    (response: any) => {
+      if (response) {
+        this.rate = response.rate;
+        this.isUserRated = true;
+        console.log("User rating found:", this.rate);
+      } else {
+        console.log("Rate not found or response is invalid");
+        this.isUserRated = false;
+      }
+      console.log("isUserRated:", this.isUserRated);
+    },
+    (error) => {
+      console.error('Error fetching movie rate:', error);
+      this.isUserRated = false;
+    }
+  );
+}
 
   checkVideoTime() {
     const video = this.bgVideo?.nativeElement;
@@ -153,7 +167,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   downloadMovie() {
-    this.movieService.getDownloadUrl(this.movie!.movieId, "1").subscribe(response => {
+    this.movieService.getDownloadUrl(this.movie!.movieId, "1", this.movie!.genres).subscribe(response => {
       const presignedUrl = response.presigned_url;
       window.open(presignedUrl, '_blank');
     }, error => {

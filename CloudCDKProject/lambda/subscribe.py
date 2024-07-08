@@ -43,11 +43,9 @@ def handler(event, context):
                 if actor not in existing_actors:
                     existing_actors.append(actor)
 
-            if director is not None:
+            if director:
                 if director not in existing_directors:
                     existing_directors.append(director)
-            else:
-                director = ''
 
             table.update_item(
                 Key={
@@ -62,15 +60,15 @@ def handler(event, context):
                 }
             )
         else:
-            table.put_item(
-                Item={
-                    "id": str(uuid.uuid4()),
-                    "user_id": user_id,
-                    "genres": genres,
-                    "actors": actors,
-                    "directors": [director]
-                }
-            )
+            item = {
+                "id": str(uuid.uuid4()),
+                "user_id": user_id,
+                "genres": genres,
+                "actors": actors,
+            }
+            if director:
+                item["directors"] = [director]
+            table.put_item(Item=item)
 
         return {
             'statusCode': 200,

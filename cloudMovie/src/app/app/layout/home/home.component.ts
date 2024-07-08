@@ -44,7 +44,6 @@ export class HomeComponent implements OnInit {
   }
 
 processMovies(response: any[]) {
-  // Create an array to hold observables for getMovieById calls
   const movieObservables = response.map((item, index) => {
     return this.movieService.getMovieById(item.movie_id, item.created_at)
       .pipe(

@@ -56,8 +56,8 @@ export class TvShowDetailsComponent implements OnInit {
             this.loadEpisodes(this.series.movieId);
           }
 
-          console.log("sta je series"+data);
           console.log(data);
+          this.getMovieRate("1", this.series!.movieId)
         });
       });
     });
@@ -70,6 +70,26 @@ export class TvShowDetailsComponent implements OnInit {
       }
     });
   }
+
+  getMovieRate(user_id: string, series_id: string) {
+  this.movieService.getMovieRate(user_id, series_id).subscribe(
+    (response: any) => {
+      if (response) {
+        this.rate = response.rate;
+        this.isUserRated = true;
+        console.log("User rating found:", this.rate);
+      } else {
+        console.log("Rate not found or response is invalid");
+        this.isUserRated = false;
+      }
+      console.log("isUserRated:", this.isUserRated);
+    },
+    (error) => {
+      console.error('Error fetching series rate:', error);
+      this.isUserRated = false;
+    }
+  );
+}
 
   loadEpisodes(seriesId: string) {
     this.movieService.getEpisodesBySeriesId(seriesId).subscribe(episodes => {
@@ -100,9 +120,10 @@ export class TvShowDetailsComponent implements OnInit {
   }
 
   addSubscribe(): void {
-    const dialogRef = this.dialog.open(SubscribeDialogComponent, {
-      panelClass: 'popup-overlay'
-    });
+     const dialogRef = this.dialog.open(SubscribeDialogComponent, {
+            panelClass: 'popup-overlay',
+            data: { movie: this.series } // Pass the movie data
+        });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
@@ -123,12 +144,6 @@ export class TvShowDetailsComponent implements OnInit {
   onNotificationIconClick(): void {
     this.isNotificationVisible = !this.isNotificationVisible;
     this.addReview(); // Ensure the dialog is opened here
-  }
-
-  onNotificationPopupClick(event: Event): void {
-    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
-       this.isNotificationVisible = false;
-    }
   }
 
   addReview(): void {
@@ -284,7 +299,7 @@ if (episode) {
   }
 
   downloadEpisode(episode: Episode) {
-    this.movieService.getDownloadUrl(episode.episodeId, "1").subscribe(response => {
+    this.movieService.getDownloadUrl(episode.episodeId, "1", this.series!.genres).subscribe(response => {
       const presignedUrl = response.presigned_url;
       window.open(presignedUrl, '_blank');
     }, error => {
@@ -292,4 +307,5 @@ if (episode) {
       alert('Failed to get presigned URL');
     });
   }
+
 }

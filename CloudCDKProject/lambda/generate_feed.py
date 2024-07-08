@@ -39,11 +39,15 @@ def handler(event, context):
             director = movie['director']
 
             #1 DOWNLOADS
-            for download in user_downloads:
-                downloads = download.get('downloads', [])
+            if len(user_downloads) > 0:
+                downloads = user_downloads[0].get('downloads', [])
 
-                if movie_id in downloads:
-                    points += 30
+                for download in downloads:
+                    genre = download['genre']
+                    score = int(download['score'])
+                    for movie_genre in genres:
+                        if movie_genre.lower() == genre.lower():
+                            points += 30*score
 
 
             #2 SUBSCRIPTIONS
@@ -51,13 +55,13 @@ def handler(event, context):
                 subscription_genres = subscription.get('genres', [])
                 genres_matches = list(set(genres).intersection(set(subscription_genres)))
                 if len(genres_matches) > 0:
-                    # print("ZANROVA POKLOPLJENO ", len(genres_matches))
+                    print("ZANROVA POKLOPLJENO ", len(genres_matches))
                     points += 10
 
                 subscription_actors = subscription.get('actors', [])
                 actors_matches = list(set(actors).intersection(set(subscription_actors)))
                 if len(actors_matches) > 1:
-                    # print("GLUMACA POKLOPLJENO ", len(actors_matches))
+                    print("GLUMACA POKLOPLJENO ", len(actors_matches))
                     points += 5
 
                 if len(actors_matches) == 1:
@@ -72,7 +76,7 @@ def handler(event, context):
             #3 RATINGS
             for rating in user_ratings:
                 if movie_id == rating['movieId']:
-                    rate = rating['rate']
+                    rate = int(rating['rate'])
 
                     if 0 < rate <= 2:
                         points += 1

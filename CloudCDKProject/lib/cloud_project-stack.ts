@@ -323,6 +323,17 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     });
     ratingsTable.grantReadWriteData(ratingLambda);
 
+    // Lambda function to rate a film
+    const getMovieRateLambda = new lambda.Function(this, 'getMovieRate', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'get_movie_rate.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        TABLE_NAME_RATING:  ratingsTable.tableName,
+      }
+    });
+    ratingsTable.grantReadData(getMovieRateLambda);
+
     // Lambda function to subscribe to the film
     const subscribeLambda = new lambda.Function(this, 'subscription', {
       runtime: lambda.Runtime.PYTHON_3_9,
@@ -437,7 +448,7 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
 
     // Integrate download lambda with API Gateway
     const downloadIntegration = new apigateway.LambdaIntegration(downloadLambda);
-    api.root.addResource('download').addResource('{movieId}').addMethod('GET', downloadIntegration);
+    api.root.addResource('download').addResource('{movieId}').addMethod('POST', downloadIntegration);
 
     // Integrate rate_movie lambda with API Gateway
     const ratingIntegration = new apigateway.LambdaIntegration(ratingLambda);
@@ -463,6 +474,10 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     const getSubscriptionsIntegration = new apigateway.LambdaIntegration(getSubscriptionsLambda);
     const subscriptionsResource = api.root.addResource('all-subscriptions');
     subscriptionsResource.addMethod('GET',getSubscriptionsIntegration);
+
+    // Integrate get rate movie lambda with API Gateway
+    const getMovieRateIntegration = new apigateway.LambdaIntegration(getMovieRateLambda);
+    api.root.addResource('get-movie-rate').addMethod('POST', getMovieRateIntegration);
 
     // Cognito User Pool
     const userPool = new cognito.UserPool(this, 'UserPool', {
