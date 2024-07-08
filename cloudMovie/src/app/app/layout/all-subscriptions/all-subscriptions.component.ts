@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MovieService} from "../movie.service";
+import {AuthService} from "../../auth/auth.service";
 
 interface Subscription {
   name: string,
@@ -17,9 +18,11 @@ export class AllSubscriptionsComponent {
   results: Subscription[] = [];
   subscriptions : [] | undefined;
   id: number | null = null;
-  constructor(private route: ActivatedRoute, private movieService: MovieService) { }
+  username: string | undefined;
+  constructor(private route: ActivatedRoute, private movieService: MovieService, private authService: AuthService) { }
 
   ngOnInit(): void {
+    this.username = this.authService.email;
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       this.id = idParam !== null ? +idParam : null;
@@ -30,7 +33,7 @@ export class AllSubscriptionsComponent {
   }
 
   getSubscriptions() {
-    this.movieService.getSubscriptions("1").subscribe(
+    this.movieService.getSubscriptions(this.username!).subscribe(
       (data: any) => {
         console.log(data)
         // this.subscriptions = data;
@@ -77,7 +80,7 @@ export class AllSubscriptionsComponent {
   }
 
   unsubscribe(subscribe: Subscription): void {
-    this.movieService.unsubscribe("1", subscribe.name).subscribe(
+    this.movieService.unsubscribe(this.username!, subscribe.name).subscribe(
       () => {
         this.results = this.results.filter(s => s !== subscribe);
         alert('Successfully unsubscribed!');

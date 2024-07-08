@@ -6,6 +6,7 @@ import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.c
 import { MovieService } from '../movie.service';
 import {Episode, Movie} from '../movie';
 import Swal from "sweetalert2";
+import {AuthService} from "../../auth/auth.service";
 
 
 @Component({
@@ -20,6 +21,7 @@ export class TvShowDetailsComponent implements OnInit {
 
   isVideoVisible = false;
   series: Movie | undefined;
+  username: string | undefined;
   isNotificationVisible = false;
   isImageVisible: boolean = true;
   isUserRated = false;
@@ -35,10 +37,12 @@ export class TvShowDetailsComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private movieService: MovieService
+    private movieService: MovieService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.username = this.authService.email;
     // Subscribe to both route params and query params
     this.route.params.subscribe(params => {
       const movieId = params['movieId']; // Get movieId from route params
@@ -57,7 +61,7 @@ export class TvShowDetailsComponent implements OnInit {
           }
 
           console.log(data);
-          this.getMovieRate("1", this.series!.movieId)
+          this.getMovieRate(this.username!, this.series!.movieId)
         });
       });
     });
@@ -113,12 +117,6 @@ export class TvShowDetailsComponent implements OnInit {
     this.addSubscribe(); // Ensure the dialog is opened here
   }
 
-  onSubscribePopupClick(event: Event): void {
-    if (this.isNotificationVisible && event.target instanceof HTMLElement && !event.target.closest('.notification-dropdown')) {
-       this.isNotificationVisible = false;
-    }
-  }
-
   addSubscribe(): void {
      const dialogRef = this.dialog.open(SubscribeDialogComponent, {
             panelClass: 'popup-overlay',
@@ -130,7 +128,7 @@ export class TvShowDetailsComponent implements OnInit {
         this.subscribe = result;
 
         // @ts-ignore
-        this.movieService.subscribe("1", this.subscribe.genres, this.subscribe.actors, this.subscribe.director).subscribe(response => {
+        this.movieService.subscribe(this.username!, this.subscribe.genres, this.subscribe.actors, this.subscribe.director).subscribe(response => {
           console.log('Subscription successful', response);
           alert('Successfully subscribed!');
         }, error => {
@@ -158,10 +156,7 @@ export class TvShowDetailsComponent implements OnInit {
 
 
          if (this.series && this.series.movieId) {
-                // Call the addRating method from the service
-           console.log("ID " + this.series.movieId)
-           console.log("RATE " + this.rate)
-            this.movieService.addRating("1", this.series.movieId, this.rate).subscribe(response => {
+            this.movieService.addRating(this.username!, this.series.movieId, this.rate).subscribe(response => {
                 console.log('Rating successful', response);
                 alert('You have successfully added your rating!');
             }, error => {
@@ -217,10 +212,6 @@ export class TvShowDetailsComponent implements OnInit {
       video.src = '';
       this.isVideoVisible = false;
     }
-  }
-
-  notImplemented() {
-
   }
 
  ceilValue(value: string): number {
@@ -299,7 +290,7 @@ if (episode) {
   }
 
   downloadEpisode(episode: Episode) {
-    this.movieService.getDownloadUrl(episode.episodeId, "1", this.series!.genres).subscribe(response => {
+    this.movieService.getDownloadUrl(episode.episodeId, this.username!, this.series!.genres).subscribe(response => {
       const presignedUrl = response.presigned_url;
       window.open(presignedUrl, '_blank');
     }, error => {

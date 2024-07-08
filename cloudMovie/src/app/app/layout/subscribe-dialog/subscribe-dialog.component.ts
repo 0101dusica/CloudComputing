@@ -16,10 +16,6 @@ export class SubscribeDialogComponent {
   selectedDirector: boolean = false;
   selectedGenres: { [key: string]: boolean } = {};
 
-  // selectedActor: number | null = null;
-  // selectedDirector: number | null = null;
-  // selectedGenre: number | null = null;
-
   constructor(
     public dialogRef: MatDialogRef<SubscribeDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -34,9 +30,6 @@ export class SubscribeDialogComponent {
 
 
   submitRating(): void {
-    // if(this.selectedActor !== null || this.selectedDirector !== null || this.selectedGenre !== null){
-    //   this.dialogRef.close({"actor": this.selectedActor, "director": this.selectedDirector, "genre": this.selectedGenre });
-    // }
     const selectedActorsArray = Object.keys(this.selectedActors).filter(key => this.selectedActors[key]);
     const selectedGenresArray = Object.keys(this.selectedGenres).filter(key => this.selectedGenres[key]);
 

@@ -6,6 +6,7 @@ import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ReviewDialogComponent } from '../review-dialog/review-dialog.component';
 import { SubscribeDialogComponent } from '../subscribe-dialog/subscribe-dialog.component';
+import {AuthService} from "../../auth/auth.service";
 
 @Component({
   selector: 'app-movie-details',
@@ -16,6 +17,7 @@ export class MovieDetailsComponent implements OnInit {
 
   isNotificationVisible = false;
   movie: Movie | undefined;
+  username: string | undefined
 
   @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
@@ -36,12 +38,9 @@ export class MovieDetailsComponent implements OnInit {
     private movieService: MovieService,
     private router: Router,
     private location: Location,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService
   ) {}
-
-  notImplemented() {
-    throw new Error('Method not implemented.');
-  }
 
   showInfoBox() {
     this.isInfoBoxVisible = true;
@@ -67,7 +66,7 @@ export class MovieDetailsComponent implements OnInit {
         this.subscribe = result;
 
         // @ts-ignore
-        this.movieService.subscribe("1", this.subscribe.genres, this.subscribe.actors, this.subscribe.director).subscribe(response => {
+        this.movieService.subscribe(this.username!, this.subscribe.genres, this.subscribe.actors, this.subscribe.director).subscribe(response => {
           console.log('Subscription successful', response);
           alert('Successfully subscribed!');
         }, error => {
@@ -101,8 +100,7 @@ export class MovieDetailsComponent implements OnInit {
         this.isUserRated = true;
 
         if (this.movie && this.movie.movieId) {
-           // Call the addRating method from the service
-            this.movieService.addRating("1", this.movie.movieId, this.rate).subscribe(response => {
+            this.movieService.addRating(this.username!, this.movie.movieId, this.rate).subscribe(response => {
                 console.log('Rating successful', response);
                 alert('You have successfully added your rating!');
             }, error => {
@@ -118,6 +116,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.username = this.authService.email;
     // Subscribe to both route params and query params
     this.route.params.subscribe(params => {
       const movieId = params['movieId']; // Get movieId from route params
@@ -131,8 +130,7 @@ export class MovieDetailsComponent implements OnInit {
           this.directors = [this.movie!.director];
 
           console.log(data);
-          this.getMovieRate('1', movieId);
-          console.log(this.isUserRated)
+          this.getMovieRate(this.username!, movieId);
         });
       });
     });
@@ -167,7 +165,7 @@ export class MovieDetailsComponent implements OnInit {
   }
 
   downloadMovie() {
-    this.movieService.getDownloadUrl(this.movie!.movieId, "1", this.movie!.genres).subscribe(response => {
+    this.movieService.getDownloadUrl(this.movie!.movieId, this.username!, this.movie!.genres).subscribe(response => {
       const presignedUrl = response.presigned_url;
       window.open(presignedUrl, '_blank');
     }, error => {

@@ -166,6 +166,11 @@ export class CloudProjectStack extends cdk.Stack {
     genresTable.grantWriteData(uploadLambda);
     episodesTable.grantWriteData(uploadLambda);
 
+    uploadLambda.addToRolePolicy(new iam.PolicyStatement({
+        actions:["sns:Publish", "sns:ListTopics"],
+        resources: ["*"]
+    }));
+
     // Lambda function to GET all movies
     const getMoviesLambda = new lambda.Function(this, 'getMovies', {
       runtime: lambda.Runtime.PYTHON_3_9,
@@ -345,6 +350,11 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     });
     subscriptionTable.grantReadWriteData(subscribeLambda);
 
+    subscribeLambda.addToRolePolicy(new iam.PolicyStatement({
+        actions:["sns:CreateTopic", "sns:ListTopics", "sns:Subscribe"],
+        resources: ["*"]
+    }));
+
     // Lambda function to unsubscribe to the film
     const unsubscribeLambda = new lambda.Function(this, 'unsubscription', {
       runtime: lambda.Runtime.PYTHON_3_9,
@@ -355,6 +365,11 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
       }
     });
     subscriptionTable.grantReadWriteData(unsubscribeLambda);
+
+   unsubscribeLambda.addToRolePolicy(new iam.PolicyStatement({
+    actions:["sns:Publish", "sns:ListTopics", "sns:ListSubscriptionsByTopic", "sns:Unsubscribe"],
+    resources: ["*"]
+    }));
 
     // Lambda function to generate the user feed
     const generateFeedLambda = new lambda.Function(this, 'feed', {

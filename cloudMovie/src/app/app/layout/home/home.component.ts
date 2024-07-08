@@ -2,7 +2,8 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MovieService } from '../movie.service';
 import {Movie} from "../movie";
-import {forkJoin, map, tap} from "rxjs"; // Adjust the path as per your project structure
+import {forkJoin, map, tap} from "rxjs";
+import {AuthService} from "../../auth/auth.service"; // Adjust the path as per your project structure
 
 @Component({
   selector: 'app-home',
@@ -12,13 +13,15 @@ import {forkJoin, map, tap} from "rxjs"; // Adjust the path as per your project 
 export class HomeComponent implements OnInit {
 
   movies: Movie[] = []; // Define the movies array to hold movie data
-  feedResults: any[] = [];
+  username: string | undefined
 
-  constructor(private route: ActivatedRoute, private movieService: MovieService) { }
+  constructor(private route: ActivatedRoute, private movieService: MovieService, private authService: AuthService) { }
 
   id: number | null = null;
 
   ngOnInit() {
+    this.username = this.authService.email;
+    console.log("USERNAME ", this.username)
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       this.id = idParam !== null ? +idParam : null;
@@ -32,7 +35,7 @@ export class HomeComponent implements OnInit {
   }
 
   generateFeed() {
-    this.movieService.generateUserFeed("1").subscribe(
+    this.movieService.generateUserFeed(this.username!).subscribe(
       (response) => {
         console.log('User feed generated:', response);
         this.processMovies(response)
@@ -78,8 +81,7 @@ processMovies(response: any[]) {
   @ViewChild('widgetsContent') widgetsContent: ElementRef | undefined;
 
   scrollLeft() {
-  // @ts-ignore
-    const container = this.widgetsContent.nativeElement;
+    const container = this.widgetsContent!.nativeElement;
   container.scrollBy({
     left: -container.offsetWidth,
     behavior: 'smooth'
@@ -87,8 +89,7 @@ processMovies(response: any[]) {
   }
 
   scrollRight() {
-    // @ts-ignore
-    const container = this.widgetsContent.nativeElement;
+    const container = this.widgetsContent!.nativeElement;
     container.scrollBy({
       left: container.offsetWidth,
       behavior: 'smooth'

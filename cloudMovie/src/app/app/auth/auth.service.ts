@@ -22,12 +22,14 @@ const userPool = new CognitoUserPool(poolData);
 })
 export class AuthService {
   username: string | undefined;
+  email: string | undefined;
   role: string | undefined;
 
   constructor() {}
 
-  setUser(username: string, role: string) {
+  setUser(username: string, email: string,  role: string) {
     this.username = username;
+    this.email = email;
     this.role = role;
   }
 
@@ -41,7 +43,7 @@ export class AuthService {
     callback: (err: Error | undefined, result: ISignUpResult | undefined) => void
   ): void {
     const attributeList: CognitoUserAttribute[] = [];
-  
+
     const dataEmail = {
       Name: 'email',
       Value: email
@@ -58,17 +60,17 @@ export class AuthService {
       Name: 'birthdate',
       Value: dobDate.toISOString().split('T')[0] // Formatted as YYYY-MM-DD
     };
-  
+
     const attributeEmail = new CognitoUserAttribute(dataEmail);
     const attributeFirstName = new CognitoUserAttribute(dataFirstName);
     const attributeLastName = new CognitoUserAttribute(dataLastName);
     const attributeDOB = new CognitoUserAttribute(dataDOB);
-  
+
     attributeList.push(attributeEmail);
     attributeList.push(attributeFirstName);
     attributeList.push(attributeLastName);
     attributeList.push(attributeDOB);
-  
+
     userPool.signUp(username, password, attributeList, [], (err, result) => callback(err, result));
   }
 
@@ -81,27 +83,28 @@ export class AuthService {
       Username: email,
       Password: password
     });
-  
+
     const userData = {
       Username: email,
       Pool: userPool
     };
-  
+
     const cognitoUser = new CognitoUser(userData);
-  
+
     cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess: (session: CognitoUserSession) => {
         const idToken = session.getIdToken();
         const username = idToken.payload['cognito:username'];
+        const email = idToken.payload['email'];
         let role = 'user'; // Default role if cognito:groups is not present
-        
+
         if (idToken.payload['cognito:groups']) {
           const userRoles = idToken.payload['cognito:groups'];
           role = userRoles.includes('admin') ? 'admin' : 'user'; // Assuming 'admin' and 'user' groups exist
         }
-        
-        this.setUser(username, role); // Store in service
-  
+
+        this.setUser(username, email,  role); // Store in service
+
         callback(null, session);
       },
       onFailure: (err) => callback(err, null)
@@ -142,7 +145,7 @@ export class AuthService {
                 const userRoles = idToken.payload['cognito:groups'];
                 role = userRoles.includes('admin') ? 'admin' : 'user';
               }
-              this.setUser(idToken.payload['cognito:username'], role);
+              this.setUser(idToken.payload['cognito:username'], idToken.payload['email'], role);
               resolve(role);
             }
           });

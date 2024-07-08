@@ -8,9 +8,13 @@ from datetime import datetime
 
 s3 = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
+sns = boto3.client('sns')
 
 
 def handler(event, context):
+    genres = []
+    director = ''
+    actors = []
     try:
         body = json.loads(event['body'])
 
@@ -27,7 +31,6 @@ def handler(event, context):
         duration = body['duration']
         movieType = body['type']
         movie_id = str(uuid.uuid4())  # Identifier for DynamoDB and S3 bucket
-
 
         bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
         table_name = os.environ['TABLE_NAME_MOVIE']  # DynamoDB
@@ -59,6 +62,7 @@ def handler(event, context):
                 }
             )
         else:
+
             actors = body['actors']
             director = body['director']
             genres = body['genres']
@@ -87,15 +91,22 @@ def handler(event, context):
             insert_items(dynamodb.Table(table_name_genres), genres, movie_id, created_at, 'genre')
             insert_items(dynamodb.Table(table_name_actors), actors, movie_id, created_at, 'actor')
 
-
-
         # Generate presigned URL for upload file to S3
         if movieType != 'show':
             presigned_url = s3.generate_presigned_url('put_object', Params={'Bucket': bucket_name, 'Key': movie_id},
-                                                  ExpiresIn=3600)
+                                                      ExpiresIn=3600)
         else:
             presigned_url = ''
 
+        message = f"New movie dropped!\n\nTitle: {title}\nGenres: {', '.join(genres)}\nDirector: {director}\nActors: {', '.join(actors)}"
+
+        for genre in body['genres']:
+            publish_topic_message(genre)
+
+        for actor in body['actors']:
+            publish_topic_message(actor)
+
+        publish_topic_message(body['director'], message)
 
         return {
             'statusCode': 200,
@@ -128,3 +139,43 @@ def insert_items(table, items, movie_id, created_at, attribute_name):
                 'createdAt': created_at
             }
         )
+
+
+def publish_topic_message(subscribe_name, message):
+    # Generate the topic name
+    name_for_topic = subscribe_name.replace(' ', '')
+    addition = "Topic"
+
+    topic_name = f"{name_for_topic}{addition}"
+    print(topic_name)
+    topic = None
+    # Check if the topic exists
+    try:
+        topics = sns.list_topics()
+        for t in topics['Topics']:
+            if t['TopicArn'].endswith(f":{topic_name}"):
+                topic = t
+                break
+        if topic:
+            topic_arn = topic['TopicArn']
+        else:
+            topic_arn = None
+    except Exception as e:
+        print(f"Error listing topics: {e}")
+        return None
+
+    print(topic_arn)
+    if not topic_arn:
+        print("topicArn is null")
+        return None
+
+    # Publish to the topic
+    try:
+        sns.publish(
+            TopicArn=topic_arn,
+            Message=message,
+            Subject="New Movie Release"
+        )
+    except Exception as e:
+        print(f"Error publishing to topic: {e}")
+        return None
