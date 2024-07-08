@@ -22,6 +22,7 @@ export class TvShowDetailsComponent implements OnInit {
   isVideoVisible = false;
   series: Movie | undefined;
   username: string | undefined;
+  role: string | undefined;
   isNotificationVisible = false;
   isImageVisible: boolean = true;
   isUserRated = false;
@@ -43,6 +44,7 @@ export class TvShowDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.username = this.authService.email;
+    this.role = this.authService.role;
     // Subscribe to both route params and query params
     this.route.params.subscribe(params => {
       const movieId = params['movieId']; // Get movieId from route params

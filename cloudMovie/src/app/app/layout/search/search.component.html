@@ -24,7 +24,7 @@
 
     <div class="container">
         <div class="movies-grid">
-            <div *ngFor="let movie of filteredMovies" class="movie-card" [routerLink]="['/movie-details', movie.movieId]" [queryParams]="{ createdAt: movie.createdAt }">
+            <div *ngFor="let movie of filteredMovies" class="movie-card" [routerLink]="getRouterLink(movie)" [queryParams]="{ createdAt: movie.createdAt }">
                 <img src="../../../../assets/movie-1.jpg" alt="{{ movie.title }}" />
                 <p>{{movie.title}}</p>
             </div>

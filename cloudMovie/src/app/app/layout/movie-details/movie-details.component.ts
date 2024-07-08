@@ -17,7 +17,8 @@ export class MovieDetailsComponent implements OnInit {
 
   isNotificationVisible = false;
   movie: Movie | undefined;
-  username: string | undefined
+  username: string | undefined;
+  role: string | undefined;
 
   @ViewChild('bgVideo', { static: false }) bgVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('fullScreenVideo', { static: false }) fullScreenVideo!: ElementRef<HTMLVideoElement>;
@@ -117,6 +118,7 @@ export class MovieDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.username = this.authService.email;
+    this.role = this.authService.role;
     // Subscribe to both route params and query params
     this.route.params.subscribe(params => {
       const movieId = params['movieId']; // Get movieId from route params

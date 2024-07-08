@@ -50,13 +50,11 @@
 
           </div>
         <div class="actions">
-          <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onSubscribeIconClick()">+ Subscribe</button>
-          <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onNotificationIconClick()">Add Review</button> <!-- vidljivo samo user-u -->
-        </div>
-        <div class="actions" style="margin-top: 2%;"> <!-- vidljivo samo adminu -->
-          <button (click)="delete()">Delete</button>
-            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode', series.movieId]">Add New Episode</button>
-        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-show', series!.movieId]" [queryParams]="{ createdAt: series!.createdAt }">Edit</button>
+          <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onSubscribeIconClick()" *ngIf="role === 'user'">+ Subscribe</button>
+          <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onNotificationIconClick()" *ngIf="role === 'user'">Add Review</button> <!-- vidljivo samo user-u -->
+          <button (click)="delete()" *ngIf="role === 'admin'">Delete</button>
+            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode', series.movieId]" *ngIf="role === 'admin'">Add New Episode</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-show', series!.movieId]" [queryParams]="{ createdAt: series!.createdAt }" *ngIf="role === 'admin'">Edit</button>
         </div>
       </div>
     </div>
@@ -74,11 +72,11 @@
             <p><i class="fas fa-clock"></i> {{ ceilValue(episode.duration) }} min</p>
           </div>
           <div class="episode-actions">
-            <button (click)="playEpisode(episode)">Play</button>
-            <button (click)="deleteEpisode(episode)">Delete</button>
-              <button [routerLink]="['/edit-movie', episode!.episodeId]" [queryParams]="{ createdAt: episode!.createdAt }">Edit</button>
+            <button (click)="playEpisode(episode)" >Play</button>
+            <button (click)="deleteEpisode(episode)" *ngIf="role === 'admin'">Delete</button>
+              <button [routerLink]="['/edit-movie', episode!.episodeId]" [queryParams]="{ createdAt: episode!.createdAt }" *ngIf="role === 'admin'">Edit</button>
 
-              <button (click)="downloadEpisode(episode)">Download</button>
+              <button (click)="downloadEpisode(episode)" *ngIf="role === 'user'">Download</button>
 
           </div>
         </div>

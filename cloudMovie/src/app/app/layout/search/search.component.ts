@@ -40,6 +40,14 @@ export class SearchComponent implements OnInit {
     );
   }
 
+  getRouterLink(movie: any): string[] {
+    if (movie.type === 'show') {
+      return ['/tv-show-details', movie.movieId];
+    } else {
+      return ['/movie-details', movie.movieId];
+    }
+  }
+  
   searchMovies() {
     // Konvertovanje unosa u mala slova
     const criteria = {

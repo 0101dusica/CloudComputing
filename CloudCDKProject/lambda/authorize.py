@@ -31,6 +31,7 @@ def generate_policy(principal_id):
 
 def handler(event, context):
     logger.info("Received event: " + json.dumps(event))
+    print(json.dumps(event))
     
     request_path = f"{event['httpMethod']} {event['resource']}"
     logger.info(f"Requested path: {request_path}")

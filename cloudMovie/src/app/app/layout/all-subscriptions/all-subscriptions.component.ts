@@ -5,8 +5,7 @@ import {AuthService} from "../../auth/auth.service";
 
 interface Subscription {
   name: string,
-  type: string,
-  photo: string
+  type: string
 };
 
 @Component({
@@ -54,24 +53,21 @@ export class AllSubscriptionsComponent {
       actors.forEach((actor: string) => {
         this.results.push({
           name: actor,
-          type: 'Actor',
-          photo: '../../../../assets/bell-icon.png'
+          type: 'Actor'
         });
       });
 
       directors.forEach((director: string) => {
         this.results.push({
           name: director,
-          type: 'Director',
-          photo: '../../../../assets/bell-icon.png'
+          type: 'Director'
         });
       });
 
       genres.forEach((genre: string) => {
         this.results.push({
           name: genre,
-          type: 'Genre',
-          photo: '../../../../assets/bell-icon.png'
+          type: 'Genre'
         });
       });
 

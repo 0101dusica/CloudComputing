@@ -49,13 +49,11 @@
       </div>
       <div class="actions" style="margin-bottom: 5%;">
         <button (click)="watchNow()">Play</button>
-        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onSubscribeIconClick()">+ Subscribe</button>
-        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onNotificationIconClick()">Add Review</button>
-        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="downloadMovie()">Download</button>
-      </div>
-      <div class="actions">
-        <button (click)="deleteMovie()">Delete</button>
-        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-movie', movie!.movieId]" [queryParams]="{ createdAt: movie!.createdAt }">Edit</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onSubscribeIconClick()" *ngIf="role === 'user'">+ Subscribe</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onNotificationIconClick()" *ngIf="role === 'user'">Add Review</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="downloadMovie()" *ngIf="role === 'user'">Download</button>
+        <button (click)="deleteMovie()" *ngIf="role === 'admin'">Delete</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-movie', movie!.movieId]" [queryParams]="{ createdAt: movie!.createdAt }" *ngIf="role === 'admin'">Edit</button>
       </div>
     </div>
   </div>

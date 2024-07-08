@@ -147,58 +147,6 @@ export class CloudProjectStack extends cdk.Stack {
     //                **************** LAMBDA ***************** //
 
     // Lambda function to UPLOAD a short film
-    // const uploadLambda = new lambda.Function(this, 'upload', {
-    //   runtime: lambda.Runtime.PYTHON_3_9,
-    //   handler: 'upload.handler',
-    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
-    //   environment: {
-    //     BUCKET_NAME: movieBucket.bucketName,
-    //     TABLE_NAME_MOVIE: moviesTable.tableName,
-    //     TABLE_NAME_ACTOR: actorsTable.tableName,
-    //     TABLE_NAME_GENRE: genresTable.tableName,
-    //     TABLE_NAME_EPISODE: episodesTable.tableName
-    //   }
-    // });
-
-    // movieBucket.grantPut(uploadLambda);
-    // moviesTable.grantWriteData(uploadLambda);
-    // actorsTable.grantWriteData(uploadLambda);
-    // genresTable.grantWriteData(uploadLambda);
-    // episodesTable.grantWriteData(uploadLambda);
-
-    const pythonLayer = new lambda.LayerVersion(
-      this,
-      "pythonLayer",
-      {
-          code: lambda.Code.fromAsset(
-              path.join(__dirname, "../layer", "python.zip")
-          ),
-          compatibleArchitectures: [lambda.Architecture.ARM_64],
-      }
-  );
-
-    const authorizerLambda = new lambda.Function(this, 'authorizeLambda', {
-      runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'authorize.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
-      layers: [pythonLayer],
-      environment: {
-        USER_POOL_ID: 'eu-central-1_9MVHrNggH',
-        CLIENT_ID: '27arrkdlj699c70k6skmm6cn74',
-      },
-    });
-
-    authorizerLambda.addToRolePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['execute-api:Invoke'],
-      resources: ['*'], // Be cautious with the resource scope
-    }));
-
-    // Lambda Authorizer
-    const authorizer = new apigateway.TokenAuthorizer(this, 'LambdaAuthorizer', {
-      handler: authorizerLambda,
-    });
-
     const uploadLambda = new lambda.Function(this, 'upload', {
       runtime: lambda.Runtime.PYTHON_3_9,
       handler: 'upload.handler',
@@ -211,13 +159,59 @@ export class CloudProjectStack extends cdk.Stack {
         TABLE_NAME_EPISODE: episodesTable.tableName
       }
     });
-    
 
     movieBucket.grantPut(uploadLambda);
     moviesTable.grantWriteData(uploadLambda);
     actorsTable.grantWriteData(uploadLambda);
     genresTable.grantWriteData(uploadLambda);
     episodesTable.grantWriteData(uploadLambda);
+
+    // const authLayer = new lambda.LayerVersion(this, 'AuthLayer', {
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../auth_layer.zip')),
+    //   compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
+    // });
+
+    // const authorizerLambda = new lambda.Function(this, 'authorizeLambda', {
+    //   runtime: lambda.Runtime.PYTHON_3_9,
+    //   handler: 'authorize.handler',
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+    //   layers: [authLayer],
+    //   environment: {
+    //     USER_POOL_ID: 'eu-central-1_9MVHrNggH',
+    //     CLIENT_ID: '27arrkdlj699c70k6skmm6cn74',
+    //   },
+    // });
+
+    // authorizerLambda.addToRolePolicy(new iam.PolicyStatement({
+    //   effect: iam.Effect.ALLOW,
+    //   actions: ['execute-api:Invoke'],
+    //   resources: ['*'], // Be cautious with the resource scope
+    // }));
+
+    // // Lambda Authorizer
+    // const authorizer = new apigateway.TokenAuthorizer(this, 'LambdaAuthorizer', {
+    //   handler: authorizerLambda,
+    // });
+
+    // const uploadLambda = new lambda.Function(this, 'upload', {
+    //   runtime: lambda.Runtime.PYTHON_3_9,
+    //   handler: 'upload.handler',
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+    //   environment: {
+    //     BUCKET_NAME: movieBucket.bucketName,
+    //     TABLE_NAME_MOVIE: moviesTable.tableName,
+    //     TABLE_NAME_ACTOR: actorsTable.tableName,
+    //     TABLE_NAME_GENRE: genresTable.tableName,
+    //     TABLE_NAME_EPISODE: episodesTable.tableName
+    //   }
+    // });
+    
+
+    // movieBucket.grantPut(uploadLambda);
+    // moviesTable.grantWriteData(uploadLambda);
+    // actorsTable.grantWriteData(uploadLambda);
+    // genresTable.grantWriteData(uploadLambda);
+    // episodesTable.grantWriteData(uploadLambda);
 
 
     uploadLambda.addToRolePolicy(new iam.PolicyStatement({
@@ -485,16 +479,16 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     });
 
     // // Integrate upload lambda with API Gateway
-    // const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
-    // api.root.addResource('upload').addMethod('POST', uploadIntegration);
+    const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
+    api.root.addResource('upload').addMethod('POST', uploadIntegration);
 
     // API Gateway integracija sa Lambda funkcijom za upload
-    const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
-    const uploadResource = api.root.addResource('upload');
-    uploadResource.addMethod('POST', uploadIntegration, {
-      authorizer,
-      authorizationType: apigateway.AuthorizationType.CUSTOM, // Koristi authorizer koji si definisao
-    });
+    // const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
+    // const uploadResource = api.root.addResource('upload');
+    // uploadResource.addMethod('POST', uploadIntegration, {
+    //   authorizer,
+    //   authorizationType: apigateway.AuthorizationType.CUSTOM, // Koristi authorizer koji si definisao
+    // });
 
     const getMoviesIntegration = new apigateway.LambdaIntegration(getMoviesLambda);
     const moviesResource = api.root.addResource('movies');
