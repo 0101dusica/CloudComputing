@@ -13,14 +13,17 @@ dynamodb = boto3.resource('dynamodb')
 
 def handler(event, context):
     # Metadata
-    genre = event['pathParameters']['genre']
-    user_id = event['queryStringParameters'].get('user_id')
+    movie_id = event['pathParameters']['movieId']
+    body = json.loads(event['body'])
+    user_id = body['user_id']
+    genres = body['genres']  # List of genres
 
-    bucket_name = os.environ['BUCKET_NAME']  # S3 bcuket
+    bucket_name = os.environ['BUCKET_NAME']  # S3 bucket
 
     table_name = os.environ['TABLE_NAME_DOWNLOADS']
     table = dynamodb.Table(table_name)
 
+    # Query to find existing items for the user
     response = table.query(
         IndexName='ind-downloads',
         KeyConditionExpression=Key('user_id').eq(user_id)
@@ -33,30 +36,38 @@ def handler(event, context):
         existing_item = results[0]
         existing_downloads = existing_item.get('downloads', [])
 
+        # Update or add genres
+        updated_downloads = []
+        genres_set = set(genres)
         for download in existing_downloads:
-            existing_genre = download['genre']
-            score = download['score']
-            if genre == existing_genre:
-                score += 1
-                download['score'] = score
+            if download['genre'] in genres_set:
+                download['score'] = str(int(download['score']) + 1)
+                genres_set.remove(download['genre'])  # Remove from set once found and updated
+            updated_downloads.append(download)
 
-                table.update_item(
-                    Key={
-                        'id': existing_item['id'],
-                        'user_id': user_id,
-                    },
-                    UpdateExpression="SET downloads = :downloads",
-                    ExpressionAttributeValues={
-                        ':downloads': existing_downloads,
-                    }
+        # Add any new genres
+        for genre in genres_set:
+            updated_downloads.append({'genre': genre, 'score': '1'})
 
-                )
+        table.update_item(
+            Key={
+                'id': existing_item['id'],
+                'user_id': user_id,
+            },
+            UpdateExpression="SET downloads = :downloads",
+            ExpressionAttributeValues={
+                ':downloads': updated_downloads,
+            }
+        )
     else:
+        # Create a new item if no existing item for the user
+        initial_downloads = [{'genre': genre, 'score': "1"} for genre in genres]
+
         table.put_item(
             Item={
                 "id": str(uuid.uuid4()),
                 "user_id": user_id,
-                "downloads": [movie_id],
+                "downloads": initial_downloads,
             }
         )
 

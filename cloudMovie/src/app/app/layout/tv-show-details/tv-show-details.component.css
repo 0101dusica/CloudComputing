@@ -105,13 +105,16 @@
     justify-content: left;
     height: 100vh;
     position: relative;
+    margin-left: 5%;
+    width: 80%;
     text-align: left;
   }
 
   .content {
     position: relative;
     z-index: 2;
-    max-width: 80%;
+    max-width: 50%;
+    margin-left: 4%;
   }
 
   h1 {
@@ -127,15 +130,16 @@
 
   .info {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 1em;
     align-items: center;
+    flex-wrap: nowrap;
   }
 
   .info span {
     padding: 5px 10px;
     border-radius: 5px;
+    white-space: nowrap;
   }
 
   .logo {
