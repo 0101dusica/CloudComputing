@@ -147,24 +147,24 @@ export class CloudProjectStack extends cdk.Stack {
     //                **************** LAMBDA ***************** //
 
     // Lambda function to UPLOAD a short film
-    const uploadLambda = new lambda.Function(this, 'upload', {
-      runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'upload.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
-      environment: {
-        BUCKET_NAME: movieBucket.bucketName,
-        TABLE_NAME_MOVIE: moviesTable.tableName,
-        TABLE_NAME_ACTOR: actorsTable.tableName,
-        TABLE_NAME_GENRE: genresTable.tableName,
-        TABLE_NAME_EPISODE: episodesTable.tableName
-      }
-    });
+    // const uploadLambda = new lambda.Function(this, 'upload', {
+    //   runtime: lambda.Runtime.PYTHON_3_9,
+    //   handler: 'upload.handler',
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+    //   environment: {
+    //     BUCKET_NAME: movieBucket.bucketName,
+    //     TABLE_NAME_MOVIE: moviesTable.tableName,
+    //     TABLE_NAME_ACTOR: actorsTable.tableName,
+    //     TABLE_NAME_GENRE: genresTable.tableName,
+    //     TABLE_NAME_EPISODE: episodesTable.tableName
+    //   }
+    // });
 
-    movieBucket.grantPut(uploadLambda);
-    moviesTable.grantWriteData(uploadLambda);
-    actorsTable.grantWriteData(uploadLambda);
-    genresTable.grantWriteData(uploadLambda);
-    episodesTable.grantWriteData(uploadLambda);
+    // movieBucket.grantPut(uploadLambda);
+    // moviesTable.grantWriteData(uploadLambda);
+    // actorsTable.grantWriteData(uploadLambda);
+    // genresTable.grantWriteData(uploadLambda);
+    // episodesTable.grantWriteData(uploadLambda);
 
     // Lambda function to GET all movies
     const getMoviesLambda = new lambda.Function(this, 'getMovies', {
@@ -415,9 +415,9 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
       restApiName: 'Movies Service'
     });
 
-    // Integrate upload lambda with API Gateway
-    const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
-    api.root.addResource('upload').addMethod('POST', uploadIntegration);
+    // // Integrate upload lambda with API Gateway
+    // const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
+    // api.root.addResource('upload').addMethod('POST', uploadIntegration);
 
     const getMoviesIntegration = new apigateway.LambdaIntegration(getMoviesLambda);
     const moviesResource = api.root.addResource('movies');
@@ -578,6 +578,57 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     new cdk.CfnOutput(this, 'UserPoolDomainOutput', {
       value: userPoolDomain.domainName,
     });
+
+    const authorizerLambda = new lambda.Function(this, 'authorizeLambda', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'authorize.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        USER_POOL_ID: 'eu-central-1_9MVHrNggH',
+        CLIENT_ID: '27arrkdlj699c70k6skmm6cn74',
+      },
+    });
+
+    authorizerLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['execute-api:Invoke'],
+      resources: ['*'], // Be cautious with the resource scope
+    }));
+
+    // Lambda Authorizer
+    const authorizer = new apigateway.TokenAuthorizer(this, 'LambdaAuthorizer', {
+      handler: authorizerLambda,
+    });
+
+    const uploadLambda = new lambda.Function(this, 'upload', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'upload.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        BUCKET_NAME: movieBucket.bucketName,
+        TABLE_NAME_MOVIE: moviesTable.tableName,
+        TABLE_NAME_ACTOR: actorsTable.tableName,
+        TABLE_NAME_GENRE: genresTable.tableName,
+        TABLE_NAME_EPISODE: episodesTable.tableName
+      }
+    });
+    
+
+    movieBucket.grantPut(uploadLambda);
+    moviesTable.grantWriteData(uploadLambda);
+    actorsTable.grantWriteData(uploadLambda);
+    genresTable.grantWriteData(uploadLambda);
+    episodesTable.grantWriteData(uploadLambda);
+
+    // API Gateway integracija sa Lambda funkcijom za upload
+    const uploadIntegration = new apigateway.LambdaIntegration(uploadLambda);
+    const uploadResource = api.root.addResource('upload');
+    uploadResource.addMethod('POST', uploadIntegration, {
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.CUSTOM, // Koristi authorizer koji si definisao
+    });
+
+
   }
 }
 

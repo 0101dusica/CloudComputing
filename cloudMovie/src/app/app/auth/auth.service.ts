@@ -22,12 +22,14 @@ const userPool = new CognitoUserPool(poolData);
 })
 export class AuthService {
   username: string | undefined;
+  email: string | undefined;
   role: string | undefined;
 
   constructor() {}
 
-  setUser(username: string, role: string) {
+  setUser(username: string, email: string,  role: string) {
     this.username = username;
+    this.email = email;
     this.role = role;
   }
 
@@ -93,6 +95,7 @@ export class AuthService {
       onSuccess: (session: CognitoUserSession) => {
         const idToken = session.getIdToken();
         const username = idToken.payload['cognito:username'];
+        const email = idToken.payload['cognito:email'];
         let role = 'user'; // Default role if cognito:groups is not present
         
         if (idToken.payload['cognito:groups']) {
@@ -100,7 +103,7 @@ export class AuthService {
           role = userRoles.includes('admin') ? 'admin' : 'user'; // Assuming 'admin' and 'user' groups exist
         }
         
-        this.setUser(username, role); // Store in service
+        this.setUser(username, email,  role); // Store in service
   
         callback(null, session);
       },
@@ -142,7 +145,7 @@ export class AuthService {
                 const userRoles = idToken.payload['cognito:groups'];
                 role = userRoles.includes('admin') ? 'admin' : 'user';
               }
-              this.setUser(idToken.payload['cognito:username'], role);
+              this.setUser(idToken.payload['cognito:username'], idToken.payload['cognito:email'], role);
               resolve(role);
             }
           });

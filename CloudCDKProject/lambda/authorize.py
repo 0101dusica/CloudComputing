@@ -2,6 +2,12 @@ import json
 import os
 import jwt
 import requests
+import boto3
+import logging
+
+# Postavite nivo logovanja za prikazivanje svih poruka
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 mapGroupsToPaths = [
     {"path": "GET /movies", "groups": ["admin", "user"]},
@@ -23,11 +29,15 @@ def generate_policy(principal_id):
         "context": {"user": principal_id},
     }
 
-def lambda_handler(event, context):
+def handler(event, context):
+    logger.info("Received event: " + json.dumps(event))
+    
     request_path = f"{event['httpMethod']} {event['resource']}"
+    logger.info(f"Requested path: {request_path}")
     
     existing_paths = [config["path"] for config in mapGroupsToPaths]
     if request_path not in existing_paths:
+        logger.warning("Requested path is not in allowed paths.")
         return {
             "statusCode": 403,
             "isAuthorized": False,
@@ -36,6 +46,7 @@ def lambda_handler(event, context):
 
     auth_header = event["headers"].get("authorization")
     if not auth_header:
+        logger.warning("No authorization header found.")
         return {
             "statusCode": 401,
             "isAuthorized": False,
@@ -45,7 +56,7 @@ def lambda_handler(event, context):
     token = auth_header.split(" ")[1]
 
     user_pool_id = os.environ["USER_POOL_ID"]
-    region = os.environ["AWS_REGION"]
+    region = boto3.Session().region_name  # Get the current region
     jwks_url = f"https://cognito-idp.{region}.amazonaws.com/{user_pool_id}/.well-known/jwks.json"
     jwks = requests.get(jwks_url).json()
 
@@ -60,6 +71,7 @@ def lambda_handler(event, context):
         public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
         payload = jwt.decode(token, public_key, algorithms=["RS256"], audience=os.environ["CLIENT_ID"])
     except Exception as e:
+        logger.error(f"Error decoding JWT token: {e}")
         return {
             "statusCode": 401,
             "isAuthorized": False,
@@ -68,9 +80,13 @@ def lambda_handler(event, context):
 
     matching_path_config = next(config for config in mapGroupsToPaths if request_path == config["path"])
     user_groups = payload["cognito:groups"]
+    logger.info(f"User groups from token: {user_groups}")
+    
     if any(group in matching_path_config["groups"] for group in user_groups):
+        logger.info("User is authorized.")
         return generate_policy(payload["sub"])
 
+    logger.warning("User is not authorized.")
     return {
         "statusCode": 403,
         "isAuthorized": False,
