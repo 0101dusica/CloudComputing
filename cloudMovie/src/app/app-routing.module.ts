@@ -14,28 +14,28 @@ import { TvShowDetailsComponent } from './app/layout/tv-show-details/tv-show-det
 import { SearchComponent } from './app/layout/search/search.component';
 import { EditTvShowComponent } from './app/layout/edit-tv-show/edit-tv-show.component';
 import { EditMovieComponent } from './app/layout/edit-movie/edit-movie.component';
+import { AuthGuardService } from './app/auth/auth-guard.service';
 
 const routes: Routes = [
-  { path: '', component: MainPageComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'search', component: SearchComponent },
+  { path: '', component: MainPageComponent }, //all 
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuardService] }, //user or admin
+  { path: 'search', component: SearchComponent, canActivate: [AuthGuardService] }, //user or admin
 
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  { path: 'login', component: LoginComponent }, //all 
+  { path: 'register', component: RegisterComponent }, //all 
 
-  { path: 'tv-show-details/:movieId', component: TvShowDetailsComponent },
-  { path: 'movie-details/:movieId', component: MovieDetailsComponent },
+  { path: 'tv-show-details/:movieId', component: TvShowDetailsComponent, canActivate: [AuthGuardService] }, //user or admin
+  { path: 'movie-details/:movieId', component: MovieDetailsComponent, canActivate: [AuthGuardService] }, //user or admin
 
-  { path: 'all-subscriptions', component: AllSubscriptionsComponent },
+  { path: 'all-subscriptions', component: AllSubscriptionsComponent, canActivate: [AuthGuardService], data: { roles: ['user', 'admin'] } }, //user
 
-  { path: 'add-new-movie', component: AddNewMovieComponent },
-  { path: 'add-new-tv-show', component: AddNewTvShowComponent },
-  { path: 'add-new-episode/:seriesId', component: AddNewEpisodeComponent },
-  { path: 'add-new-people', component: AddNewPeopleComponent },
+  { path: 'add-new-movie', component: AddNewMovieComponent, canActivate: [AuthGuardService], data: { roles: ['admin'] } }, //admin
+  { path: 'add-new-tv-show', component: AddNewTvShowComponent, canActivate: [AuthGuardService], data: { roles: ['admin'] } }, //admin
+  { path: 'add-new-episode/:seriesId', component: AddNewEpisodeComponent, canActivate: [AuthGuardService], data: { roles: ['admin'] } }, //admin
+  { path: 'add-new-people', component: AddNewPeopleComponent, canActivate: [AuthGuardService], data: { roles: ['admin'] } }, //admin
 
-  { path: 'edit-movie/:movieId', component: EditMovieComponent },
-  { path: 'edit-show/:movieId', component: EditTvShowComponent },
-
+  { path: 'edit-movie/:movieId', component: EditMovieComponent, canActivate: [AuthGuardService], data: { roles: ['admin'] } }, //admin
+  { path: 'edit-show/:movieId', component: EditTvShowComponent, canActivate: [AuthGuardService], data: { roles: ['admin'] } }, //admin
 ];
 
 @NgModule({
