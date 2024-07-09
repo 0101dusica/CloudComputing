@@ -29,7 +29,6 @@ export class AddNewMovieComponent {
     type: "movie",
     numberOfSeasons: "0"
   };
-
   actorsInput: string = ""; // Variable to store the input for actors
   selectedFile: File | null = null; // Variable to store the selected file
 

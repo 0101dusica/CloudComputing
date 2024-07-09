@@ -34,31 +34,30 @@ export class HomeComponent implements OnInit {
 
   }
 
-  generateFeed() {
-    this.movieService.generateUserFeed(this.username!).subscribe(
-      (response) => {
-        console.log('User feed generated:', response);
-        this.processMovies(response)
-      },
-      (error) => {
-        console.error('Error generating user feed:', error);
-      }
-    );
-  }
+ generateFeed() {
+  this.movieService.generateUserFeed(this.username!).subscribe(
+    (response) => {
+      console.log('User feed generated:', response);
+      this.processMovies(response);
+    },
+    (error) => {
+      console.error('Error generating user feed:', error);
+    }
+  );
+}
 
 processMovies(response: any[]) {
-  const movieObservables = response.map((item, index) => {
-    return this.movieService.getMovieById(item.movie_id, item.created_at)
-      .pipe(
-        map(movie => ({
-          index: index,
-          movie: movie
-        }))
-      );
-  });
+  const movieObservables = response.map((item, index) =>
+    this.movieService.getMovieById(item.movie_id, item.created_at).pipe(
+      map(movie => ({
+        index: index,
+        movie: movie
+      }))
+    )
+  );
 
-  // Wait for all getMovieById calls to complete
-  forkJoin(movieObservables).subscribe(
+  // Concatenate all observables and collect the results into an array
+  this.movieService.getMoviesFromObservables(movieObservables).subscribe(
     (movies) => {
       // Sort movies by their original index
       this.movies = movies.sort((a, b) => a.index - b.index).map(item => item.movie);
@@ -69,7 +68,6 @@ processMovies(response: any[]) {
     }
   );
 }
-
   getRouterLink(movie: any): string[] {
     if (movie.type === 'show') {
       return ['/tv-show-details', movie.movieId];

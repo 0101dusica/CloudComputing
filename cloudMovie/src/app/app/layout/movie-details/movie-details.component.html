@@ -53,6 +53,7 @@
         <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onNotificationIconClick()" *ngIf="role === 'user'">Add Review</button>
         <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="downloadMovie()" *ngIf="role === 'user'">Download</button>
         <button (click)="deleteMovie()" *ngIf="role === 'admin'">Delete</button>
+        <button (click)="initiateTranscoding()" *ngIf="role === 'admin'">Transcode Movie</button>
         <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-movie', movie!.movieId]" [queryParams]="{ createdAt: movie!.createdAt }" *ngIf="role === 'admin'">Edit</button>
       </div>
     </div>

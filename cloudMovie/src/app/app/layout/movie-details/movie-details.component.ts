@@ -214,4 +214,22 @@ export class MovieDetailsComponent implements OnInit {
       });
     }
   }
+
+initiateTranscoding() {
+  if (this.movie?.movieId) {
+    this.movieService.transcodeVideo(this.movie.movieId).subscribe(
+      (response) => {
+        console.log('Transcoding response:', response);
+        // Ovde možeš dodati dodatnu logiku nakon uspešnog transcodinga
+      },
+      (error) => {
+        console.error('Error initiating transcoding:', error);
+        // Ovde možeš dodati dodatnu logiku za rukovanje greškom
+      }
+    );
+  } else {
+    console.error('Movie ID is not available');
+    // Ovde možeš dodati dodatnu logiku za slučaj kada movieId nije dostupan
+  }
+}
 }

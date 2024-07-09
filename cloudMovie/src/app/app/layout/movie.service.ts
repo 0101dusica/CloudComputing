@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import { Observable, of, switchMap } from 'rxjs';
+import {concat, Observable, of, switchMap, toArray} from 'rxjs';
 import { env } from '../../../env/env';
 import {Episode, Movie} from './movie';
 import {SubscribeDialogComponent} from "./subscribe-dialog/subscribe-dialog.component";
@@ -148,5 +148,13 @@ export class MovieService {
     return new Uint8Array(byteNumbers);
   }
 
+  getMoviesFromObservables(observables: Observable<any>[]): Observable<any[]> {
+  return concat(...observables).pipe(
+    toArray()  // Collect all results into an array
+  );
+}
+  transcodeVideo(movieId: string): Observable<any> {
+    return this.http.post<any>(`${env.apiGatewayHost}transcode`, {movie_id: movieId});
+  }
 
 }
