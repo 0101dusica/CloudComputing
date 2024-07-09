@@ -101,10 +101,10 @@ def handler(event, context):
         message = f"New movie dropped!\n\nTitle: {title}\nGenres: {', '.join(genres)}\nDirector: {director}\nActors: {', '.join(actors)}"
 
         for genre in body['genres']:
-            publish_topic_message(genre)
+            publish_topic_message(genre, message)
 
         for actor in body['actors']:
-            publish_topic_message(actor)
+            publish_topic_message(actor, message)
 
         publish_topic_message(body['director'], message)
 

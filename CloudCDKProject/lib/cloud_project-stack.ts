@@ -7,8 +7,9 @@ import path = require('path');
 import { AttributeType,ProjectionType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 
 import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';  // Uvezite Effect ovde
@@ -593,6 +594,81 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     new cdk.CfnOutput(this, 'UserPoolDomainOutput', {
       value: userPoolDomain.domainName,
     });
+
+    //                **************** TRANSCODING ***************** //
+
+      // Kreiramo SQS red
+    const queue = new sqs.Queue(this, 'TranscodingQueue', {
+      visibilityTimeout: cdk.Duration.minutes(5),
+      retentionPeriod: cdk.Duration.days(1),
+    });
+
+
+    // Kreiramo IAM ulogu za Lambda funkcije
+    const lambdaRole = new iam.Role(this, 'LambdaRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+    });
+
+    lambdaRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['s3:*', 'sqs:*'],
+      resources: ['*'],
+    }));
+
+    // Lambda funkcija za primanje zahteva (Request Handler)
+    const requestHandler = new lambda.Function(this, 'RequestHandler', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'request_handler.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        QUEUE_URL: queue.queueUrl,
+        BUCKET_NAME: movieBucket.bucketName
+      },
+      role: lambdaRole,
+    });
+
+    //ffmpeg
+       const ffmpegLayer = new lambda.LayerVersion(
+            this,
+            "FfmpegLayer",
+            {
+                code: lambda.Code.fromAsset(
+                    path.join(__dirname, "../layer", "ffmpeg.zip")
+                ),
+                compatibleArchitectures: [lambda.Architecture.ARM_64],
+            }
+        );
+
+    // Lambda funkcija za transcoding (Transcoder)
+    const transcoder = new lambda.Function(this, 'Transcoder', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'transcoder.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      layers: [ffmpegLayer],
+      environment: {
+        BUCKET_NAME: movieBucket.bucketName,
+      },
+      role: lambdaRole,
+    });
+
+     // Lambda function to GET all movies
+    const transcodeLambda = new lambda.Function(this, 'transcode', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'transcode.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
+      environment: {
+        BUCKET_NAME: movieBucket.bucketName,
+      }
+    });
+    movieBucket.grantReadWrite(transcodeLambda);
+    movieBucket.grantPut(transcodeLambda);
+
+
+    // Dodeljujemo SQS red kao izvor događaja za Transcoder Lambda funkciju
+    transcodeLambda.addEventSource(new lambdaEventSources.SqsEventSource(queue));
+
+    // Integrate transcoder lambda with API Gateway
+    const transcode = api.root.addResource('transcode');
+    transcode.addMethod('POST', new apigateway.LambdaIntegration(requestHandler));
   }
 }
 
