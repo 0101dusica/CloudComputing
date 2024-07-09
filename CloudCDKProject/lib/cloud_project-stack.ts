@@ -10,6 +10,8 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 
 
 import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';  // Uvezite Effect ovde
@@ -32,11 +34,51 @@ export class CloudProjectStack extends cdk.Stack {
             s3.HttpMethods.POST,
             s3.HttpMethods.DELETE,
           ],
-          allowedOrigins: ["http://localhost:4201"],
+          allowedOrigins: ['https://d1vr26jx9wt03z.cloudfront.net'],
           exposedHeaders: ["ETag"],
           maxAge: 3000,
         },
       ],
+    });
+
+    
+    const oai = new cloudfront.OriginAccessIdentity(this, 'OAI');
+
+    // Dodaj policy za pristup OAI
+    movieBucket.addToResourcePolicy(new iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: [movieBucket.arnForObjects('*')],
+      principals: [new iam.CanonicalUserPrincipal(oai.cloudFrontOriginAccessIdentityS3CanonicalUserId)],
+    }));
+
+    // CloudFront distribucija za S3 bucket
+    const distribution = new cloudfront.CloudFrontWebDistribution(
+      this,
+      'SiteDistribution',
+      {
+        originConfigs: [
+          {
+            s3OriginSource: {
+              s3BucketSource: movieBucket,
+              originAccessIdentity: oai,
+            },
+            behaviors: [{ isDefaultBehavior: true }],
+          },
+        ],
+      }
+    );
+    
+    // Deployovanje Angular aplikacije u S3 bucket
+    new s3deploy.BucketDeployment(this, 'DeployWithInvalidation', {
+      sources: [s3deploy.Source.asset('../cloudMovie/dist/cloud-movie')],
+      destinationBucket: movieBucket,
+      distribution,
+      distributionPaths: ['/*'],
+    });
+    
+    // Izlazne vrednosti
+    new cdk.CfnOutput(this, 'DistributionDomainName', {
+      value: distribution.distributionDomainName,
     });
 
 
@@ -725,6 +767,7 @@ updateLambda.addToRolePolicy(dynamoDBPolicy);
     // Integrate transcoder lambda with API Gateway
     const transcode = api.root.addResource('transcode');
     transcode.addMethod('POST', new apigateway.LambdaIntegration(requestHandler));
+
   }
 }
 
