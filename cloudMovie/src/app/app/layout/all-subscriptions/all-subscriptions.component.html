@@ -1,0 +1,34 @@
+<html>
+<body>
+    <div class="amenities-admin">
+        <div class="amenities-admin-child"></div>
+        <app-nav-bar [id]="1"></app-nav-bar>
+
+        <div class="main-content" id="main-content">
+          <b class="no-text" *ngIf="results.length === 0">NO RESULTS</b>
+          <div *ngFor="let result of results" class="acc-frame">
+              <img
+                class="accommodation-image"
+                alt=""
+                src="../../../../assets/subscribe-box-icon.png"
+              />
+
+              <div class="left-data">
+                  <b class="title">{{ result.name }}</b>
+
+
+                  <div class="location-frame">
+                    <div class="location-text">{{ result.type }}</div>
+                  </div>
+              </div>
+
+              <div class="right-buttons">
+                <div class="reject-button" id="reject-button" (click)="unsubscribe(result)">
+                    <b class="button-text">Unsubscribe</b>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+  </body>
+</html>

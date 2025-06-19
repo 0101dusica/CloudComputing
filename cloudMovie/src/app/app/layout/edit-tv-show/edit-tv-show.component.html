@@ -1,0 +1,69 @@
+<div class="main">
+  <app-nav-bar [id]="0"></app-nav-bar>
+
+  <div class="container">
+    <label class="title">Edit TV Show Information</label>
+    <form (ngSubmit)="onSubmit()" style="margin-top: 2%;">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" [(ngModel)]="series!.title" name="title" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" [(ngModel)]="series!.description" name="description" class="form-control" required></textarea>
+      </div>
+<!--      <div class="form-group">-->
+<!--        <label for="seasons">Number of Seasons</label>-->
+<!--        <input type="number" id="seasons" [(ngModel)]="series!.seasons" name="seasons" class="form-control" required (ngModelChange)="updateSeasonsArray()" />-->
+<!--      </div>-->
+       <div class="form-group">
+        <label>Actors</label>
+        <input type="text" id="actors" [(ngModel)]="actorsString" name="actors" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label>Directors</label>
+     <select id="director" [(ngModel)]="selectedDirector" name="director" class="form-control">
+  <option *ngFor="let directorOption of directors" [ngValue]="directorOption">{{ directorOption }}</option>
+</select>
+
+
+
+      </div>
+      <div class="form-group">
+  <label>Genres</label>
+  <div class="options-wrap">
+    <div class="option-box" *ngFor="let genre of genres">
+      <input type="checkbox" [id]="genre.name" [value]="genre.name" (change)="onCheckboxChange($event, genre.name)" [checked]="genre.isChecked" />
+      <label class="options" [for]="genre.name">{{ genre.name }}</label>
+    </div>
+  </div>
+</div>
+
+
+      <div class="seasons" *ngFor="let season of seasonsArray; let i = index">
+        <h2>Season {{ season }}</h2>
+        <div class="episode" *ngFor="let episode of episodes[season]">
+          <div class="form-group">
+            <label for="episode-video-{{season}}-{{episode.number}}">Episode Video</label>
+            <div *ngIf="loadedEpisodeFiles[season] && loadedEpisodeFiles[season][episode.number] && loadedEpisodeFiles[season][episode.number]['video']; else episodeVideoInput">
+              <span class="file-name">{{ loadedEpisodeFiles[season][episode.number]['video']?.name }}</span>
+              <button class="btn-delete" type="button" (click)="deleteEpisodeFile(season, episode.number, 'video')">Delete Video</button>
+            </div>
+            <ng-template #episodeVideoInput>
+              <input type="file" id="episode-video-{{season}}-{{episode.number}}" (change)="onEpisodeFileSelected($event, season, episode.number, 'video')" class="form-control" />
+            </ng-template>
+          </div>
+          <div class="form-group">
+            <label for="episode-title-{{season}}-{{episode.number}}">Title</label>
+            <input type="text" id="episode-title-{{season}}-{{episode.number}}" [(ngModel)]="episode.title" name="episode-title-{{season}}-{{episode.number}}" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="episode-description-{{season}}-{{episode.number}}">Description</label>
+            <textarea id="episode-description-{{season}}-{{episode.number}}" [(ngModel)]="episode.description" name="episode-description-{{season}}-{{episode.number}}" class="form-control" required></textarea>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Update TV Show</button>
+    </form>
+  </div>
+</div>

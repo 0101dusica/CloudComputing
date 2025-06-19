@@ -1,0 +1,32 @@
+
+<div class="notification">
+    <div class="header">
+      <div class="text-box">
+        <div class="all-text">Subscribe for the content you love!</div>
+      </div>
+    </div>
+
+    <label>Actors</label>
+    <div class="rating-options">
+        <mat-checkbox *ngFor="let actor of actors" [(ngModel)]="selectedActors[actor]">{{ actor }}</mat-checkbox>
+    </div>
+
+
+   <label>Directors</label>
+   <div class="rating-options">
+<!--      <mat-radio-group [(ngModel)]="selectedDirector">-->
+        <mat-checkbox [(ngModel)]="selectedDirector">{{ director }}</mat-checkbox>
+<!--      </mat-radio-group>-->
+   </div>
+
+      <label>Genres</label>
+      <div class="rating-options">
+<!--        <mat-radio-group [(ngModel)]="selectedGenre">-->
+          <mat-checkbox *ngFor="let genre of genres" [(ngModel)]="selectedGenres[genre]">{{ genre }}</mat-checkbox>
+<!--        </mat-radio-group>-->
+      </div>
+
+    <div class="submit-section">
+      <button mat-button class="btn" (click)="submitRating()">Subscribe</button>
+    </div>
+  </div>

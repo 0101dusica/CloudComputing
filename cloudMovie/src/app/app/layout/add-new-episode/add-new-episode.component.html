@@ -1,0 +1,31 @@
+<div class="main">
+    <app-nav-bar [id]="0"></app-nav-bar>
+
+    <div class="container">
+      <label class="title">Episode Informations</label>
+      <form (ngSubmit)="onSubmit()" style="margin-top: 2%;">
+        <div class="form-group">
+          <label for="episode">Episode</label>
+          <input type="file" id="episode" (change)="onFileSelected($event, 'video')" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" [(ngModel)]="episode.title" name="title" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="season">Season</label>
+          <input type="number" id="year" [(ngModel)]="episode.seasonNumber" name="season" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="number">Ordinal Number</label>
+            <input type="number" id="number" [(ngModel)]="episode.episodeNumber" name="number" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" [(ngModel)]="episode.description" name="description" class="form-control" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Episode</button>
+      </form>
+    </div>
+</div>
+

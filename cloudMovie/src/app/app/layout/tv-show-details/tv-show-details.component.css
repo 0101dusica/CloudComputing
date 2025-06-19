@@ -1,0 +1,349 @@
+.container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Arial', sans-serif;
+    flex-direction: column;
+    color: #fff;
+  }
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    object-fit: cover;
+    z-index: -2;
+  }
+
+  #bgVideo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+
+  .video-container.hidden {
+    display: none;
+  }
+
+  .video-container {
+    display: flex;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+  }
+  .fullscreen-video {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+  }
+
+  .close-btn {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 15px;
+    right: 15px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 4px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 1001;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity as needed */
+    z-index: -1;
+  }
+
+  .vignette {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%; /* Adjust the height as needed */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    z-index: -1;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .background-image {
+    background-image: url('../../../../assets/movie-scene.jpeg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .main-content {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    height: 100vh;
+    position: relative;
+    margin-left: 5%;
+    width: 80%;
+    text-align: left;
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    max-width: 50%;
+    margin-left: 4%;
+  }
+
+  h1 {
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+    cursor: pointer;
+  }
+
+  h2 {
+    font-size: 3em;
+    margin-bottom: 0.5em;
+  }
+
+  .info {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1em;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .info span {
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+
+  .logo {
+    width: 40px;
+    height: 20px;
+  }
+
+  .question-logo{
+    width: 20px;
+    height: 20px;
+  }
+
+  .hover-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .info-box {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px; /* Adjust as needed */
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+  }
+
+  .info-box p {
+    margin: 0;
+  }
+  .episode {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.episode-content {
+  flex-grow: 1;
+  display: flex;
+}
+
+.episode-details {
+  flex-grow: 1;
+}
+
+.episode-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+
+  .info-box ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  .rating {
+    background-color: #f5c518;
+    color: #000;
+  }
+
+  .description {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+  }
+
+  .tags {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1em;
+  }
+
+  .tags span {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    align-content: center;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .actions button {
+    padding: 10px 20px;
+    background-color: #e50914;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1em;
+  }
+
+  .actions button:hover {
+    background-color: #f40612;
+  }
+
+  .actions button:last-child {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .actions button:last-child:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .episode-actions button {
+    padding: 10px 20px;
+    background-color: transparent;
+    border: 1px solid white;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+  }
+
+  .episodes {
+    width: 100%;
+    background-color: #222;
+    padding-bottom: 5%;
+  }
+
+  .top-box{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex-direction: row;
+    margin-left: 15%;
+    padding-top: 5%;
+    height: 10%;
+    width: 80%;
+    font-size: var(--font-size-9xl);
+    font-weight: bold;
+  }
+
+  .title{
+    width: 80%;
+    display: block;
+  }
+
+  .season{
+    width: 20%;
+    margin-left: 12%;
+    font-size: var(--font-size-lg);
+  }
+
+  .episode {
+    margin-left: 15%;
+    display: flex;
+    align-items: center;
+    background: #222;
+    width: 70%;
+    padding: 15px;
+    margin-top: 3%;
+    padding-bottom: 5%;
+    border-bottom: 1px solid #fff;
+    align-content: center;
+  }
+
+  .episode-number {
+    font-size: 1.5em;
+    margin-right: 15px;
+  }
+
+  .episode-content {
+    display: flex;
+    align-items: center;
+  }
+
+  .episode-image {
+    width: 150px;
+    height: auto;
+    margin-right: 15px;
+    border-radius: 5px;
+  }
+
+  .episode-details {
+    flex: 1;
+    position: relative;
+  }
+
+  .episode-details h3 {
+    margin: 0;
+  }
+
+  .episode-details p {
+    margin: 10px 0;
+  }
+
+  .episode-duration {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+  }

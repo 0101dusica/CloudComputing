@@ -1,0 +1,61 @@
+<div class="container" [ngClass]="{'background-image': isImageVisible}">
+  <video id="bgVideo" autoplay muted loop (timeupdate)="checkVideoTime()" #bgVideo>
+    <source src="../../../../assets/trailer-1.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="video-container" id="videoContainer" [ngClass]="{'hidden': !isVideoVisible}">
+    <video #fullScreenVideo class="fullscreen-video" controls></video>
+    <button class="close-btn" (click)="closeVideo()">X</button>
+  </div>
+
+  <div class="main-content">
+    <div class="content">
+      <div class="popup-overlay" *ngIf="isNotificationVisible" (click)="onNotificationPopupClick($event)">
+        <app-review-dialog></app-review-dialog>
+      </div>
+      <h1>SKY STREAM</h1>
+      <h2>{{ movie?.title }}</h2>
+      <div class="info">
+        <img src="../../../../assets/imdb-icon.png" class="logo">
+        <span>6.1</span>
+        <span>|</span>
+        <span>2023</span>
+        <span>|</span>
+        <span>18+</span>
+        <span *ngIf="isUserRated">|</span>
+        <span *ngIf="isUserRated">Your Rating: {{ rate }}★</span>
+        <span>|</span>
+        <div class="hover-container">
+          <img src="../../../../assets/question-icon.png" class="question-logo" (mouseenter)="showInfoBox()" (mouseleave)="hideInfoBox()">
+          <div class="info-box" *ngIf="isInfoBoxVisible">
+            <p><strong>Cast:</strong></p>
+            <p><strong>Actors:</strong></p>
+            <ul>
+              <li *ngFor="let actor of actors">{{ actor }}</li>
+            </ul>
+            <p><strong>Directors:</strong></p>
+            <ul>
+              <li *ngFor="let director of directors">{{ director }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p class="description">
+        {{ movie?.description }}
+      </p>
+      <div class="tags">
+        <span *ngFor="let genre of movie?.genres">{{ genre }}</span>
+      </div>
+      <div class="actions" style="margin-bottom: 5%;">
+        <button (click)="watchNow()">Play</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onSubscribeIconClick()" *ngIf="role === 'user'">+ Subscribe</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onNotificationIconClick()" *ngIf="role === 'user'">Add Review</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="downloadMovie()" *ngIf="role === 'user'">Download</button>
+        <button (click)="deleteMovie()" *ngIf="role === 'admin'">Delete</button>
+        <button (click)="initiateTranscoding()" *ngIf="role === 'admin'">Transcode Movie</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-movie', movie!.movieId]" [queryParams]="{ createdAt: movie!.createdAt }" *ngIf="role === 'admin'">Edit</button>
+      </div>
+    </div>
+  </div>
+</div>

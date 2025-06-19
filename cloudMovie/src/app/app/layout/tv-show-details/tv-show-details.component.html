@@ -1,0 +1,87 @@
+<html>
+<body>
+  <div class="container" *ngIf="series">
+    <video id="bgVideo" autoplay muted loop>
+      <source src="assets/trailer-1.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+  <div class="video-container" id="videoContainer" [ngClass]="{'hidden': !isVideoVisible}">
+    <video #fullScreenVideo class="fullscreen-video" controls></video>
+    <button class="close-btn" (click)="closeVideo()">X</button>
+  </div>
+  <div class="vignette"></div>
+    <div class="main-content">
+        <div class="content">
+          <h1>SKY STREAM</h1>
+      <h2>{{ series?.title }}</h2>
+          <div class="info">
+              <img src="../../../../assets/imdb-icon.png" class="logo">
+              <span>6.1</span>
+              <span>|</span>
+              <span>2023</span>
+              <span>|</span>
+              <span>{{series.numberOfSeasons}} Seasons</span>
+              <span>|</span>
+              <span>18+</span>
+              <span *ngIf="isUserRated">|</span>
+              <span *ngIf="isUserRated">Your Rating: {{rate}}★</span>
+              <span>|</span>
+              <div class="hover-container">
+                <img src="../../../../assets/question-icon.png" class="question-logo" (mouseenter)="showInfoBox()" (mouseleave)="hideInfoBox()">
+                <div class="info-box" *ngIf="isInfoBoxVisible">
+                  <p><strong>Cast:</strong></p>
+                  <p><strong>Actors:</strong></p>
+                  <ul>
+                    <li *ngFor="let actor of actors">{{ actor }}</li>
+                  </ul>
+                  <p><strong>Directors:</strong></p>
+                  <ul>
+                    <li *ngFor="let director of directors">{{ director }}</li>
+                  </ul>
+                </div>
+              </div>
+          </div>
+          <p class="description">
+        {{ series?.description }}
+          </p>
+          <div class="tags">
+                   <span *ngFor="let genre of series?.genres">{{ genre }}</span>
+
+          </div>
+        <div class="actions">
+          <button style="background-color: rgba(0, 0, 0, 0.5);" (click)="onSubscribeIconClick()" *ngIf="role === 'user'">+ Subscribe</button>
+          <button style="background-color: rgba(0, 0, 0, 0.5); " (click)="onNotificationIconClick()" *ngIf="role === 'user'">Add Review</button> <!-- vidljivo samo user-u -->
+          <button (click)="delete()" *ngIf="role === 'admin'">Delete</button>
+            <button style="background-color: rgba(0, 0, 0, 0.5); " [routerLink]="['/add-new-episode', series.movieId]" *ngIf="role === 'admin'">Add New Episode</button>
+        <button style="background-color: rgba(0, 0, 0, 0.5);" [routerLink]="['/edit-show', series!.movieId]" [queryParams]="{ createdAt: series!.createdAt }" *ngIf="role === 'admin'">Edit</button>
+        </div>
+      </div>
+    </div>
+        <div class="episodes">
+      <div class="top-box">
+        <label class="title">Episodes</label>
+      </div>
+      <div class="episode" *ngFor="let episode of episodes; let i = index">
+        <div class="episode-number">{{episode.episodeNumber}}</div>
+        <div class="episode-content">
+          <img src="../../../../assets/episode-four.jpg" class="episode-image" alt="">
+          <div class="episode-details">
+            <b><h3>Season {{episode.seasonNumber}}: {{episode.title}}</h3></b>
+            <p><i class="fas fa-info-circle"></i> {{episode.description}}</p>
+            <p><i class="fas fa-clock"></i> {{ ceilValue(episode.duration) }} min</p>
+          </div>
+          <div class="episode-actions">
+            <button (click)="playEpisode(episode)" >Play</button>
+            <button (click)="deleteEpisode(episode)" *ngIf="role === 'admin'">Delete</button>
+              <button [routerLink]="['/edit-movie', episode!.episodeId]" [queryParams]="{ createdAt: episode!.createdAt }" *ngIf="role === 'admin'">Edit</button>
+
+              <button (click)="downloadEpisode(episode)" *ngIf="role === 'user'">Download</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

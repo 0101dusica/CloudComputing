@@ -1,0 +1,203 @@
+.notification{
+    background-color: var(--color-white);
+    position: relative;
+    border-radius: var(--br-3xs);
+    box-shadow: 0 4px 44px rgba(0, 0, 0, 0.15);
+    width: 600px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--padding-3xs) 0;
+    box-sizing: border-box;
+    gap: var(--gap-12xs);
+    max-width: 90%;
+    height: auto;
+    overflow: auto;
+    text-align: left;
+    font-size: var(--font-size-mini);
+    color: var(--gray-2);
+    font-family: var(--font-adamina);
+}
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    box-shadow: 0 0.5px 0#d5d5d5;
+    width: 100%;
+    height: 10%;
+}
+.all-text,
+.mark-text,
+.titile-text,
+.time-text,
+.message-text{
+    font-size: var(--font-size-sm);
+    line-height: 16px;
+    color: var(--color-darkslategray-100);
+    font-family: var(--font-adamina);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2%;
+}
+.text-box{
+    width: 60%;
+    display: flex;
+    flex-direction: row;
+}
+.all-text,
+.mark-text{
+    width: 47%;
+    cursor: pointer; 
+    margin-left: 8%; 
+    color: #1d3b62;
+    font-weight: bold;
+}
+.mark-text{
+  width: 25%;
+  font-size: var(--font-size-xs);
+  justify-content: right;
+}
+.time-text{
+    margin-top: 1%;
+    color: var(--color-darkgray-200)
+}
+.message-text{
+    margin-top: 1%;
+    color: var(--color-dimgray-100);
+}
+.icon-settings{
+    width: 18px;
+    height: 18px;
+    width: 10%;
+    cursor: pointer;
+}
+.icon{
+    margin-left: 10%;
+    width: 80%;
+    height: auto;
+}
+.notification-list{
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+.notification-box{
+    box-shadow: 0 0.5px 0#d5d5d5;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: var(--padding-3xs) var(--padding-10xs) var(--padding-3xs)
+    var(--padding-3xs);
+    box-sizing: border-box;
+    gap: var(--gap-3xs);
+}
+.picture-box{
+    width: 10%;
+}
+.data-box{
+    width: 85%;
+    margin-right: 5%;
+}
+
+.notification-titile-box{
+    margin-left: 3%;
+    width: 67%;
+}
+.toggle-box{
+    margin-left: 10%;
+    width: 15%;
+    margin-right: 5%;
+}
+.toggle {
+    --width: 80px;
+    --height: calc(var(--width) / 3);
+  
+    position: relative;
+    display: inline-block;
+    width: var(--width);
+    height: var(--height);
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+    border-radius: var(--height);
+    cursor: pointer;
+  }
+  
+  .toggle input {
+    display: none;
+  }
+  
+  .toggle .slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--height);
+    background-color: #ccc;
+    transition: all 0.4s ease-in-out;
+  }
+  
+  .toggle .slider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--height));
+    height: calc(var(--height));
+    border-radius: calc(var(--height) / 2);
+    background-color: #fff;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease-in-out;
+  }
+  
+  .toggle input:checked+.slider {
+    background-color: var( --color-seagreen-100);
+  }
+  
+  .toggle input:checked+.slider::before {
+    transform: translateX(calc(var(--width) - var(--height)));
+  }
+  
+  .toggle .labels {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    font-family: sans-serif;
+    transition: all 0.4s ease-in-out;
+  }
+  
+  .toggle .labels::after {
+    content: attr(data-off);
+    position: absolute;
+    right: 5px;
+    color: #4d4d4d;
+    opacity: 1;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s ease-in-out;
+  }
+  
+  .toggle .labels::before {
+    content: attr(data-on);
+    position: absolute;
+    left: 5px;
+    color: #ffffff;
+    opacity: 0;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.4);
+    transition: all 0.4s ease-in-out;
+  }
+  
+  .toggle input:checked~.labels::after {
+    opacity: 0;
+  }
+  
+  .toggle input:checked~.labels::before {
+    opacity: 1;
+  }

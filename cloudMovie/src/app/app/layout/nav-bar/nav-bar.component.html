@@ -1,0 +1,7 @@
+<ng-container *ngIf="role === 'admin'">
+  <app-admin-nav></app-admin-nav>
+</ng-container>
+
+<ng-container *ngIf="role === 'user'">
+  <app-user-nav></app-user-nav>
+</ng-container>
